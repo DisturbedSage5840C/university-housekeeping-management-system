@@ -1,0 +1,3884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Housekeeping Tracker - Campus Hygiene Monitoring System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ── THEME: Black + White + Cyan accent ── */
+        :root {
+            --accent: #00e5ff;
+            --accent-dim: #00b8d4;
+            --accent-glow: rgba(0, 229, 255, 0.15);
+            --accent-glow-strong: rgba(0, 229, 255, 0.25);
+
+            /* Light mode defaults */
+            --bg: #f5f5f7;
+            --bg-card: #ffffff;
+            --bg-elevated: #ffffff;
+            --bg-input: #ffffff;
+            --bg-hover: #f0f0f2;
+            --border: #e0e0e4;
+            --border-subtle: #ebebef;
+            --text-primary: #0a0a0a;
+            --text-secondary: #555560;
+            --text-muted: #8e8e99;
+            --text-inverse: #ffffff;
+            --overlay: rgba(0, 0, 0, 0.45);
+
+            /* Status colors */
+            --status-success: #00c853;
+            --status-success-bg: rgba(0, 200, 83, 0.1);
+            --status-warning: #ff9100;
+            --status-warning-bg: rgba(255, 145, 0, 0.1);
+            --status-danger: #ff1744;
+            --status-danger-bg: rgba(255, 23, 68, 0.1);
+            --status-info: var(--accent);
+            --status-info-bg: var(--accent-glow);
+
+            --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.06);
+            --shadow: 0 1px 4px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.04);
+            --shadow-md: 0 4px 12px rgb(0 0 0 / 0.08);
+            --shadow-lg: 0 8px 24px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 16px 40px rgb(0 0 0 / 0.12);
+            --radius: 14px;
+            --radius-sm: 10px;
+            --radius-lg: 22px;
+        }
+
+        /* ── DARK MODE ── */
+        [data-theme="dark"] {
+            --bg: #0a0a0c;
+            --bg-card: #141418;
+            --bg-elevated: #1a1a20;
+            --bg-input: #1a1a20;
+            --bg-hover: #1e1e24;
+            --border: #2a2a32;
+            --border-subtle: #222228;
+            --text-primary: #f0f0f2;
+            --text-secondary: #a0a0ac;
+            --text-muted: #666674;
+            --text-inverse: #0a0a0a;
+            --overlay: rgba(0, 0, 0, 0.7);
+
+            --status-success-bg: rgba(0, 200, 83, 0.12);
+            --status-warning-bg: rgba(255, 145, 0, 0.12);
+            --status-danger-bg: rgba(255, 23, 68, 0.12);
+            --status-info-bg: rgba(0, 229, 255, 0.1);
+
+            --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+            --shadow: 0 1px 4px rgb(0 0 0 / 0.4);
+            --shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
+            --shadow-lg: 0 8px 24px rgb(0 0 0 / 0.5);
+            --shadow-xl: 0 16px 40px rgb(0 0 0 / 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* ── Theme Toggle ── */
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            transition: all 0.25s;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: var(--bg);
+            position: relative;
+            overflow: hidden;
+        }
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-glow-strong) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .login-container::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -15%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 44px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            z-index: 1;
+        }
+        .login-role-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .login-role-btn {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            padding: 12px 14px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .login-role-btn:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .login-role-btn small {
+            display: block;
+            color: var(--text-muted);
+            margin-top: 2px;
+            font-size: 0.75rem;
+        }
+        .selected-login-track {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-input);
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+        .selected-login-track button {
+            border: none;
+            background: transparent;
+            color: var(--accent);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.78rem;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .login-theme-toggle {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-logo-icon {
+            font-size: 3rem;
+            margin-bottom: 8px;
+        }
+
+        .login-logo h1 {
+            font-size: 1.75rem;
+            color: var(--text-primary);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .login-logo h1 span {
+            color: var(--accent);
+        }
+
+        .login-logo p {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            margin-top: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: var(--bg-input);
+            color: var(--text-primary);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .password-field {
+            position: relative;
+        }
+
+        .password-field input {
+            padding-right: 50px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 50%;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .password-toggle:hover {
+            background: var(--bg-hover);
+            color: var(--accent);
+        }
+
+        .password-toggle:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--accent-glow);
+            color: var(--accent);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #0a0a0a;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            background: var(--accent-dim);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px var(--accent-glow-strong);
+        }
+
+        .btn-secondary {
+            background: var(--text-primary);
+            color: var(--bg);
+        }
+        .btn-secondary:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: var(--status-success);
+            color: #0a0a0a;
+        }
+        .btn-success:hover { opacity: 0.85; }
+
+        .btn-warning {
+            background: var(--status-warning);
+            color: #0a0a0a;
+        }
+
+        .btn-danger {
+            background: var(--status-danger);
+            color: #fff;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.8rem;
+        }
+
+        .btn-lg {
+            padding: 16px 32px;
+            font-size: 1rem;
+        }
+
+        /* App Layout */
+        .app-container {
+            display: none;
+        }
+
+        .app-container.active {
+            display: block;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-logo {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+        .header-logo span {
+            color: var(--accent);
+        }
+
+        .header-role {
+            font-size: 0.68rem;
+            padding: 3px 10px;
+            background: var(--accent);
+            color: #0a0a0a;
+            border-radius: 20px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .logout-btn {
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            padding: 7px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .logout-btn:hover {
+            background: var(--status-danger-bg);
+            color: var(--status-danger);
+            border-color: var(--status-danger);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+
+        /* Dashboard Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent);
+        }
+        .stat-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0;
+        }
+
+        .stat-card-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            background: var(--accent-glow);
+        }
+        .stat-card-icon.teal { background: var(--accent-glow); }
+        .stat-card-icon.green { background: var(--status-success-bg); }
+        .stat-card-icon.orange { background: var(--status-warning-bg); }
+        .stat-card-icon.yellow { background: var(--status-warning-bg); }
+        .stat-card-icon.red { background: var(--status-danger-bg); }
+        .stat-card-icon.blue { background: var(--status-info-bg); }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -1px;
+        }
+
+        .stat-card p {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .section-header h2 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1.5px solid var(--border);
+            background: var(--bg-card);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-family: inherit;
+        }
+
+        .filter-btn.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #0a0a0a;
+        }
+
+        .filter-btn:hover:not(.active) {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        @media (min-width: 768px) {
+            .cards-grid.two-col {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Task/Complaint Card */
+        .task-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            border-left: 3px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .task-card:hover {
+            border-color: var(--accent);
+            border-left-color: var(--accent);
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+
+        .task-card.pending { border-left-color: var(--status-warning); }
+        .task-card.in-progress { border-left-color: var(--accent); }
+        .task-card.resolved, .task-card.cleaned { border-left-color: var(--status-success); }
+
+        .task-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        .task-card-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .badge {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-pending {
+            background: var(--status-warning-bg);
+            color: var(--status-warning);
+        }
+
+        .badge-in-progress {
+            background: var(--status-info-bg);
+            color: var(--accent);
+        }
+
+        .badge-resolved, .badge-cleaned {
+            background: var(--status-success-bg);
+            color: var(--status-success);
+        }
+
+        .task-card-meta {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 3px;
+        }
+
+        .task-card-meta span {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .task-card-description {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .task-card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .task-card-actions .btn {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        /* Floors/Rooms Grid */
+        .floors-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .floor-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .floor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .floor-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 8px;
+        }
+
+        .room-card {
+            padding: 14px 8px;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1.5px solid var(--border);
+            background: var(--bg-elevated);
+        }
+
+        .room-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .room-card.cleaned {
+            background: var(--status-success-bg);
+            border-color: var(--status-success);
+        }
+
+        .room-card.in-progress {
+            background: var(--status-info-bg);
+            border-color: var(--accent);
+        }
+
+        .room-card.needs-maintenance {
+            background: var(--status-danger-bg);
+            border-color: var(--status-danger);
+        }
+
+        .room-number {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .room-status {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-weight: 500;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 2px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 4px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+            font-family: inherit;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: #0a0a0a;
+            box-shadow: none;
+        }
+
+        /* Mobile Action Buttons */
+        .mobile-action-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .mobile-action-btn {
+            padding: 12px 8px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .mobile-action-btn.clean {
+            background: var(--status-success);
+            color: #0a0a0a;
+        }
+
+        .mobile-action-btn.progress {
+            background: var(--accent);
+            color: #0a0a0a;
+        }
+
+        .mobile-action-btn.maintenance {
+            background: var(--status-danger);
+            color: #fff;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--overlay);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 4px;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: var(--status-danger);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-sm);
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-upload:hover {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .file-upload-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .file-upload-text {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+        }
+
+        .file-upload-text span {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Assign Modal */
+        .staff-select-list {
+            display: grid;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .staff-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--bg-elevated);
+        }
+
+        .staff-option:hover {
+            border-color: var(--accent);
+        }
+
+        .staff-option.selected {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        .staff-option input {
+            display: none;
+        }
+
+        .staff-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--text-primary);
+            color: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .staff-info h4 {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.92rem;
+        }
+
+        .staff-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 3.5rem;
+            margin-bottom: 14px;
+            opacity: 0.4;
+        }
+
+        .empty-state h3 {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #0a0a0a;
+            border: none;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 20px var(--accent-glow-strong);
+            transition: all 0.2s;
+            z-index: 50;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 28px var(--accent-glow-strong);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filters {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 8px;
+            }
+
+            .rooms-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .tabs {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+                padding: 8px;
+            }
+
+            .tab-btn {
+                min-width: 0;
+                white-space: normal;
+                line-height: 1.2;
+                min-height: 50px;
+                padding: 10px;
+                font-size: 0.8rem;
+            }
+
+            .inventory-table {
+                width: max-content;
+                min-width: 980px;
+            }
+
+            .inventory-table th,
+            .inventory-table td {
+                white-space: nowrap;
+            }
+        }
+
+        /* Hide sections based on role */
+        .admin-only, .staff-only, .resident-only, .supervisor-only {
+            display: none;
+        }
+
+        [data-role="admin"] .admin-only { display: block; }
+        [data-role="staff"] .staff-only { display: block; }
+        [data-role="resident"] .resident-only { display: block; }
+        [data-role="supervisor"] .supervisor-only { display: block; }
+
+        /* Supply Inventory Table */
+        .inventory-table-wrap {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .inventory-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .inventory-table th, .inventory-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+        .inventory-table th { background: var(--bg-hover); text-transform: uppercase; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; color: var(--text-muted); }
+        .inventory-table tr:hover { background: var(--accent-glow); }
+        .stock-low { color: var(--status-danger); font-weight: 700; }
+        .stock-ok { color: var(--status-success); font-weight: 700; }
+        .stock-warning { color: var(--status-warning); font-weight: 700; }
+
+        /* Restocking Timeline */
+        .restock-timeline { list-style: none; padding: 0; margin: 0; }
+        .restock-timeline li { padding: 12px 16px; border-left: 3px solid var(--accent); margin-bottom: 8px; background: var(--bg-elevated); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+        .restock-timeline .time { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+        .restock-timeline .item-name { font-weight: 600; color: var(--text-primary); }
+        .restock-timeline .location { font-size: 0.82rem; color: var(--text-secondary); }
+        .restock-timeline .proof-link { color: var(--accent); font-size: 0.8rem; cursor: pointer; text-decoration: underline; }
+        .restock-timeline .proof-link:hover { color: var(--accent-dim); }
+
+        /* Verification badges */
+        .verification-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 16px; font-size: 0.72rem; font-weight: 700; }
+        .verification-badge.verified { background: var(--status-success-bg); color: var(--status-success); }
+        .verification-badge.pending-review { background: var(--status-warning-bg); color: var(--status-warning); }
+        .verification-badge.rejected { background: var(--status-danger-bg); color: var(--status-danger); }
+        .verification-badge.llm-verified { background: rgba(0, 229, 255, 0.15); color: var(--accent); }
+
+        /* Washroom card */
+        .washroom-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; transition: all 0.2s; }
+        .washroom-card:hover { border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
+        .washroom-card .location-tag { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+        .washroom-card .supply-status { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+
+        /* Shift indicator */
+        .shift-badge { padding: 3px 10px; border-radius: 16px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+        .shift-badge.morning { background: var(--status-warning-bg); color: var(--status-warning); }
+        .shift-badge.evening { background: var(--status-info-bg); color: var(--accent); }
+        .shift-badge.night { background: var(--bg-hover); color: var(--text-muted); }
+
+        /* Image preview */
+        .image-preview {
+            margin-top: 12px;
+            border-radius: 8px;
+            overflow: hidden;
+            max-width: 200px;
+        }
+
+        .image-preview img {
+            width: 100%;
+            display: block;
+        }
+
+        /* AI Analysis Box */
+        .ai-analysis-box {
+            background: var(--accent-glow);
+            border: 1px solid var(--accent);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-top: 16px;
+        }
+        .ai-analysis-box h4 {
+            color: var(--accent);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .ai-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 3px 3px 3px 0;
+        }
+        .ai-tag.category { background: rgba(0, 229, 255, 0.15); color: var(--accent); }
+        .ai-tag.priority-low { background: var(--status-success-bg); color: var(--status-success); }
+        .ai-tag.priority-medium { background: var(--status-warning-bg); color: var(--status-warning); }
+        .ai-tag.priority-high { background: var(--status-danger-bg); color: var(--status-danger); }
+        .ai-tag.priority-urgent { background: var(--status-danger-bg); color: var(--status-danger); }
+        .ai-tag.sentiment { background: var(--bg-hover); color: var(--text-secondary); }
+        .ai-actions-list {
+            list-style: none;
+            margin: 8px 0 0;
+            padding: 0;
+        }
+        .ai-actions-list li {
+            padding: 4px 0;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+        .ai-actions-list li::before {
+            content: '→ ';
+            color: var(--accent);
+            font-weight: 700;
+        }
+        .confidence-bar {
+            display: inline-block;
+            width: 60px;
+            height: 5px;
+            background: var(--border);
+            border-radius: 3px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .confidence-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: var(--accent);
+        }
+
+        /* Complaint Detail Modal */
+        .detail-modal {
+            max-width: 600px;
+        }
+        .detail-section {
+            margin-bottom: 16px;
+        }
+        .detail-section:last-child { margin-bottom: 0; }
+        .detail-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .detail-value {
+            color: var(--text-primary);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .detail-image {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            margin-top: 6px;
+            cursor: pointer;
+        }
+        .detail-image:hover {
+            border-color: var(--accent);
+        }
+        .card-image {
+            width: 100%;
+            max-height: 180px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            margin-top: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .card-image:hover {
+            border-color: var(--accent);
+        }
+        .detail-ai-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .detail-ai-card {
+            background: var(--bg-hover);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+        }
+        .detail-ai-card .label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+        .detail-ai-card .value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 2px;
+        }
+
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--text-primary);
+            color: var(--bg);
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 1001;
+            font-weight: 600;
+            font-size: 0.88rem;
+        }
+
+        .toast.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success {
+            background: var(--status-success);
+            color: #0a0a0a;
+        }
+
+        /* Scrollbar styling for dark mode */
+        [data-theme="dark"] ::-webkit-scrollbar {
+            width: 8px;
+        }
+        [data-theme="dark"] ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        [data-theme="dark"] ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+        [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-container" id="loginScreen">
+        <div class="login-card">
+            <button class="theme-toggle login-theme-toggle" onclick="toggleTheme()" title="Toggle dark mode" id="loginThemeBtn">🌙</button>
+            <div class="login-logo">
+                <div class="login-logo-icon">🧼</div>
+                <h1>Housekeeping <span>Tracker</span></h1>
+                <p>Campus Hygiene Monitoring System</p>
+            </div>
+            <div id="loginRoleChooser">
+                <div class="login-role-grid">
+                    <button type="button" class="login-role-btn" onclick="chooseLoginTrack('admin')">👔 Admin
+                        <small>Campus-level operations and live monitoring</small>
+                    </button>
+                    <button type="button" class="login-role-btn" onclick="chooseLoginTrack('housekeeping')">🧹 Housekeeping
+                        <small>Supervisor and Cleaning Staff login</small>
+                    </button>
+                    <button type="button" class="login-role-btn" onclick="chooseLoginTrack('resident')">🎓 Faculty / Student
+                        <small>View stock updates and report issues</small>
+                    </button>
+                </div>
+            </div>
+            <form id="loginForm" class="hidden">
+                <div class="selected-login-track hidden" id="selectedLoginTrackBox">
+                    <span id="selectedLoginTrackText">Selected Login: -</span>
+                    <button type="button" onclick="resetLoginTrackSelection()">Change</button>
+                </div>
+                <div class="form-group">
+                    <label for="loginEmail">📧 Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">🔒 Password</label>
+                    <div class="password-field">
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                        <button type="button" class="password-toggle" id="loginPasswordToggle" onclick="toggleLoginPassword()" aria-label="Toggle password visibility" title="Toggle password visibility">🙈</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg">Sign In</button>
+            </form>
+            <div style="margin-top:12px;text-align:center;">
+                <button type="button" class="btn btn-outline btn-sm" onclick="openForgotPasswordModal()">Forgot Password?</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal-overlay" id="forgotPasswordModal">
+        <div class="modal" style="max-width:460px;">
+            <div class="modal-header">
+                <h3>Reset Password via OTP</h3>
+                <button class="modal-close" onclick="closeModal('forgotPasswordModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="forgotEmail">Email</label>
+                    <input type="email" id="forgotEmail" placeholder="Enter registered email">
+                </div>
+                <div class="form-group">
+                    <label for="forgotPhone">Registered Mobile Number</label>
+                    <input type="text" id="forgotPhone" placeholder="Enter registered phone number">
+                </div>
+                <button class="btn btn-primary" type="button" id="sendOtpBtn" onclick="requestResetOtp()">Send OTP</button>
+                <p id="otpHintText" style="display:none;margin-top:8px;font-size:0.78rem;color:var(--text-muted);"></p>
+
+                <hr style="margin:16px 0;border:0;border-top:1px solid var(--border);">
+
+                <div class="form-group">
+                    <label for="resetOtp">OTP</label>
+                    <input type="text" id="resetOtp" placeholder="Enter OTP">
+                </div>
+                <div class="form-group">
+                    <label for="resetNewPassword">New Password</label>
+                    <input type="password" id="resetNewPassword" placeholder="At least 8 characters">
+                </div>
+                <div class="form-group">
+                    <label for="resetConfirmPassword">Confirm New Password</label>
+                    <input type="password" id="resetConfirmPassword" placeholder="Re-enter new password">
+                </div>
+                <button class="btn btn-primary" type="button" id="resetPasswordBtn" onclick="resetPasswordWithOtp()">Reset Password</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app-container" id="appContainer">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <span class="header-logo">🧼 Housekeeping <span>Tracker</span></span>
+                    <span class="header-role" id="userRoleBadge">Admin</span>
+                </div>
+                <div class="header-user">
+                    <span class="user-name" id="userName">John Doe</span>
+                    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode" id="appThemeBtn">🌙</button>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Admin Dashboard -->
+        <main class="main-content admin-only" id="adminDashboard">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <h3 id="statTotalRooms">48</h3>
+                            <p>Total Washrooms</p>
+                        </div>
+                        <div class="stat-card-icon teal">🚻</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <h3 id="statCleanedToday">32</h3>
+                            <p>Restocked Today</p>
+                        </div>
+                        <div class="stat-card-icon green">✨</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <h3 id="statPendingComplaints">5</h3>
+                            <p>Pending Reports</p>
+                        </div>
+                        <div class="stat-card-icon yellow">⏳</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <h3 id="statResolvedComplaints">23</h3>
+                            <p>Resolved This Week</p>
+                        </div>
+                        <div class="stat-card-icon green">✅</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <h3 id="statActiveStaff">6</h3>
+                            <p>Staff on Shift</p>
+                        </div>
+                        <div class="stat-card-icon blue">👷</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs for Admin -->
+            <div class="tabs" id="adminTabs">
+                <button class="tab-btn active" onclick="switchAdminTab('washrooms')">Washroom Map</button>
+                <button class="tab-btn" onclick="switchAdminTab('inventory')">Supply Inventory</button>
+                <button class="tab-btn" onclick="switchAdminTab('complaints')">Complaints</button>
+                <button class="tab-btn" onclick="switchAdminTab('shifts')">Staff & Shifts</button>
+                <button class="tab-btn" onclick="switchAdminTab('liveupdates')">Live Updates</button>
+            </div>
+
+            <!-- Washroom Map Section (replaces Room Management) -->
+            <div id="adminWashroomsTab">
+                <div class="section-header">
+                    <h2>Washrooms — Building & Floor Map</h2>
+                    <button class="btn btn-primary btn-sm" onclick="openAssignModal()">
+                        👤 Assign Staff
+                    </button>
+                </div>
+                <div class="floors-container" id="floorsContainer">
+                    <!-- Rendered dynamically with building + direction info -->
+                </div>
+            </div>
+
+            <!-- Supply Inventory Section -->
+            <div id="adminInventoryTab" style="display: none;">
+                <div class="section-header">
+                    <h2>🧴 Supply Inventory Sheet</h2>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <button class="btn btn-primary btn-sm" onclick="exportInventoryCSV()">📥 Export CSV</button>
+                        <button class="btn btn-outline btn-sm" onclick="exportInventoryPDF()">📄 Export PDF</button>
+                    </div>
+                </div>
+                <div class="inventory-table-wrap">
+                    <table class="inventory-table" id="inventoryTable">
+                        <thead>
+                            <tr>
+                                <th>Building</th>
+                                <th>Floor</th>
+                                <th>Washroom</th>
+                                <th>🧻 Tissues</th>
+                                <th>🧼 Soap</th>
+                                <th>🧴 Sanitizer</th>
+                                <th>Health</th>
+                                <th>Last Restocked</th>
+                                <th>Assigned Supervisor</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryBody">
+                            <!-- Rendered dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Complaints Section -->
+            <div id="adminComplaintsTab" style="display: none;">
+                <div class="section-header">
+                    <h2>All Reports & Complaints</h2>
+                    <button class="filter-btn" id="togglePhotosBtn" onclick="toggleComplaintPhotos()" style="border-color:var(--accent);margin-left:auto;">📷 Show Photos</button>
+                </div>
+                <div class="filters">
+                    <button class="filter-btn active" onclick="filterComplaints('all', this)">All</button>
+                    <button class="filter-btn" onclick="filterComplaints('pending', this)">Pending</button>
+                    <button class="filter-btn" onclick="filterComplaints('in-progress', this)">In Progress</button>
+                    <button class="filter-btn" onclick="filterComplaints('resolved', this)">Resolved</button>
+                    <button class="filter-btn" style="border-color:var(--status-danger);" onclick="filterComplaints('false-report', this)">⚠️ False Reports</button>
+                </div>
+                <div class="cards-grid two-col" id="adminComplaintsList">
+                    <!-- Complaints will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Staff & Shifts Section -->
+            <div id="adminShiftsTab" style="display: none;">
+                <div class="section-header">
+                    <h2>👷 Staff Shift Tracker</h2>
+                </div>
+                <div class="cards-grid two-col" id="staffShiftsList">
+                    <!-- Rendered dynamically -->
+                </div>
+                <div class="section-header" style="margin-top: 24px;">
+                    <h2>📊 Activity History</h2>
+                </div>
+                <div id="activityHistory" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
+                    <ul class="restock-timeline" id="activityTimeline">
+                        <!-- Rendered dynamically -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Live Updates Section -->
+            <div id="adminLiveupdatesTab" style="display: none;">
+                <div class="section-header">
+                    <h2>📡 Live Work Updates (Read-only)</h2>
+                </div>
+                <div class="info-box" style="background: var(--accent-glow); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 16px; font-size: 0.85rem; color: var(--text-secondary);">
+                    Admin can monitor complete task evidence, status, and timeline. Approval/rejection is restricted to supervisors.
+                </div>
+                <div class="cards-grid two-col" id="verificationList">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Staff Dashboard (Cleaning Staff) -->
+        <main class="main-content staff-only" id="staffDashboard">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchStaffTab('tasks')">My Tasks</button>
+                <button class="tab-btn" onclick="switchStaffTab('complaints')">Assigned Issues</button>
+                <button class="tab-btn" onclick="switchStaffTab('upload')">📷 Upload Work</button>
+            </div>
+
+            <!-- Tasks Section -->
+            <div id="staffTasksTab">
+                <div class="section-header">
+                    <h2>Today's Cleaning & Restocking Tasks</h2>
+                    <span style="color: var(--text-muted);" id="staffTaskCount">8 washrooms assigned</span>
+                </div>
+                <div class="cards-grid" id="staffTasksList">
+                    <!-- Tasks will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Staff Complaints Section -->
+            <div id="staffComplaintsTab" style="display: none;">
+                <div class="section-header">
+                    <h2>Issues in Your Area</h2>
+                    <button class="filter-btn" id="togglePhotosStaffBtn" onclick="toggleComplaintPhotosStaff()" style="border-color:var(--accent);">📷 Show Photos</button>
+                </div>
+                <div class="cards-grid" id="staffComplaintsList">
+                    <!-- Complaints will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Upload Work Photo Section -->
+            <div id="staffUploadTab" style="display: none;">
+                <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px;">
+                    <h3 style="margin-bottom: 16px; color: var(--text-primary);">📷 Upload Restocking / Cleaning Proof</h3>
+                    <div class="info-box" style="background: var(--accent-glow); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 16px; font-size: 0.85rem; color: var(--text-secondary);">
+                        Upload a photo of completed restocking/cleaning. The image will be verified in 2 steps:<br>
+                        <strong>1)</strong> AI validates the photo is recent and shows actual supplies <strong>2)</strong> Your supervisor reviews & approves
+                    </div>
+                    <form id="workUploadForm">
+                        <div class="form-group">
+                            <label>Building & Washroom</label>
+                            <select id="workWashroom" required>
+                                <option value="">Select washroom...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Task Type</label>
+                            <select id="workTaskType" required>
+                                <option value="restocking">🧻 Restocking (Tissues, Soap, Sanitizer)</option>
+                                <option value="cleaning">🧹 Cleaning</option>
+                                <option value="refilling">🧴 Refilling Dispensers</option>
+                                <option value="maintenance">🔧 Maintenance</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Items Restocked / Work Done</label>
+                            <textarea id="workNotes" placeholder="e.g., Refilled soap dispensers (2), replaced tissue rolls (4), cleaned floor and mirrors" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>📷 Photo Proof (Required)</label>
+                            <div class="file-upload" onclick="document.getElementById('workPhoto').click()">
+                                <input type="file" id="workPhoto" accept="image/*" capture="environment" onchange="previewWorkPhoto(this)" required>
+                                <div class="file-upload-icon">📷</div>
+                                <div class="file-upload-text">
+                                    <span>Take or upload photo</span> of completed work
+                                </div>
+                            </div>
+                            <div class="image-preview" id="workPhotoPreview"></div>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-lg" onclick="submitWorkProof()" id="submitWorkBtn">Upload & Submit for Verification</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <!-- Supervisor Dashboard -->
+        <main class="main-content supervisor-only" id="supervisorDashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <h3 id="supPendingVerify">3</h3>
+                            <p>Pending Verification</p>
+                        </div>
+                        <div class="stat-card-icon yellow">⏳</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <h3 id="supApproved">12</h3>
+                            <p>Approved Today</p>
+                        </div>
+                        <div class="stat-card-icon green">✅</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <h3 id="supBuildings">2</h3>
+                            <p>Buildings Assigned</p>
+                        </div>
+                        <div class="stat-card-icon teal">🏢</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-header" style="margin-bottom: 14px;">
+                <h2>📋 My Tasks</h2>
+            </div>
+
+            <!-- My Tasks -->
+            <div id="supVerifyTab">
+                <div class="section-header">
+                    <h2>📋 Work Submissions — Pending Your Approval</h2>
+                </div>
+                <div class="cards-grid" id="supervisorVerifyList">
+                    <!-- Rendered dynamically -->
+                </div>
+
+                <div class="section-header" style="margin-top: 22px;">
+                    <h2>🏢 My Assigned Buildings & Room Staff Mapping</h2>
+                </div>
+                <div class="cards-grid" id="supervisorAssignmentList">
+                    <!-- Rendered dynamically -->
+                </div>
+
+                <div class="section-header" style="margin-top: 22px;">
+                    <h2>📬 Complaints in My Buildings</h2>
+                </div>
+                <div class="cards-grid" id="supervisorComplaintsList">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Student/Faculty Dashboard -->
+        <main class="main-content resident-only" id="residentDashboard">
+            <div class="tabs" style="margin-bottom: 20px;">
+                <button class="tab-btn active" onclick="switchResidentTab('restocking')">🧻 Restocking Status</button>
+                <button class="tab-btn" onclick="switchResidentTab('inventory')">📦 Stock Inventory</button>
+                <button class="tab-btn" onclick="switchResidentTab('complaints')">📋 My Complaints</button>
+            </div>
+
+            <!-- Restocking Timeline (when were supplies last restocked + proof) -->
+            <div id="residentRestockingTab">
+                <div class="section-header">
+                    <h2>🧻 Washroom Supply Status & Restocking Timeline</h2>
+                </div>
+                <div class="info-box" style="background: var(--accent-glow); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 16px; font-size: 0.85rem; color: var(--text-secondary);">
+                    Track when supplies (tissues, soap, sanitizer) were last restocked in campus washrooms. Each entry includes a timestamp, photo proof, and verification status. <strong>If you suspect false reporting, click "Report False" on that entry.</strong>
+                </div>
+                <div id="restockingTimeline">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+
+            <div id="residentInventoryTab" style="display: none;">
+                <div class="section-header">
+                    <h2>📦 Full Stock Inventory (Building-wise)</h2>
+                </div>
+                <div class="inventory-table-wrap">
+                    <table class="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>Building</th>
+                                <th>Floor / Wing</th>
+                                <th>Washroom</th>
+                                <th>🧻 Tissues</th>
+                                <th>🧼 Soap</th>
+                                <th>🧴 Sanitizer</th>
+                                <th>Health</th>
+                                <th>Last Restocked</th>
+                                <th>Assigned Supervisor</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="residentInventoryBody"></tbody>
+                    </table>
+                </div>
+                <div class="section-header" style="margin-top: 20px;">
+                    <h2>🕒 Live Restocking Feed</h2>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
+                    <ul class="restock-timeline" id="residentLiveUpdates"></ul>
+                </div>
+            </div>
+
+            <!-- Complaints Section -->
+            <div id="residentComplaintsTab" style="display: none;">
+                <div class="section-header">
+                    <h2>My Complaints</h2>
+                    <button class="btn btn-primary" onclick="openComplaintModal()">
+                        + Report Issue
+                    </button>
+                </div>
+                <div class="cards-grid" id="residentComplaintsList">
+                    <!-- Complaints will be rendered here -->
+                </div>
+            </div>
+
+            <!-- FAB for mobile -->
+            <button class="fab" onclick="openComplaintModal()">+</button>
+        </main>
+    </div>
+
+    <!-- Complaint Modal -->
+    <div class="modal-overlay" id="complaintModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Report an Issue</h3>
+                <button class="modal-close" onclick="resetComplaintForm()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="complaintForm">
+                    <div class="form-group">
+                        <label for="complaintCategory">Category <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted);">(optional — AI will detect)</span></label>
+                        <select id="complaintCategory">
+                            <option value="">🤖 Let AI Detect Automatically</option>
+                            <option value="hygiene">🧼 Hygiene / Supplies Empty</option>
+                            <option value="cleaning">🧹 Cleaning Not Done</option>
+                            <option value="false_reporting">⚠️ False Reporting by Staff</option>
+                            <option value="plumbing">🔧 Plumbing</option>
+                            <option value="electrical">💡 Electrical</option>
+                            <option value="pest_control">🐛 Pest Control</option>
+                            <option value="furniture">🪑 Furniture</option>
+                            <option value="maintenance">🔨 Maintenance</option>
+                            <option value="noise">🔊 Noise</option>
+                            <option value="security">🔒 Security</option>
+                            <option value="internet">📶 Internet/WiFi</option>
+                            <option value="appliance">❄️ Appliance (AC/Fan/Geyser)</option>
+                            <option value="hvac">🌡️ HVAC</option>
+                            <option value="other">📋 Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="complaintBuilding">Building</label>
+                        <select id="complaintBuilding" onchange="updateWashroomOptions()">
+                            <option value="">Select Building</option>
+                            <option value="H1">H1 — Hostel 1</option>
+                            <option value="H2">H2 — Hostel 2</option>
+                            <option value="H3">H3 — Hostel 3</option>
+                            <option value="Academic Block">Academic Block</option>
+                            <option value="Library">Library Block</option>
+                            <option value="Cafeteria">Cafeteria</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="complaintRoom">Washroom / Room Number</label>
+                        <input type="text" id="complaintRoom" placeholder="e.g., Floor 2 - East Wing" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="complaintDescription">Description</label>
+                        <textarea id="complaintDescription" placeholder="Describe the issue in detail..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Attach Image (Optional)</label>
+                        <div class="file-upload" onclick="document.getElementById('complaintImage').click()">
+                            <input type="file" id="complaintImage" accept="image/*" onchange="previewImage(this)">
+                            <div class="file-upload-icon">📷</div>
+                            <div class="file-upload-text">
+                                <span>Click to upload</span> or drag and drop
+                            </div>
+                        </div>
+                        <div class="image-preview" id="imagePreview"></div>
+                    </div>
+                    <div id="aiAnalysisResult" style="display:none;"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="resetComplaintForm()">Cancel</button>
+                <button class="btn btn-primary" id="submitComplaintBtn" onclick="submitComplaint()">Submit Complaint</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assign Supervisor Modal -->
+    <div class="modal-overlay" id="assignModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Assign Building to Supervisor</h3>
+                <button class="modal-close" onclick="closeModal('assignModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="assignFloor">Select Building</label>
+                    <select id="assignFloor">
+                        <option value="H1">H1 — Hostel 1</option>
+                        <option value="H2">H2 — Hostel 2</option>
+                        <option value="H3">H3 — Hostel 3</option>
+                        <option value="Academic Block">Academic Block</option>
+                        <option value="Library">Library Block</option>
+                        <option value="Cafeteria">Cafeteria</option>
+                    </select>
+                </div>
+                <label>Select Supervisor</label>
+                <div class="staff-select-list" id="staffSelectList">
+                    <!-- Supervisor options will be rendered here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('assignModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="assignStaff()">Assign</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reminder Modal (Supervisor) -->
+    <div class="modal-overlay" id="reminderModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>⏰ Set Restocking Reminder</h3>
+                <button class="modal-close" onclick="closeModal('reminderModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Building</label>
+                    <select id="reminderBuilding">
+                        <option value="H1">H1 — Hostel 1</option>
+                        <option value="H2">H2 — Hostel 2</option>
+                        <option value="H3">H3 — Hostel 3</option>
+                        <option value="Academic Block">Academic Block</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Reminder Type</label>
+                    <select id="reminderType">
+                        <option value="restocking">🧻 Restocking (Tissues, Soap)</option>
+                        <option value="cleaning">🧹 Cleaning</option>
+                        <option value="refilling">🧴 Refilling Dispensers</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Frequency (based on consumption)</label>
+                    <select id="reminderFrequency">
+                        <option value="4h">Every 4 Hours (High Traffic)</option>
+                        <option value="8h">Every 8 Hours (Medium Traffic)</option>
+                        <option value="12h">Every 12 Hours (Low Traffic)</option>
+                        <option value="24h">Once Daily</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Notify Staff via</label>
+                    <div style="display:flex;gap:10px;">
+                        <label style="display:flex;align-items:center;gap:6px;font-size:0.85rem;cursor:pointer;">
+                            <input type="checkbox" id="notifyPortal" checked> Portal
+                        </label>
+                        <label style="display:flex;align-items:center;gap:6px;font-size:0.85rem;cursor:pointer;">
+                            <input type="checkbox" id="notifyMobile" checked> Mobile Push
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Notes (optional)</label>
+                    <textarea id="reminderNotes" placeholder="e.g., H1 has high consumption on weekdays, increase during exams"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('reminderModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveReminder()">Save Reminder</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complaint Detail Modal -->
+    <div class="modal-overlay" id="complaintDetailModal">
+        <div class="modal detail-modal">
+            <div class="modal-header">
+                <h3>📋 Complaint Details</h3>
+                <button class="modal-close" onclick="closeModal('complaintDetailModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="complaintDetailBody">
+                <!-- Filled dynamically -->
+            </div>
+            <div class="modal-footer" id="complaintDetailFooter">
+                <!-- Action buttons filled dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ──── API Client ────
+        const API_BASE = window.location.origin + '/api';
+        let authToken = localStorage.getItem('authToken');
+
+        const api = {
+            async request(method, path, body, isFormData = false) {
+                const headers = {};
+                if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+                if (!isFormData) headers['Content-Type'] = 'application/json';
+                try {
+                    const res = await fetch(`${API_BASE}${path}`, {
+                        method, headers,
+                        body: isFormData ? body : (body ? JSON.stringify(body) : undefined),
+                    });
+                    if (res.status === 401) { logout(); throw new Error('Session expired'); }
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error || 'Request failed');
+                    return data;
+                } catch (err) {
+                    console.warn('API call failed:', err.message);
+                    return null;
+                }
+            },
+            get: (path) => api.request('GET', path),
+            post: (path, body) => api.request('POST', path, body),
+            put: (path, body) => api.request('PUT', path, body),
+            delete: (path) => api.request('DELETE', path),
+            upload: (path, formData) => api.request('POST', path, formData, true),
+        };
+
+        // ──── State ────
+        let currentUser = null;
+        let selectedStaff = null;
+        let selectedLoginTrack = '';
+        let complaintsData = []; // from API or demo
+        let useOfflineMode = false;
+
+        // ── Washroom Data — Building-wise, Floor-wise, with Direction ──
+        const buildings = [
+            { id: 'H1', name: 'H1 — Hostel 1', type: 'hostel' },
+            { id: 'H2', name: 'H2 — Hostel 2', type: 'hostel' },
+            { id: 'H3', name: 'H3 — Hostel 3', type: 'hostel' },
+            { id: 'Academic Block', name: 'Academic Block', type: 'academic' },
+            { id: 'Library', name: 'Library Block', type: 'academic' },
+            { id: 'Cafeteria', name: 'Cafeteria', type: 'other' },
+        ];
+
+        const washroomData = [
+            // H1 — Hostel 1
+            { id: 'H1-G-M', building: 'H1', floor: 'Ground', direction: '', label: 'Ground Floor WR (Male)', supplies: { tissues: 80, soap: 90, sanitizer: 70 }, lastRestocked: new Date(Date.now() - 3600000) },
+            { id: 'H1-G-F', building: 'H1', floor: 'Ground', direction: '', label: 'Ground Floor WR (Female)', supplies: { tissues: 60, soap: 40, sanitizer: 85 }, lastRestocked: new Date(Date.now() - 7200000) },
+            { id: 'H1-1-M', building: 'H1', floor: '1st', direction: '', label: 'Floor 1 WR (Male)', supplies: { tissues: 30, soap: 20, sanitizer: 50 }, lastRestocked: new Date(Date.now() - 86400000 * 2) },
+            { id: 'H1-1-F', building: 'H1', floor: '1st', direction: '', label: 'Floor 1 WR (Female)', supplies: { tissues: 90, soap: 85, sanitizer: 60 }, lastRestocked: new Date(Date.now() - 43200000) },
+            { id: 'H1-2-M', building: 'H1', floor: '2nd', direction: '', label: 'Floor 2 WR (Male)', supplies: { tissues: 10, soap: 5, sanitizer: 15 }, lastRestocked: new Date(Date.now() - 86400000 * 4) },
+            { id: 'H1-2-F', building: 'H1', floor: '2nd', direction: '', label: 'Floor 2 WR (Female)', supplies: { tissues: 45, soap: 50, sanitizer: 30 }, lastRestocked: new Date(Date.now() - 86400000) },
+            // H2 — Hostel 2 (with directional info: North/South wing)
+            { id: 'H2-G-N', building: 'H2', floor: 'Ground', direction: 'North Wing', label: 'Ground Floor WR (North Wing)', supplies: { tissues: 70, soap: 80, sanitizer: 90 }, lastRestocked: new Date(Date.now() - 7200000) },
+            { id: 'H2-G-S', building: 'H2', floor: 'Ground', direction: 'South Wing', label: 'Ground Floor WR (South Wing)', supplies: { tissues: 5, soap: 10, sanitizer: 0 }, lastRestocked: new Date(Date.now() - 86400000 * 3) },
+            { id: 'H2-1-N', building: 'H2', floor: '1st', direction: 'North Wing', label: 'Floor 1 WR (North Wing)', supplies: { tissues: 55, soap: 60, sanitizer: 45 }, lastRestocked: new Date(Date.now() - 28800000) },
+            { id: 'H2-1-S', building: 'H2', floor: '1st', direction: 'South Wing', label: 'Floor 1 WR (South Wing)', supplies: { tissues: 85, soap: 90, sanitizer: 80 }, lastRestocked: new Date(Date.now() - 14400000) },
+            { id: 'H2-2-N', building: 'H2', floor: '2nd', direction: 'North Wing', label: 'Floor 2 WR (North Wing)', supplies: { tissues: 40, soap: 35, sanitizer: 25 }, lastRestocked: new Date(Date.now() - 86400000) },
+            { id: 'H2-2-S', building: 'H2', floor: '2nd', direction: 'South Wing', label: 'Floor 2 WR (South Wing)', supplies: { tissues: 0, soap: 0, sanitizer: 5 }, lastRestocked: new Date(Date.now() - 86400000 * 4) },
+            // H3 — Hostel 3
+            { id: 'H3-G', building: 'H3', floor: 'Ground', direction: '', label: 'Ground Floor WR', supplies: { tissues: 95, soap: 88, sanitizer: 92 }, lastRestocked: new Date(Date.now() - 3600000) },
+            { id: 'H3-1', building: 'H3', floor: '1st', direction: '', label: 'Floor 1 WR', supplies: { tissues: 50, soap: 55, sanitizer: 40 }, lastRestocked: new Date(Date.now() - 43200000) },
+            { id: 'H3-2', building: 'H3', floor: '2nd', direction: '', label: 'Floor 2 WR', supplies: { tissues: 20, soap: 15, sanitizer: 10 }, lastRestocked: new Date(Date.now() - 86400000 * 2) },
+            // Academic Block
+            { id: 'AB-G', building: 'Academic Block', floor: 'Ground', direction: '', label: 'Ground Floor WR', supplies: { tissues: 60, soap: 75, sanitizer: 50 }, lastRestocked: new Date(Date.now() - 21600000) },
+            { id: 'AB-1', building: 'Academic Block', floor: '1st', direction: '', label: 'Floor 1 WR', supplies: { tissues: 25, soap: 30, sanitizer: 20 }, lastRestocked: new Date(Date.now() - 86400000 * 1.5) },
+            { id: 'AB-2', building: 'Academic Block', floor: '2nd', direction: '', label: 'Floor 2 WR', supplies: { tissues: 80, soap: 85, sanitizer: 70 }, lastRestocked: new Date(Date.now() - 28800000) },
+            // Library
+            { id: 'LIB-G', building: 'Library', floor: 'Ground', direction: '', label: 'Ground Floor WR', supplies: { tissues: 35, soap: 40, sanitizer: 30 }, lastRestocked: new Date(Date.now() - 57600000) },
+            { id: 'LIB-1', building: 'Library', floor: '1st', direction: '', label: 'Floor 1 WR', supplies: { tissues: 65, soap: 70, sanitizer: 55 }, lastRestocked: new Date(Date.now() - 36000000) },
+            // Cafeteria
+            { id: 'CAF-G', building: 'Cafeteria', floor: 'Ground', direction: '', label: 'Main WR', supplies: { tissues: 15, soap: 10, sanitizer: 5 }, lastRestocked: new Date(Date.now() - 86400000 * 3) },
+        ];
+
+        // Staff members with roles (supervisor vs cleaning staff) and shifts
+        const staffMembers = [
+            { id: 1, name: 'Rajesh Kumar', role: 'cleaning', assignedBuildings: ['H1'], shift: 'morning', supervisor_id: 5 },
+            { id: 2, name: 'Priya Sharma', role: 'cleaning', assignedBuildings: ['H2'], shift: 'morning', supervisor_id: 5 },
+            { id: 3, name: 'Amit Patel', role: 'cleaning', assignedBuildings: ['H3', 'Academic Block'], shift: 'evening', supervisor_id: 6 },
+            { id: 4, name: 'Sarah Johnson', role: 'cleaning', assignedBuildings: ['Library', 'Cafeteria'], shift: 'evening', supervisor_id: 6 },
+            { id: 5, name: 'Vikram Singh', role: 'supervisor', assignedBuildings: ['H1', 'H2'], shift: 'morning' },
+            { id: 6, name: 'Meera Desai', role: 'supervisor', assignedBuildings: ['H3', 'Academic Block', 'Library', 'Cafeteria'], shift: 'evening' },
+        ];
+
+        // Work submissions (restocking/cleaning proof)
+        let workSubmissions = [
+            { id: 1, staffId: 1, staffName: 'Rajesh Kumar', washroom: 'H1-G-M', building: 'H1', task: 'restocking', notes: 'Refilled 4 tissue rolls, 2 soap dispensers', imageUrl: null, submittedAt: new Date(Date.now() - 7200000), photoTakenAt: new Date(Date.now() - 8100000), llmVerified: true, llmScore: 0.92, llmFeedback: 'Image metadata is fresh and aligned with the submission time.', supervisorApproved: true, supervisorId: 5 },
+            { id: 2, staffId: 2, staffName: 'Priya Sharma', washroom: 'H2-G-N', building: 'H2', task: 'restocking', notes: 'Refilled soap and sanitizer in North Wing ground floor', imageUrl: null, submittedAt: new Date(Date.now() - 3600000), photoTakenAt: new Date(Date.now() - 5400000), llmVerified: true, llmScore: 0.87, llmFeedback: 'Photo recency check passed.', supervisorApproved: null, supervisorId: 5 },
+            { id: 3, staffId: 1, staffName: 'Rajesh Kumar', washroom: 'H1-1-M', building: 'H1', task: 'cleaning', notes: 'Deep cleaned washroom, mopped floor, cleaned mirrors', imageUrl: null, submittedAt: new Date(Date.now() - 1800000), photoTakenAt: new Date(Date.now() - 86400000 * 3), llmVerified: false, llmScore: 0.34, llmFeedback: 'Photo appears old based on metadata. Supervisor review required.', supervisorApproved: null, supervisorId: 5 },
+            { id: 4, staffId: 3, staffName: 'Amit Patel', washroom: 'H3-G', building: 'H3', task: 'restocking', notes: 'Restocked tissues (6 rolls), soap (3 dispensers), sanitizer (2)', imageUrl: null, submittedAt: new Date(Date.now() - 900000), photoTakenAt: new Date(Date.now() - 1500000), llmVerified: true, llmScore: 0.95, llmFeedback: 'Image metadata and visual checks passed.', supervisorApproved: null, supervisorId: 6 },
+        ];
+
+        // Reminders
+        let reminders = [
+            { id: 1, building: 'H1', type: 'restocking', frequency: '8h', notifyPortal: true, notifyMobile: true, notes: 'High traffic building', createdBy: 'Vikram Singh', nextDue: new Date(Date.now() + 3600000 * 4) },
+            { id: 2, building: 'H2', type: 'cleaning', frequency: '12h', notifyPortal: true, notifyMobile: true, notes: '', createdBy: 'Vikram Singh', nextDue: new Date(Date.now() + 3600000 * 8) },
+            { id: 3, building: 'H3', type: 'restocking', frequency: '4h', notifyPortal: true, notifyMobile: false, notes: 'Exam period - high usage', createdBy: 'Meera Desai', nextDue: new Date(Date.now() + 3600000) },
+        ];
+
+        // Keep rooms for backwards compatibility with room management
+        let rooms = [];
+        for (let floor = 1; floor <= 4; floor++) {
+            for (let room = 1; room <= 12; room++) {
+                const roomNum = floor * 100 + room;
+                const statuses = ['pending', 'cleaned', 'in-progress', 'needs-maintenance'];
+                const randomStatus = Math.random() > 0.7 ? statuses[Math.floor(Math.random() * statuses.length)] : 'pending';
+                rooms.push({
+                    id: roomNum, floor: floor, number: roomNum.toString(),
+                    status: randomStatus,
+                    assignedTo: staffMembers.find(s => s.role === 'cleaning' && s.assignedBuildings.includes('H1'))?.id || null
+                });
+            }
+        }
+
+        // Demo complaints fallback
+        const demoComplaints = [
+            { id: 1, category: 'hygiene', room_number: 'H1 - Floor 2 East', description: 'No soap in washroom for 3 days. Tissue dispensers also empty. This is unacceptable for hygiene standards.', status: 'pending', priority: 'high', created_at: new Date(Date.now() - 86400000).toISOString(), resident_name: 'Student One', resident_id: 'r1', image_url: null, ai_analysis: null },
+            { id: 2, category: 'cleaning', room_number: 'H2 - Ground Floor South Wing', description: 'Washroom not cleaned for 2 days. Floor is dirty and smells bad.', status: 'in-progress', priority: 'high', created_at: new Date(Date.now() - 172800000).toISOString(), resident_name: 'Student One', resident_id: 'r1', image_url: null, ai_analysis: null },
+            { id: 3, category: 'hygiene', room_number: 'Academic Block - Floor 1', description: 'Sanitizer dispenser broken. No hand soap available.', status: 'resolved', priority: 'medium', created_at: new Date(Date.now() - 259200000).toISOString(), resident_name: 'Faculty Member', resident_id: 'r2', image_url: null, ai_analysis: null },
+            { id: 4, category: 'false_reporting', room_number: 'H2 - Floor 2 North Wing', description: 'Staff uploaded old photo as proof of restocking but washroom still has no tissues. Photo metadata shows it was taken 3 days ago.', status: 'pending', priority: 'urgent', created_at: new Date(Date.now() - 43200000).toISOString(), resident_name: 'Student One', resident_id: 'r1', image_url: null, ai_analysis: null },
+            { id: 5, category: 'plumbing', room_number: 'H3 - Floor 2', description: 'Soap dispenser is leaking, wasting liquid soap. Needs repair.', status: 'in-progress', priority: 'medium', created_at: new Date(Date.now() - 129600000).toISOString(), resident_name: 'Student Three', resident_id: 'r3', image_url: null, ai_analysis: null }
+        ];
+
+        // ──── Login ────
+        async function authPost(path, body) {
+            try {
+                const res = await fetch(`${API_BASE}${path}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body || {}),
+                });
+                const data = await res.json().catch(() => ({}));
+                return { ok: res.ok, status: res.status, data, error: data?.error || 'Request failed' };
+            } catch (_err) {
+                return { ok: false, status: 0, data: null, error: 'Network error. Please try again.' };
+            }
+        }
+
+        function chooseLoginTrack(track) {
+            selectedLoginTrack = track;
+            const labels = {
+                admin: 'Admin Login',
+                housekeeping: 'Housekeeping Login (Supervisor + Cleaning Staff)',
+                resident: 'Faculty / Student Login',
+            };
+            document.getElementById('loginRoleChooser').classList.add('hidden');
+            document.getElementById('selectedLoginTrackBox').classList.remove('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('selectedLoginTrackText').textContent = `Selected: ${labels[track] || track}`;
+        }
+
+        function resetLoginTrackSelection() {
+            selectedLoginTrack = '';
+            document.getElementById('loginRoleChooser').classList.remove('hidden');
+            document.getElementById('selectedLoginTrackBox').classList.add('hidden');
+            document.getElementById('loginForm').classList.add('hidden');
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!selectedLoginTrack) { showToast('Please choose login type first'); return; }
+            if (!password) { showToast('Please enter your password'); return; }
+
+            const login = await authPost('/auth/login', { email, password });
+            if (!login.ok || !login.data?.token) {
+                showToast(login.error || 'Password not correct');
+                return;
+            }
+
+            authToken = login.data.token;
+                localStorage.setItem('authToken', authToken);
+            currentUser = login.data.user;
+            const role = currentUser.role;
+            const validTrack =
+                (selectedLoginTrack === 'admin' && role === 'admin') ||
+                (selectedLoginTrack === 'housekeeping' && (role === 'staff' || role === 'supervisor')) ||
+                (selectedLoginTrack === 'resident' && role === 'resident');
+
+            if (!validTrack) {
+                authToken = null;
+                currentUser = null;
+                localStorage.removeItem('authToken');
+                showToast('Selected login type does not match your account');
+                return;
+            }
+            useOfflineMode = false;
+
+            localStorage.setItem('hostelUser', JSON.stringify(currentUser));
+            document.getElementById('otpHintText').style.display = 'none';
+            showApp();
+        });
+
+        function openForgotPasswordModal() {
+            document.getElementById('otpHintText').style.display = 'none';
+            document.getElementById('forgotPasswordModal').classList.add('active');
+        }
+
+        async function requestResetOtp() {
+            const email = document.getElementById('forgotEmail').value.trim();
+            const phone = document.getElementById('forgotPhone').value.trim();
+            if (!email || !phone) {
+                showToast('Email and mobile number are required');
+                return;
+            }
+
+            const btn = document.getElementById('sendOtpBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Sending OTP...';
+
+            const result = await authPost('/auth/forgot-password/request-otp', { email, phone });
+
+            btn.disabled = false;
+            btn.textContent = 'Send OTP';
+
+            if (!result.ok) {
+                showToast(result.error || 'Could not send OTP');
+                return;
+            }
+
+            showToast('OTP sent to your registered mobile number', 'success');
+            if (result.data && result.data.devOtp) {
+                const hint = document.getElementById('otpHintText');
+                hint.textContent = `Dev OTP: ${result.data.devOtp}`;
+                hint.style.display = 'block';
+            }
+        }
+
+        async function resetPasswordWithOtp() {
+            const email = document.getElementById('forgotEmail').value.trim();
+            const phone = document.getElementById('forgotPhone').value.trim();
+            const otp = document.getElementById('resetOtp').value.trim();
+            const newPassword = document.getElementById('resetNewPassword').value;
+            const confirmPassword = document.getElementById('resetConfirmPassword').value;
+
+            if (!email || !phone || !otp || !newPassword || !confirmPassword) {
+                showToast('Please fill all reset fields');
+                return;
+            }
+            if (newPassword.length < 8) {
+                showToast('New password must be at least 8 characters');
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                showToast('Passwords do not match');
+                return;
+            }
+
+            const btn = document.getElementById('resetPasswordBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Resetting...';
+
+            const result = await authPost('/auth/forgot-password/reset', { email, phone, otp, newPassword });
+
+            btn.disabled = false;
+            btn.textContent = 'Reset Password';
+
+            if (!result.ok) {
+                showToast(result.error || 'OTP not correct');
+                return;
+            }
+
+            showToast('Password reset successful. Please login.', 'success');
+            closeModal('forgotPasswordModal');
+            document.getElementById('resetOtp').value = '';
+            document.getElementById('resetNewPassword').value = '';
+            document.getElementById('resetConfirmPassword').value = '';
+        }
+
+
+        function toggleLoginPassword() {
+            const input = document.getElementById('loginPassword');
+            const toggle = document.getElementById('loginPasswordToggle');
+            const isHidden = input.type === 'password';
+
+            input.type = isHidden ? 'text' : 'password';
+            toggle.textContent = isHidden ? '👁️' : '🙈';
+            toggle.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+            toggle.setAttribute('title', isHidden ? 'Hide password' : 'Show password');
+        }
+        function showApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appContainer').classList.add('active');
+            // Map supervisor to staff role for backend, but keep UI role
+            const uiRole = currentUser.role === 'supervisor' ? 'supervisor' : currentUser.role;
+            document.getElementById('appContainer').setAttribute('data-role', uiRole);
+            document.getElementById('userName').textContent = currentUser.name;
+            const roleLabels = { admin: 'Admin', staff: 'Cleaning Staff', supervisor: 'Supervisor', resident: 'Student/Faculty' };
+            document.getElementById('userRoleBadge').textContent = roleLabels[currentUser.role] || currentUser.role;
+
+            if (currentUser.role === 'admin') renderAdminDashboard();
+            else if (currentUser.role === 'supervisor') renderSupervisorDashboard();
+            else if (currentUser.role === 'staff') renderStaffDashboard();
+            else renderResidentDashboard();
+        }
+
+        function logout() {
+            currentUser = null;
+            authToken = null;
+            useOfflineMode = false;
+            complaintsData = [];
+            localStorage.removeItem('hostelUser');
+            localStorage.removeItem('authToken');
+            document.getElementById('appContainer').classList.remove('active');
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('loginForm').reset();
+            resetLoginTrackSelection();
+            document.getElementById('loginPassword').type = 'password';
+            document.getElementById('loginPasswordToggle').textContent = '🙈';
+            document.getElementById('loginPasswordToggle').setAttribute('aria-label', 'Show password');
+            document.getElementById('loginPasswordToggle').setAttribute('title', 'Show password');
+        }
+
+        // ──── Load Complaints from API ────
+        async function loadComplaints() {
+            if (useOfflineMode) {
+                complaintsData = demoComplaints;
+                return;
+            }
+            const result = await api.get('/complaints?limit=100');
+            if (result && result.data) {
+                complaintsData = result.data;
+            } else {
+                complaintsData = demoComplaints;
+                useOfflineMode = true;
+            }
+        }
+
+        // ──── Admin Dashboard ────
+        async function renderAdminDashboard() {
+            await loadComplaints();
+            updateStats();
+            renderFloors();
+            renderAdminComplaints();
+        }
+
+        function updateStats() {
+            const totalWashrooms = washroomData.length;
+            const restockedToday = washroomData.filter(w => (Date.now() - w.lastRestocked.getTime()) < 86400000).length;
+            const pending = complaintsData.filter(c => c.status === 'pending').length;
+            const resolved = complaintsData.filter(c => c.status === 'resolved').length;
+            const activeStaff = staffMembers.filter(s => s.role === 'cleaning').length;
+
+            document.getElementById('statTotalRooms').textContent = totalWashrooms;
+            document.getElementById('statCleanedToday').textContent = restockedToday;
+            document.getElementById('statPendingComplaints').textContent = pending;
+            document.getElementById('statResolvedComplaints').textContent = resolved;
+            document.getElementById('statActiveStaff').textContent = activeStaff;
+        }
+
+        function renderFloors() {
+            const container = document.getElementById('floorsContainer');
+            // Group washrooms by building
+            const grouped = {};
+            washroomData.forEach(w => {
+                if (!grouped[w.building]) grouped[w.building] = [];
+                grouped[w.building].push(w);
+            });
+
+            container.innerHTML = Object.entries(grouped).map(([building, washrooms]) => {
+                const bldg = buildings.find(b => b.id === building);
+                const assignedStaff = staffMembers.filter(s => s.assignedBuildings.includes(building));
+
+                return `
+                    <div class="floor-section">
+                        <div class="floor-header">
+                            <span class="floor-title">🏢 ${bldg?.name || building}</span>
+                            <span style="color: var(--text-muted); font-size: 0.82rem;">
+                                ${assignedStaff.length > 0 ? assignedStaff.map(s => `👤 ${s.name} <span class="shift-badge ${s.shift}">${s.shift}</span>`).join(' &nbsp; ') : 'Not assigned'}
+                            </span>
+                        </div>
+                        <div class="rooms-grid" style="grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));">
+                            ${washrooms.map(w => {
+                                const avgSupply = (w.supplies.tissues + w.supplies.soap + w.supplies.sanitizer) / 3;
+                                const statusClass = avgSupply > 60 ? 'cleaned' : avgSupply > 25 ? 'in-progress' : 'needs-maintenance';
+                                const daysSince = Math.floor((Date.now() - w.lastRestocked.getTime()) / 86400000);
+                                return `
+                                <div class="room-card ${statusClass}" title="${w.label}${w.direction ? ' (' + w.direction + ')' : ''}">
+                                    <div class="room-number" style="font-size:0.85rem;">${w.floor}</div>
+                                    <div class="room-status">${w.direction || w.label.replace(/Floor \d+ /, '')}</div>
+                                    <div style="margin-top:4px;font-size:0.7rem;">
+                                        🧻${w.supplies.tissues}% 🧼${w.supplies.soap}%
+                                    </div>
+                                    <div style="font-size:0.65rem;color:var(--text-muted);margin-top:2px;">
+                                        ${daysSince === 0 ? 'Restocked today' : daysSince === 1 ? '1 day ago' : daysSince + ' days ago'}
+                                        ${daysSince >= 3 ? ' ⚠️' : ''}
+                                    </div>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getSupervisorsForBuilding(building) {
+            return staffMembers
+                .filter(s => s.role === 'supervisor' && s.assignedBuildings.includes(building))
+                .map(s => s.name);
+        }
+
+        function getComplaintBuilding(complaint) {
+            const roomText = String(complaint?.room_number || complaint?.room || '').toLowerCase();
+            const match = buildings.find(b => roomText.includes(String(b.id).toLowerCase()));
+            return match ? match.id : null;
+        }
+
+        function writeToSupervisor(complaintId) {
+            const complaint = complaintsData.find(c => c.id === complaintId);
+            if (!complaint) return;
+
+            if (complaint.category !== 'false_reporting') {
+                showToast('This action is only for false report complaints');
+                return;
+            }
+
+            const building = getComplaintBuilding(complaint);
+            const supervisors = building ? getSupervisorsForBuilding(building) : [];
+            if (!supervisors.length) {
+                showToast('No supervisor assigned for this building');
+                return;
+            }
+
+            const note = window.prompt(`Write message to supervisor (${supervisors.join(', ')})`);
+            if (!note || !note.trim()) return;
+
+            complaint.admin_supervisor_note = {
+                message: note.trim(),
+                by: currentUser?.name || 'Admin',
+                at: new Date().toISOString(),
+                supervisors,
+            };
+
+            showToast('Message sent to supervisor', 'success');
+        }
+
+        function inventoryStatusForWashroom(w) {
+            const avg = Math.round((w.supplies.tissues + w.supplies.soap + w.supplies.sanitizer) / 3);
+            const hoursSince = Math.floor((Date.now() - w.lastRestocked.getTime()) / 3600000);
+            const status = avg <= 25 || hoursSince >= 72 ? 'Critical' : avg <= 60 || hoursSince >= 24 ? 'Watch' : 'Healthy';
+            const statusClass = status === 'Critical' ? 'stock-low' : status === 'Watch' ? 'stock-warning' : 'stock-ok';
+            return { avg, hoursSince, status, statusClass };
+        }
+
+        // ── Supply Inventory Table ──
+        function renderInventory(targetBodyId = 'inventoryBody') {
+            const body = document.getElementById(targetBodyId);
+            if (!body) return;
+
+            const sorted = [...washroomData].sort((a, b) => {
+                if (a.building !== b.building) return a.building.localeCompare(b.building);
+                return String(a.floor).localeCompare(String(b.floor));
+            });
+
+            let lastBuilding = '';
+            body.innerHTML = sorted.map(w => {
+                const stockClass = (v) => v > 60 ? 'stock-ok' : v > 25 ? 'stock-warning' : 'stock-low';
+                const summary = inventoryStatusForWashroom(w);
+                const supervisors = getSupervisorsForBuilding(w.building);
+                const buildingHeader = lastBuilding !== w.building
+                    ? `<tr><td colspan="10" style="background:var(--bg-hover);font-weight:700;color:var(--accent);">🏢 ${w.building}</td></tr>`
+                    : '';
+                lastBuilding = w.building;
+
+                return `${buildingHeader}<tr>
+                    <td>${w.building}</td>
+                    <td>${w.floor}${w.direction ? ' (' + w.direction + ')' : ''}</td>
+                    <td style="font-weight:500;">${w.label}</td>
+                    <td class="${stockClass(w.supplies.tissues)}">${w.supplies.tissues}%</td>
+                    <td class="${stockClass(w.supplies.soap)}">${w.supplies.soap}%</td>
+                    <td class="${stockClass(w.supplies.sanitizer)}">${w.supplies.sanitizer}%</td>
+                    <td class="${summary.statusClass}">${summary.avg}% (${summary.status})</td>
+                    <td style="font-size:0.8rem;">${w.lastRestocked.toLocaleString()}</td>
+                    <td style="font-size:0.8rem;">${supervisors.length ? supervisors.join(', ') : 'Not assigned'}</td>
+                    <td><span class="${summary.statusClass}">${summary.hoursSince >= 24 ? `${Math.floor(summary.hoursSince / 24)}d ago` : `${summary.hoursSince}h ago`}</span></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function getInventoryExportRows() {
+            return washroomData.map(w => {
+                const summary = inventoryStatusForWashroom(w);
+                return {
+                    building: w.building,
+                    floor: `${w.floor}${w.direction ? ' (' + w.direction + ')' : ''}`,
+                    washroom: w.label,
+                    tissues: `${w.supplies.tissues}%`,
+                    soap: `${w.supplies.soap}%`,
+                    sanitizer: `${w.supplies.sanitizer}%`,
+                    health: `${summary.avg}%`,
+                    lastRestocked: w.lastRestocked.toLocaleString(),
+                    supervisor: getSupervisorsForBuilding(w.building).join(', ') || 'Not assigned',
+                    status: summary.status,
+                };
+            });
+        }
+
+        function exportInventoryCSV() {
+            const rows = getInventoryExportRows();
+            const headers = ['Building', 'Floor', 'Washroom', 'Tissues', 'Soap', 'Sanitizer', 'Health', 'Last Restocked', 'Assigned Supervisor', 'Status'];
+            const escapeCsv = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+            const csv = [
+                headers.join(','),
+                ...rows.map(r => [
+                    r.building, r.floor, r.washroom, r.tissues, r.soap, r.sanitizer, r.health, r.lastRestocked, r.supervisor, r.status
+                ].map(escapeCsv).join(','))
+            ].join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `inventory-${new Date().toISOString().slice(0, 10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Inventory exported as CSV', 'success');
+        }
+
+        function exportInventoryPDF() {
+            const rows = getInventoryExportRows();
+            const htmlRows = rows.map(r => `
+                <tr>
+                    <td>${r.building}</td>
+                    <td>${r.floor}</td>
+                    <td>${r.washroom}</td>
+                    <td>${r.tissues}</td>
+                    <td>${r.soap}</td>
+                    <td>${r.sanitizer}</td>
+                    <td>${r.health}</td>
+                    <td>${r.lastRestocked}</td>
+                    <td>${r.supervisor}</td>
+                    <td>${r.status}</td>
+                </tr>
+            `).join('');
+
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                showToast('Popup blocked. Please allow popups for PDF export.');
+                return;
+            }
+
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Inventory Export</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 18px; }
+                        h2 { margin-bottom: 4px; }
+                        p { margin: 0 0 12px; color: #555; }
+                        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+                        th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+                        th { background: #f0f0f0; }
+                    </style>
+                </head>
+                <body>
+                    <h2>Housekeeping Tracker - Inventory Export</h2>
+                    <p>Generated: ${new Date().toLocaleString()}</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Building</th><th>Floor</th><th>Washroom</th><th>Tissues</th><th>Soap</th><th>Sanitizer</th><th>Health</th><th>Last Restocked</th><th>Assigned Supervisor</th><th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>${htmlRows}</tbody>
+                    </table>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+            showToast('Inventory export opened for PDF save', 'success');
+        }
+
+        // ── Staff Shifts & Activity ──
+        function renderStaffShifts() {
+            const container = document.getElementById('staffShiftsList');
+            container.innerHTML = staffMembers.map(s => {
+                const recentWork = workSubmissions.filter(w => w.staffId === s.id).length;
+                const supervisor = s.role === 'cleaning'
+                    ? staffMembers.find(x => x.id === s.supervisor_id)?.name || 'Not assigned'
+                    : 'Self (Supervisor)';
+                return `
+                <div class="task-card">
+                    <div class="task-card-header">
+                        <span class="task-card-title">👷 ${s.name}</span>
+                        <div style="display:flex;gap:4px;align-items:center;">
+                            <span class="badge" style="background:var(--accent-glow);color:var(--accent);">${s.role === 'supervisor' ? 'Supervisor' : 'Cleaning'}</span>
+                            <span class="shift-badge ${s.shift}">${s.shift}</span>
+                        </div>
+                    </div>
+                    <p class="task-card-meta">Buildings: <span>${s.assignedBuildings.join(', ')}</span></p>
+                    <p class="task-card-meta">Supervisor: <span>${supervisor}</span></p>
+                    <p class="task-card-meta">Tasks submitted today: <span>${recentWork}</span></p>
+                    ${s.role === 'supervisor' ? '<p class="task-card-meta" style="color:var(--accent);">Approves work for: <span>' + s.assignedBuildings.join(', ') + '</span></p>' : ''}
+                </div>`;
+            }).join('');
+
+            // Activity history timeline
+            const timeline = document.getElementById('activityTimeline');
+            const sorted = [...workSubmissions].sort((a, b) => b.submittedAt - a.submittedAt);
+            timeline.innerHTML = sorted.map(w => {
+                const ws = washroomData.find(x => x.id === w.washroom);
+                const approved = w.supervisorApproved === true ? '✅ Approved' : w.supervisorApproved === false ? '❌ Rejected' : '⏳ Pending';
+                const capturedAt = w.photoTakenAt ? new Date(w.photoTakenAt) : null;
+                return `
+                <li>
+                    <div class="time">${w.submittedAt.toLocaleString()}</div>
+                    <div class="item-name">${w.staffName} — ${w.task.charAt(0).toUpperCase() + w.task.slice(1)}</div>
+                    <div class="location">${w.building} → ${ws?.label || w.washroom}</div>
+                    <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap;">
+                        <span class="verification-badge ${w.llmVerified ? 'llm-verified' : 'rejected'}">🤖 LLM: ${w.llmVerified ? 'Pass (' + Math.round(w.llmScore * 100) + '%)' : 'Fail (' + Math.round(w.llmScore * 100) + '%)'}</span>
+                        <span class="verification-badge ${w.supervisorApproved === true ? 'verified' : w.supervisorApproved === false ? 'rejected' : 'pending-review'}">${approved}</span>
+                    </div>
+                    ${capturedAt ? `<div style="font-size:0.76rem;color:var(--text-muted);margin-top:4px;">🕒 Photo metadata time: ${capturedAt.toLocaleString()}</div>` : ''}
+                    ${w.llmFeedback ? `<div style="font-size:0.76rem;color:var(--text-muted);margin-top:3px;">${w.llmFeedback}</div>` : ''}
+                    <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">${w.notes}</div>
+                </li>`;
+            }).join('');
+        }
+
+        // ── Live Updates (Admin view, read-only) ──
+        function renderVerification() {
+            const container = document.getElementById('verificationList');
+            const sorted = [...workSubmissions].sort((a, b) => b.submittedAt - a.submittedAt);
+            if (sorted.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="empty-state-icon">📡</div><h3>No live updates yet</h3><p>Work updates will appear here.</p></div>';
+                return;
+            }
+            container.innerHTML = sorted.map(w => {
+                const ws = washroomData.find(x => x.id === w.washroom);
+                const capturedAt = w.photoTakenAt ? new Date(w.photoTakenAt) : null;
+                const verificationLabel = w.supervisorApproved === true ? '✅ Approved' : w.supervisorApproved === false ? '❌ Rejected' : '⏳ Pending Supervisor';
+                return `
+                <div class="task-card">
+                    <div class="task-card-header">
+                        <span class="task-card-title">${w.staffName}</span>
+                        <span class="badge ${w.supervisorApproved === true ? 'badge-resolved' : w.supervisorApproved === false ? 'badge-pending' : 'badge-in-progress'}">${verificationLabel}</span>
+                    </div>
+                    <p class="task-card-meta">Building: <span>${w.building}</span> | Washroom: <span>${ws?.label || w.washroom}</span></p>
+                    <p class="task-card-meta">Task: <span>${w.task}</span> | Submitted: <span>${w.submittedAt.toLocaleString()}</span></p>
+                    ${capturedAt ? `<p class="task-card-meta">Photo metadata time: <span>${capturedAt.toLocaleString()}</span></p>` : ''}
+                    <p class="task-card-description">${w.notes}</p>
+                    <div style="display:flex;gap:6px;margin-top:8px;">
+                        <span class="verification-badge ${w.llmVerified ? 'llm-verified' : 'rejected'}">🤖 LLM: ${w.llmVerified ? 'Pass (' + Math.round(w.llmScore * 100) + '%)' : 'Fail (' + Math.round(w.llmScore * 100) + '%)'}</span>
+                    </div>
+                    ${w.llmFeedback ? `<p style="font-size:0.8rem;color:var(--text-muted);margin-top:6px;">${w.llmFeedback}</p>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        function verifyWork(id, approved) {
+            const w = workSubmissions.find(x => x.id === id);
+            if (w) {
+                w.supervisorApproved = approved;
+                renderVerification();
+                renderStaffShifts();
+                showToast(approved ? 'Work approved ✅' : 'Work rejected ❌', approved ? 'success' : '');
+            }
+        }
+
+        function toggleRoomStatus(washroomId) {
+            const washroom = washroomData.find(w => w.id === washroomId);
+            if (!washroom) return;
+            const statuses = ['pending', 'in-progress', 'cleaned', 'needs-maintenance'];
+            const currentIndex = statuses.indexOf(washroom.status || 'cleaned');
+            washroom.status = statuses[(currentIndex + 1) % statuses.length];
+            renderFloors();
+            updateStats();
+            showToast(`${washroom.building} Floor ${washroom.floor} washroom → ${formatStatus(washroom.status)}`);
+        }
+
+        function formatStatus(status) {
+            const map = { 'pending': 'Pending', 'in-progress': 'In Progress', 'cleaned': 'Cleaned', 'needs-maintenance': 'Maintenance', 'resolved': 'Resolved' };
+            return map[status] || status;
+        }
+
+        function formatCategory(cat) {
+            if (!cat) return 'Unknown';
+            return cat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function priorityClass(p) {
+            if (!p) return 'priority-medium';
+            return `priority-${p.toLowerCase()}`;
+        }
+
+        // ──── Admin Complaints List (clickable cards) ────
+        function renderAdminComplaints(filter = 'all') {
+            const container = document.getElementById('adminComplaintsList');
+            let filtered = complaintsData;
+            if (filter !== 'all') filtered = complaintsData.filter(c => c.status === filter);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">📋</div>
+                        <h3>No complaints found</h3>
+                        <p>No complaints match the selected filter.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(c => {
+                const ai = parseAI(c.ai_analysis);
+                const hasAI = !!ai;
+                const aiCat = ai?.ml_analysis?.category;
+                const aiPri = ai?.ml_analysis?.priority;
+                const sentiment = ai?.nlp_analysis?.sentiment;
+                const urgency = ai?.nlp_analysis?.urgency;
+
+                return `
+                <div class="task-card ${c.status}" onclick="openComplaintDetail(${c.id})" style="cursor:pointer;">
+                    <div class="task-card-header">
+                        <span class="task-card-title">${formatCategory(c.category)}</span>
+                        <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+                            ${c.priority ? `<span class="ai-tag ${priorityClass(c.priority)}">${c.priority.toUpperCase()}</span>` : ''}
+                            <span class="badge badge-${c.status}">${formatStatus(c.status)}</span>
+                        </div>
+                    </div>
+                    <p class="task-card-meta">Room: <span>${c.room_number || c.room}</span> &nbsp;|&nbsp; ${c.resident_name ? 'By: <span>' + c.resident_name + '</span>' : ''}</p>
+                    <p class="task-card-meta">Submitted: <span>${formatDate(c.created_at || c.createdAt)}</span></p>
+                    <p class="task-card-description">${truncate(c.description, 120)}</p>
+                    ${c.image_url && showComplaintPhotos ? `<img class="card-image" src="${API_BASE.replace('/api', '')}${c.image_url}" alt="Complaint photo" onclick="window.open(this.src, '_blank'); event.stopPropagation();">` : ''}
+                    ${c.image_url && !showComplaintPhotos ? '<p class="task-card-meta">📷 <span>Image attached (click Show Photos to view)</span></p>' : ''}
+                    ${hasAI ? `
+                    <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;">
+                        ${aiCat ? `<span class="ai-tag category">🤖 ${formatCategory(aiCat.category || '')} ${confidenceLabel(aiCat.confidence)}</span>` : ''}
+                        ${sentiment ? `<span class="ai-tag sentiment">${sentimentEmoji(sentiment.label)} ${sentiment.label}</span>` : ''}
+                        ${urgency ? `<span class="ai-tag ${priorityClass(urgency.level)}">⚡ ${urgency.level}</span>` : ''}
+                    </div>` : ''}
+                    <div class="task-card-actions" onclick="event.stopPropagation();">
+                        ${c.category === 'false_reporting' ? `<button class="btn btn-outline btn-sm" onclick="writeToSupervisor(${c.id})">✉️ Write to Supervisor</button>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function truncate(str, len) {
+            if (!str) return '';
+            return str.length > len ? str.substring(0, len) + '...' : str;
+        }
+
+        function confidenceLabel(conf) {
+            if (!conf && conf !== 0) return '';
+            return `(${Math.round(conf * 100)}%)`;
+        }
+
+        function sentimentEmoji(label) {
+            if (!label) return '😐';
+            if (label.includes('positive')) return '😊';
+            if (label.includes('negative')) return '😟';
+            return '😐';
+        }
+
+        function parseAI(data) {
+            if (!data) return null;
+            if (typeof data === 'string') { try { return JSON.parse(data); } catch { return null; } }
+            return data;
+        }
+
+        // ──── Complaint Detail Modal ────
+        function openComplaintDetail(id) {
+            const c = complaintsData.find(x => x.id === id);
+            if (!c) return;
+
+            const ai = parseAI(c.ai_analysis);
+            const mlCat = ai?.ml_analysis?.category;
+            const mlPri = ai?.ml_analysis?.priority;
+            const nlp = ai?.nlp_analysis;
+            const sentiment = nlp?.sentiment;
+            const urgency = nlp?.urgency;
+            const actions = ai?.ml_analysis?.suggested_actions || [];
+            const estHours = ai?.ml_analysis?.estimated_resolution_hours;
+            const summary = ai?.summary;
+            const roomText = String(c.room_number || c.room || '').toLowerCase();
+            const relatedUpdates = workSubmissions
+                .filter(w => roomText.includes(String(w.building).toLowerCase()) || roomText.includes(String(w.washroom).toLowerCase()))
+                .sort((a, b) => b.submittedAt - a.submittedAt)
+                .slice(0, 4);
+
+            const body = document.getElementById('complaintDetailBody');
+            body.innerHTML = `
+                <div class="detail-grid">
+                    <div class="detail-section">
+                        <div class="detail-label">Category</div>
+                        <div class="detail-value">${formatCategory(c.category)}</div>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-label">Status</div>
+                        <div class="detail-value"><span class="badge badge-${c.status}">${formatStatus(c.status)}</span></div>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-label">Room Number</div>
+                        <div class="detail-value">${c.room_number || c.room || 'N/A'}</div>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-label">Priority</div>
+                        <div class="detail-value"><span class="ai-tag ${priorityClass(c.priority)}">${(c.priority || 'medium').toUpperCase()}</span></div>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-label">Reported By</div>
+                        <div class="detail-value">${c.resident_name || 'Unknown'}</div>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-label">Submitted</div>
+                        <div class="detail-value">${new Date(c.created_at || c.createdAt).toLocaleString()}</div>
+                    </div>
+                </div>
+
+                <div class="detail-section" style="margin-top:14px;">
+                    <div class="detail-label">Description</div>
+                    <div class="detail-value">${c.description}</div>
+                </div>
+
+                ${c.image_url ? `
+                <div class="detail-section">
+                    <div class="detail-label">Attached Image</div>
+                    <img class="detail-image" src="${API_BASE.replace('/api', '')}${c.image_url}" alt="Complaint image" onclick="window.open(this.src, '_blank')">
+                </div>` : ''}
+
+                ${relatedUpdates.length ? `
+                <div class="detail-section" style="margin-top:14px;">
+                    <div class="detail-label">Related Staff Work Updates</div>
+                    <div style="display:grid;gap:10px;margin-top:8px;">
+                        ${relatedUpdates.map(w => `
+                            <div style="border:1px solid var(--border);border-radius:10px;padding:10px;background:var(--bg-hover);">
+                                <div style="font-size:0.82rem;color:var(--text-secondary);">${w.submittedAt.toLocaleString()} • ${w.staffName} • ${w.task}</div>
+                                <div style="font-size:0.84rem;color:var(--text-primary);margin-top:4px;">${w.notes}</div>
+                                <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+                                    <span class="verification-badge ${w.llmVerified ? 'llm-verified' : 'rejected'}">🤖 ${w.llmVerified ? 'AI Verified' : 'AI Flagged'}</span>
+                                    <span class="verification-badge ${w.supervisorApproved === true ? 'verified' : w.supervisorApproved === false ? 'rejected' : 'pending-review'}">${w.supervisorApproved === true ? '✅ Supervisor Approved' : w.supervisorApproved === false ? '❌ Rejected' : '⏳ Pending Review'}</span>
+                                </div>
+                                ${w.imageUrl ? `<div style="margin-top:6px;"><a class="proof-link" onclick="window.open('${w.imageUrl}','_blank')">📷 View staff photo</a></div>` : '<div style="margin-top:6px;font-size:0.78rem;color:var(--text-muted);">📷 Staff photo on file</div>'}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>` : ''}
+
+                ${ai ? `
+                <div class="ai-analysis-box" style="margin-top:14px;">
+                    <h4>🤖 AI Analysis${ai.fallback ? ' <span style="font-size:0.7rem;opacity:0.7;">(Fallback — AI service offline)</span>' : ''}</h4>
+
+                    <div class="detail-ai-grid">
+                        ${mlCat ? `<div class="detail-ai-card">
+                            <div class="label">AI Category</div>
+                            <div class="value">${formatCategory(mlCat.category)} <span class="confidence-bar"><span class="confidence-bar-fill" style="width:${(mlCat.confidence||0)*100}%"></span></span></div>
+                        </div>` : ''}
+                        ${mlPri ? `<div class="detail-ai-card">
+                            <div class="label">AI Priority</div>
+                            <div class="value"><span class="ai-tag ${priorityClass(mlPri.priority)}">${(mlPri.priority||'').toUpperCase()}</span> <span class="confidence-bar"><span class="confidence-bar-fill" style="width:${(mlPri.confidence||0)*100}%"></span></span></div>
+                        </div>` : ''}
+                        ${sentiment ? `<div class="detail-ai-card">
+                            <div class="label">Sentiment</div>
+                            <div class="value">${sentimentEmoji(sentiment.label)} ${sentiment.label} (${typeof sentiment.polarity === 'number' ? sentiment.polarity.toFixed(2) : ''})</div>
+                        </div>` : ''}
+                        ${urgency ? `<div class="detail-ai-card">
+                            <div class="label">Urgency</div>
+                            <div class="value"><span class="ai-tag ${priorityClass(urgency.level)}">⚡ ${urgency.level}</span></div>
+                        </div>` : ''}
+                    </div>
+
+                    ${summary ? `<p style="margin-top:10px;font-size:0.85rem;color:var(--text-secondary);"><strong>Summary:</strong> ${summary}</p>` : ''}
+
+                    ${actions.length > 0 ? `
+                    <div style="margin-top:10px;">
+                        <div class="detail-label">Suggested Actions</div>
+                        <ul class="ai-actions-list">${actions.map(a => `<li>${a}</li>`).join('')}</ul>
+                    </div>` : ''}
+
+                    ${estHours ? `<p style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);">⏱ Estimated resolution: ${estHours} hours</p>` : ''}
+                </div>` : '<div style="margin-top:14px;padding:12px;background:var(--bg-hover);border-radius:var(--radius-sm);color:var(--text-muted);font-size:0.85rem;">🤖 No AI analysis available for this complaint.</div>'}
+
+                ${c.assigned_staff_name ? `
+                <div class="detail-section" style="margin-top:14px;">
+                    <div class="detail-label">Assigned To</div>
+                    <div class="detail-value">👤 ${c.assigned_staff_name}</div>
+                </div>` : ''}
+
+                ${c.resolution_notes ? `
+                <div class="detail-section" style="margin-top:10px;">
+                    <div class="detail-label">Resolution Notes</div>
+                    <div class="detail-value">${c.resolution_notes}</div>
+                </div>` : ''}
+            `;
+
+            const footer = document.getElementById('complaintDetailFooter');
+            const canMessageSupervisor = currentUser && currentUser.role === 'admin' && c.category === 'false_reporting';
+            footer.innerHTML = `
+                <button class="btn btn-outline" onclick="closeModal('complaintDetailModal')">Close</button>
+                ${canMessageSupervisor ? `<button class="btn btn-primary btn-sm" onclick="writeToSupervisor(${c.id})">✉️ Write to Supervisor</button>` : ''}
+            `;
+
+            document.getElementById('complaintDetailModal').classList.add('active');
+        }
+
+        // ──── Toggle Complaint Photos ────
+        function toggleComplaintPhotos() {
+            showComplaintPhotos = !showComplaintPhotos;
+            const btn = document.getElementById('togglePhotosBtn');
+            if (btn) {
+                btn.textContent = showComplaintPhotos ? '📷 Hide Photos' : '📷 Show Photos';
+                btn.style.background = showComplaintPhotos ? 'var(--accent)' : 'transparent';
+                btn.style.color = showComplaintPhotos ? '#0a0a0a' : 'var(--accent)';
+            }
+            renderAdminComplaints();
+        }
+
+        function toggleComplaintPhotosStaff() {
+            showComplaintPhotos = !showComplaintPhotos;
+            const btn = document.getElementById('togglePhotosStaffBtn');
+            if (btn) {
+                btn.textContent = showComplaintPhotos ? '📷 Hide Photos' : '📷 Show Photos';
+                btn.style.background = showComplaintPhotos ? 'var(--accent)' : 'transparent';
+                btn.style.color = showComplaintPhotos ? '#0a0a0a' : 'var(--accent)';
+            }
+            renderStaffComplaints();
+        }
+
+        function filterComplaints(filter, btn) {
+            document.querySelectorAll('#adminComplaintsTab .filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderAdminComplaints(filter);
+        }
+
+        function switchAdminTab(tab) {
+            document.querySelectorAll('#adminDashboard .tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            const tabs = ['washrooms', 'inventory', 'complaints', 'shifts', 'liveupdates'];
+            tabs.forEach(t => {
+                const el = document.getElementById('admin' + t.charAt(0).toUpperCase() + t.slice(1) + 'Tab');
+                if (el) el.style.display = t === tab ? 'block' : 'none';
+            });
+            if (tab === 'washrooms') renderFloors();
+            if (tab === 'inventory') renderInventory();
+            if (tab === 'shifts') renderStaffShifts();
+            if (tab === 'liveupdates') renderVerification();
+        }
+
+        // ──── Staff Dashboard (Cleaning Staff) ────
+        async function renderStaffDashboard() {
+            await loadComplaints();
+            // Show washrooms assigned to this staff member's buildings
+            const staffInfo = staffMembers.find(s => s.role === 'cleaning') || staffMembers[0];
+            const myWashrooms = washroomData.filter(w => staffInfo.assignedBuildings.includes(w.building));
+
+            document.getElementById('staffTaskCount').textContent = `${myWashrooms.length} washrooms assigned`;
+
+            const container = document.getElementById('staffTasksList');
+            if (myWashrooms.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">✨</div><h3>No tasks assigned</h3><p>You don't have any washrooms assigned for today.</p></div>`;
+            } else {
+                container.innerHTML = myWashrooms.map(w => {
+                    const avgSupply = (w.supplies.tissues + w.supplies.soap + w.supplies.sanitizer) / 3;
+                    const urgency = avgSupply < 25 ? 'needs-maintenance' : avgSupply < 60 ? 'in-progress' : 'cleaned';
+                    const daysSince = Math.floor((Date.now() - w.lastRestocked.getTime()) / 86400000);
+                    return `
+                    <div class="task-card ${urgency}">
+                        <div class="task-card-header">
+                            <span class="task-card-title">${w.building} — ${w.label}</span>
+                            <span class="badge badge-${urgency === 'needs-maintenance' ? 'pending' : urgency}">${avgSupply < 25 ? 'LOW STOCK' : avgSupply < 60 ? 'Check' : 'OK'}</span>
+                        </div>
+                        <p class="task-card-meta">Floor: <span>${w.floor}</span>${w.direction ? ' | Direction: <span>' + w.direction + '</span>' : ''}</p>
+                        <p class="task-card-meta">🧻 Tissues: <span>${w.supplies.tissues}%</span> | 🧼 Soap: <span>${w.supplies.soap}%</span> | 🧴 Sanitizer: <span>${w.supplies.sanitizer}%</span></p>
+                        <p class="task-card-meta">Last restocked: <span>${daysSince === 0 ? 'Today' : daysSince === 1 ? 'Yesterday' : daysSince + ' days ago'}${daysSince >= 3 ? ' ⚠️ OVERDUE' : ''}</span></p>
+                        <div class="mobile-action-grid">
+                            <button class="mobile-action-btn clean" onclick="switchStaffTab('upload'); prefillUpload('${w.id}')">📷 Upload Proof</button>
+                            <button class="mobile-action-btn progress" onclick="showToast('Marked in progress')">⏳ In Progress</button>
+                            <button class="mobile-action-btn maintenance" onclick="showToast('Flagged for maintenance')">🔧 Issue</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+
+            // Populate work upload dropdown
+            populateWorkWashrooms(myWashrooms);
+            renderStaffComplaints();
+        }
+
+        function populateWorkWashrooms(washrooms) {
+            const select = document.getElementById('workWashroom');
+            if (!select) return;
+            select.innerHTML = '<option value="">Select washroom...</option>' +
+                (washrooms || washroomData).map(w => `<option value="${w.id}">${w.building} — ${w.label}${w.direction ? ' (' + w.direction + ')' : ''}</option>`).join('');
+        }
+
+        function prefillUpload(washroomId) {
+            const select = document.getElementById('workWashroom');
+            if (select) select.value = washroomId;
+        }
+
+        function previewWorkPhoto(input) {
+            const preview = document.getElementById('workPhotoPreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) { preview.innerHTML = `<img src="${e.target.result}" alt="Work photo preview">`; };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.innerHTML = '';
+            }
+        }
+
+        async function submitWorkProof() {
+            const washroom = document.getElementById('workWashroom').value;
+            const taskType = document.getElementById('workTaskType').value;
+            const notes = document.getElementById('workNotes').value;
+            const photo = document.getElementById('workPhoto').files[0];
+
+            if (!washroom || !notes || !photo) {
+                showToast('Please fill all fields and attach a photo');
+                return;
+            }
+
+            const btn = document.getElementById('submitWorkBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Uploading & Verifying...';
+
+            // Simulate LLM verification (check image metadata, freshness)
+            await new Promise(r => setTimeout(r, 1500));
+            const photoTakenAt = new Date(photo.lastModified || Date.now());
+            const photoAgeHours = Math.floor((Date.now() - photoTakenAt.getTime()) / 3600000);
+            const metadataFresh = photoAgeHours <= 48;
+            const baseScore = 0.62 + Math.random() * 0.33;
+            const llmScore = metadataFresh ? baseScore : Math.max(0.2, baseScore - 0.4);
+            const llmPassed = metadataFresh && llmScore > 0.6;
+            const llmFeedback = metadataFresh
+                ? `Photo metadata is recent (${photoAgeHours}h old).`
+                : `Photo metadata indicates an old image (${photoAgeHours}h old).`;
+
+            const ws = washroomData.find(w => w.id === washroom);
+            const submission = {
+                id: workSubmissions.length + 10,
+                staffId: currentUser.id,
+                staffName: currentUser.name,
+                washroom: washroom,
+                building: ws?.building || '',
+                task: taskType,
+                notes: notes,
+                imageUrl: null,
+                submittedAt: new Date(),
+                photoTakenAt,
+                llmVerified: llmPassed,
+                llmScore: llmScore,
+                llmFeedback,
+                supervisorApproved: null,
+                supervisorId: null,
+            };
+            workSubmissions.push(submission);
+
+            btn.disabled = false;
+            btn.textContent = 'Upload & Submit for Verification';
+            document.getElementById('workUploadForm').reset();
+            document.getElementById('workPhotoPreview').innerHTML = '';
+            showToast(llmPassed ? `✅ Photo verified by AI (${Math.round(llmScore * 100)}%) — awaiting supervisor approval` : `⚠️ ${llmFeedback} Supervisor review required`, llmPassed ? 'success' : '');
+        }
+
+        function renderStaffComplaints() {
+            const myComplaints = complaintsData.filter(c => c.status !== 'resolved');
+            const container = document.getElementById('staffComplaintsList');
+
+            if (myComplaints.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">✅</div><h3>All caught up!</h3><p>No pending issues in your area.</p></div>`;
+            } else {
+                container.innerHTML = myComplaints.map(c => `
+                    <div class="task-card ${c.status}" onclick="openComplaintDetail(${c.id})" style="cursor:pointer;">
+                        <div class="task-card-header">
+                            <span class="task-card-title">${formatCategory(c.category)}</span>
+                            <span class="badge badge-${c.status}">${formatStatus(c.status)}</span>
+                        </div>
+                        <p class="task-card-meta">Room: <span>${c.room_number || c.room}</span></p>
+                        <p class="task-card-description">${truncate(c.description, 100)}</p>
+                        ${c.image_url && showComplaintPhotos ? `<img class="card-image" src="${API_BASE.replace('/api', '')}${c.image_url}" alt="Complaint photo" onclick="window.open(this.src, '_blank'); event.stopPropagation();">` : ''}
+                        ${c.image_url && !showComplaintPhotos ? '<p class="task-card-meta">📷 <span>Image attached (click Show Photos to view)</span></p>' : ''}
+                        <div class="task-card-actions" onclick="event.stopPropagation();">
+                            <button class="btn btn-success btn-lg" onclick="updateComplaintStatus(${c.id}, 'resolved')" style="width: 100%;">✓ Mark as Resolved</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updateRoomStatus(washroomId, status) {
+            const washroom = washroomData.find(w => w.id === washroomId);
+            if (washroom) {
+                washroom.status = status;
+                renderStaffDashboard();
+                showToast(`${washroom.building} Floor ${washroom.floor} → ${formatStatus(status)}`, 'success');
+            }
+        }
+
+        function switchStaffTab(tab) {
+            document.querySelectorAll('#staffDashboard .tab-btn').forEach(b => b.classList.remove('active'));
+            if (event && event.target) event.target.classList.add('active');
+            document.getElementById('staffTasksTab').style.display = tab === 'tasks' ? 'block' : 'none';
+            document.getElementById('staffComplaintsTab').style.display = tab === 'complaints' ? 'block' : 'none';
+            document.getElementById('staffUploadTab').style.display = tab === 'upload' ? 'block' : 'none';
+        }
+
+        // ──── Student/Faculty Dashboard ────
+        async function renderResidentDashboard() {
+            await loadComplaints();
+            renderRestockingTimeline();
+            renderResidentInventory();
+            renderResidentComplaints();
+        }
+
+        function renderResidentInventory() {
+            renderInventory('residentInventoryBody');
+            const container = document.getElementById('residentLiveUpdates');
+            if (!container) return;
+
+            const sorted = [...workSubmissions].sort((a, b) => b.submittedAt - a.submittedAt);
+            if (sorted.length === 0) {
+                container.innerHTML = '<li><div class="item-name">No live restocking updates yet.</div></li>';
+                return;
+            }
+
+            container.innerHTML = sorted.map(w => {
+                const ws = washroomData.find(x => x.id === w.washroom);
+                const approval = w.supervisorApproved === true ? '✅ Approved' : w.supervisorApproved === false ? '❌ Rejected' : '⏳ Pending';
+                return `<li>
+                    <div class="time">${w.submittedAt.toLocaleString()}</div>
+                    <div class="item-name">${w.building} — ${ws?.label || w.washroom}</div>
+                    <div class="location">${w.staffName} submitted ${w.task} update</div>
+                    <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap;">
+                        <span class="verification-badge ${w.llmVerified ? 'llm-verified' : 'rejected'}">🤖 ${w.llmVerified ? 'AI Verified' : 'AI Flagged'}</span>
+                        <span class="verification-badge ${w.supervisorApproved === true ? 'verified' : w.supervisorApproved === false ? 'rejected' : 'pending-review'}">${approval}</span>
+                    </div>
+                </li>`;
+            }).join('');
+        }
+
+        function renderRestockingTimeline() {
+            const container = document.getElementById('restockingTimeline');
+            // Show recent work submissions as restocking timeline for students
+            const sorted = [...workSubmissions].sort((a, b) => b.submittedAt - a.submittedAt);
+
+            if (sorted.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🧻</div><h3>No restocking data yet</h3></div>';
+                return;
+            }
+
+            // Group by building
+            const grouped = {};
+            sorted.forEach(w => {
+                if (!grouped[w.building]) grouped[w.building] = [];
+                grouped[w.building].push(w);
+            });
+
+            container.innerHTML = Object.entries(grouped).map(([building, entries]) => `
+                <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;">
+                    <h3 style="font-size:1rem;margin-bottom:14px;color:var(--text-primary);">🏢 ${building}</h3>
+                    <ul class="restock-timeline">
+                        ${entries.map(w => {
+                            const ws = washroomData.find(x => x.id === w.washroom);
+                            const verified = w.supervisorApproved === true && w.llmVerified;
+                            const capturedAt = w.photoTakenAt ? new Date(w.photoTakenAt) : null;
+                            return `
+                            <li>
+                                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                                    <div>
+                                        <div class="time">📅 ${w.submittedAt.toLocaleString()}</div>
+                                        <div class="item-name">${w.task.charAt(0).toUpperCase() + w.task.slice(1)} — ${ws?.label || w.washroom}</div>
+                                        <div class="location">By: ${w.staffName}</div>
+                                        ${capturedAt ? `<div style="font-size:0.76rem;color:var(--text-muted);margin-top:3px;">🕒 Photo metadata time: ${capturedAt.toLocaleString()}</div>` : ''}
+                                        <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap;">
+                                            <span class="verification-badge ${w.llmVerified ? 'llm-verified' : 'rejected'}">🤖 AI: ${w.llmVerified ? 'Verified' : 'Failed'}</span>
+                                            <span class="verification-badge ${w.supervisorApproved === true ? 'verified' : w.supervisorApproved === false ? 'rejected' : 'pending-review'}">
+                                                ${w.supervisorApproved === true ? '✅ Supervisor Approved' : w.supervisorApproved === false ? '❌ Rejected' : '⏳ Pending Review'}
+                                            </span>
+                                        </div>
+                                        ${w.llmFeedback ? `<div style="font-size:0.76rem;color:var(--text-muted);margin-top:3px;">${w.llmFeedback}</div>` : ''}
+                                        <div style="font-size:0.82rem;color:var(--text-secondary);margin-top:4px;">${w.notes}</div>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        ${w.imageUrl ? '<span class="proof-link" onclick="window.open(\'' + w.imageUrl + '\')">📷 View Photo</span>' : '<span style="font-size:0.75rem;color:var(--text-muted);">📷 Photo on file</span>'}
+                                        ${!verified ? '<br><button class="btn btn-sm" style="margin-top:6px;background:var(--status-danger-bg);color:var(--status-danger);border:none;font-size:0.72rem;" onclick="reportFalse(' + w.id + ')">⚠️ Report False</button>' : ''}
+                                    </div>
+                                </div>
+                            </li>`;
+                        }).join('')}
+                    </ul>
+                </div>
+            `).join('');
+        }
+
+        function reportFalse(workId) {
+            const w = workSubmissions.find(x => x.id === workId);
+            if (!w) return;
+            // Pre-fill the complaint modal with false reporting details
+            openComplaintModal();
+            document.getElementById('complaintCategory').value = 'false_reporting';
+            document.getElementById('complaintRoom').value = `${w.building} — ${w.washroom}`;
+            document.getElementById('complaintDescription').value = `Suspected false reporting: "${w.notes}" submitted by ${w.staffName} at ${w.submittedAt.toLocaleString()}. The supplies shown as restocked appear to not actually be present in the washroom.`;
+            showToast('Fill in additional details and submit your complaint');
+        }
+
+        function renderResidentComplaints() {
+            const container = document.getElementById('residentComplaintsList');
+
+            if (complaintsData.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📝</div><h3>No complaints yet</h3><p>Click the button above to report an issue.</p></div>`;
+            } else {
+                container.innerHTML = complaintsData.map(c => {
+                    const ai = parseAI(c.ai_analysis);
+                    return `
+                    <div class="task-card ${c.status}">
+                        <div class="task-card-header">
+                            <span class="task-card-title">${formatCategory(c.category)}</span>
+                            <div style="display:flex;gap:4px;align-items:center;">
+                                ${c.priority ? `<span class="ai-tag ${priorityClass(c.priority)}">${c.priority.toUpperCase()}</span>` : ''}
+                                <span class="badge badge-${c.status}">${formatStatus(c.status)}</span>
+                            </div>
+                        </div>
+                        <p class="task-card-meta">Room: <span>${c.room_number || c.room}</span></p>
+                        <p class="task-card-meta">Submitted: <span>${formatDate(c.created_at || c.createdAt)}</span></p>
+                        <p class="task-card-description">${c.description}</p>
+                        ${c.image_url ? `<img src="${API_BASE.replace('/api', '')}${c.image_url}" style="width:100%;max-height:150px;object-fit:cover;border-radius:8px;margin-top:8px;" alt="Complaint image">` : ''}
+                        ${ai ? `
+                        <div class="ai-analysis-box" style="margin-top:10px;">
+                            <h4>🤖 AI Analysis</h4>
+                            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                                ${ai.ml_analysis?.category ? `<span class="ai-tag category">${formatCategory(ai.ml_analysis.category.category)} ${confidenceLabel(ai.ml_analysis.category.confidence)}</span>` : ''}
+                                ${ai.ml_analysis?.priority ? `<span class="ai-tag ${priorityClass(ai.ml_analysis.priority.priority)}">${(ai.ml_analysis.priority.priority||'').toUpperCase()} ${confidenceLabel(ai.ml_analysis.priority.confidence)}</span>` : ''}
+                                ${ai.nlp_analysis?.sentiment ? `<span class="ai-tag sentiment">${sentimentEmoji(ai.nlp_analysis.sentiment.label)} ${ai.nlp_analysis.sentiment.label}</span>` : ''}
+                            </div>
+                            ${ai.ml_analysis?.suggested_actions?.length ? `<ul class="ai-actions-list">${ai.ml_analysis.suggested_actions.slice(0,3).map(a => `<li>${a}</li>`).join('')}</ul>` : ''}
+                        </div>` : ''}
+                        <div class="task-card-actions" style="margin-top:10px;">
+                            <button class="btn btn-danger btn-sm" onclick="deleteResidentComplaint(${c.id})">🗑 Delete</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+        }
+
+        async function deleteResidentComplaint(id) {
+            const complaint = complaintsData.find(c => c.id === id);
+            if (!complaint) return;
+
+            const confirmed = window.confirm('Delete this complaint? This action cannot be undone.');
+            if (!confirmed) return;
+
+            if (useOfflineMode) {
+                complaintsData = complaintsData.filter(c => c.id !== id);
+                renderResidentComplaints();
+                showToast('Complaint deleted', 'success');
+                return;
+            }
+
+            const result = await api.delete(`/complaints/${id}`);
+            if (result && !result.error) {
+                await loadComplaints();
+                renderResidentComplaints();
+                showToast('Complaint deleted', 'success');
+            } else {
+                showToast('Unable to delete complaint');
+            }
+        }
+
+        function switchResidentTab(tab) {
+            document.querySelectorAll('#residentDashboard .tab-btn').forEach(b => b.classList.remove('active'));
+            if (event && event.target) event.target.classList.add('active');
+            document.getElementById('residentRestockingTab').style.display = tab === 'restocking' ? 'block' : 'none';
+            document.getElementById('residentInventoryTab').style.display = tab === 'inventory' ? 'block' : 'none';
+            document.getElementById('residentComplaintsTab').style.display = tab === 'complaints' ? 'block' : 'none';
+        }
+
+        // ──── Supervisor Dashboard ────
+        async function renderSupervisorDashboard() {
+            await loadComplaints();
+            const supInfo = staffMembers.find(s => s.role === 'supervisor') || staffMembers[4];
+            const myBuildings = supInfo.assignedBuildings || [];
+            const pendingVerify = workSubmissions.filter(w => myBuildings.includes(w.building) && w.supervisorApproved === null);
+            const approvedToday = workSubmissions.filter(w => myBuildings.includes(w.building) && w.supervisorApproved === true);
+
+            document.getElementById('supPendingVerify').textContent = pendingVerify.length;
+            document.getElementById('supApproved').textContent = approvedToday.length;
+            document.getElementById('supBuildings').textContent = myBuildings.length;
+
+            renderSupervisorVerify(pendingVerify);
+            renderSupervisorAssignments(supInfo, myBuildings);
+            renderSupervisorComplaints(supInfo, myBuildings);
+        }
+
+        function getSupervisorTeam(supervisor, myBuildings) {
+            return staffMembers.filter(s =>
+                s.role === 'cleaning' &&
+                s.supervisor_id === supervisor.id &&
+                s.assignedBuildings.some(b => myBuildings.includes(b))
+            );
+        }
+
+        function renderSupervisorAssignments(supervisor, myBuildings) {
+            const container = document.getElementById('supervisorAssignmentList');
+            if (!container) return;
+
+            const team = getSupervisorTeam(supervisor, myBuildings);
+            if (!myBuildings.length) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🏢</div><h3>No buildings assigned</h3><p>Admin assignment required.</p></div>';
+                return;
+            }
+
+            container.innerHTML = myBuildings.map(building => {
+                const buildingRooms = washroomData.filter(w => w.building === building);
+                const buildingStaff = team.filter(s => s.assignedBuildings.includes(building));
+                return `
+                <div class="task-card">
+                    <div class="task-card-header">
+                        <span class="task-card-title">🏢 ${building}</span>
+                        <span class="badge badge-in-progress">${buildingRooms.length} rooms</span>
+                    </div>
+                    <p class="task-card-meta">Staff assigned: <span>${buildingStaff.length ? buildingStaff.map(s => s.name).join(', ') : 'None'}</span></p>
+                    <div style="display:grid;gap:8px;margin-top:10px;">
+                        ${buildingRooms.map(w => `
+                            <div style="border:1px solid var(--border);border-radius:10px;padding:10px;background:var(--bg-hover);">
+                                <div style="font-size:0.82rem;font-weight:600;color:var(--text-primary);">${w.label}</div>
+                                <div style="font-size:0.78rem;color:var(--text-secondary);margin-top:3px;">Assigned staff: ${buildingStaff.length ? buildingStaff.map(s => s.name).join(', ') : 'Not assigned'}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderSupervisorComplaints(supervisor, myBuildings) {
+            const container = document.getElementById('supervisorComplaintsList');
+            if (!container) return;
+
+            const team = getSupervisorTeam(supervisor, myBuildings);
+            const scopedComplaints = complaintsData.filter(c => {
+                const b = getComplaintBuilding(c);
+                return b && myBuildings.includes(b);
+            });
+
+            if (!scopedComplaints.length) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><h3>No complaints in your buildings</h3><p>New complaints will appear here.</p></div>';
+                return;
+            }
+
+            container.innerHTML = scopedComplaints.map(c => {
+                const complaintBuilding = getComplaintBuilding(c);
+                const eligibleStaff = team.filter(s => s.assignedBuildings.includes(complaintBuilding));
+                const assignedText = c.assigned_staff_name ? `Assigned to ${c.assigned_staff_name}` : 'Not assigned';
+                return `
+                <div class="task-card ${c.status}">
+                    <div class="task-card-header">
+                        <span class="task-card-title">${formatCategory(c.category)}</span>
+                        <span class="badge badge-${c.status}">${formatStatus(c.status)}</span>
+                    </div>
+                    <p class="task-card-meta">Building: <span>${complaintBuilding || 'N/A'}</span> | Room: <span>${c.room_number || c.room || 'N/A'}</span></p>
+                    <p class="task-card-description">${truncate(c.description, 130)}</p>
+                    <p class="task-card-meta">${assignedText}</p>
+                    <div class="task-card-actions">
+                        <select id="supAssignStaff-${c.id}" style="flex:1;min-width:180px;">
+                            <option value="">Select staff to assign</option>
+                            ${eligibleStaff.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+                        </select>
+                        <button class="btn btn-primary btn-sm" onclick="supervisorAssignComplaint(${c.id})">Assign</button>
+                        <button class="btn btn-outline btn-sm" onclick="openComplaintDetail(${c.id})">Details</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function supervisorAssignComplaint(complaintId) {
+            const select = document.getElementById(`supAssignStaff-${complaintId}`);
+            if (!select || !select.value) {
+                showToast('Please select a staff member');
+                return;
+            }
+
+            const staffId = Number(select.value);
+            const staff = staffMembers.find(s => s.id === staffId);
+            if (!staff) return;
+
+            if (!useOfflineMode) {
+                const result = await api.put(`/complaints/${complaintId}/assign`, { staff_id: staffId });
+                if (result) {
+                    await loadComplaints();
+                    renderSupervisorDashboard();
+                    showToast(`Complaint assigned to ${staff.name}`, 'success');
+                    return;
+                }
+            }
+
+            const complaint = complaintsData.find(c => c.id === complaintId);
+            if (complaint) {
+                complaint.assigned_staff_id = staffId;
+                complaint.assigned_staff_name = staff.name;
+                renderSupervisorDashboard();
+                showToast(`Complaint assigned to ${staff.name}`, 'success');
+            }
+        }
+
+        function renderSupervisorVerify(pendingList) {
+            const container = document.getElementById('supervisorVerifyList');
+            if (!pendingList || pendingList.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✅</div><h3>All clear!</h3><p>No pending work submissions to approve.</p></div>';
+                return;
+            }
+            container.innerHTML = pendingList.map(w => {
+                const ws = washroomData.find(x => x.id === w.washroom);
+                const capturedAt = w.photoTakenAt ? new Date(w.photoTakenAt) : null;
+                const relatedComplaints = complaintsData.filter(c => {
+                    const roomText = String(c.room_number || c.room || '').toLowerCase();
+                    return roomText.includes(String(w.building).toLowerCase()) || roomText.includes(String(w.washroom).toLowerCase());
+                }).slice(0, 2);
+                return `
+                <div class="task-card">
+                    <div class="task-card-header">
+                        <span class="task-card-title">📷 ${w.staffName}</span>
+                        <span class="badge badge-pending">Awaiting Approval</span>
+                    </div>
+                    <p class="task-card-meta">Building: <span>${w.building}</span> | Washroom: <span>${ws?.label || w.washroom}</span></p>
+                    <p class="task-card-meta">Task: <span>${w.task}</span> | Time: <span>${w.submittedAt.toLocaleString()}</span></p>
+                    ${capturedAt ? `<p class="task-card-meta">Photo metadata time: <span>${capturedAt.toLocaleString()}</span></p>` : ''}
+                    <p class="task-card-description">${w.notes}</p>
+                    <div style="display:flex;gap:6px;margin:8px 0;">
+                        <span class="verification-badge ${w.llmVerified ? 'llm-verified' : 'rejected'}">🤖 AI Verification: ${w.llmVerified ? 'Pass (' + Math.round(w.llmScore * 100) + '%)' : 'Fail (' + Math.round(w.llmScore * 100) + '%)'}</span>
+                    </div>
+                    ${w.llmFeedback ? `<p style="font-size:0.8rem;color:var(--text-muted);margin:6px 0;">${w.llmFeedback}</p>` : ''}
+                    ${!w.llmVerified ? '<p style="color:var(--status-danger);font-size:0.82rem;">⚠️ AI flagged this photo as potentially invalid. Review carefully.</p>' : ''}
+                    ${relatedComplaints.length ? `
+                        <div style="margin:10px 0 4px;">
+                            <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;">Related complaints:</div>
+                            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                                ${relatedComplaints.map(c => `<button class="btn btn-outline btn-sm" onclick="openComplaintDetail(${c.id})">📋 ${formatCategory(c.category)}</button>`).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    <div class="task-card-actions">
+                        <button class="btn btn-success btn-sm" onclick="supervisorApprove(${w.id}, true)">✅ Approve</button>
+                        <button class="btn btn-danger btn-sm" onclick="supervisorApprove(${w.id}, false)">❌ Reject</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function supervisorApprove(id, approved) {
+            const w = workSubmissions.find(x => x.id === id);
+            if (w) {
+                w.supervisorApproved = approved;
+                renderSupervisorDashboard();
+                showToast(approved ? 'Work approved ✅' : 'Work rejected — staff notified ❌', approved ? 'success' : '');
+            }
+        }
+
+        function renderReminders() {
+            const container = document.getElementById('remindersList');
+            if (reminders.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏰</div><h3>No reminders set</h3><p>Click "+ Set Reminder" to create one.</p></div>';
+                return;
+            }
+            container.innerHTML = reminders.map(r => `
+                <div class="task-card">
+                    <div class="task-card-header">
+                        <span class="task-card-title">🏢 ${r.building} — ${r.type}</span>
+                        <span class="badge badge-in-progress">Every ${r.frequency}</span>
+                    </div>
+                    <p class="task-card-meta">Next due: <span>${r.nextDue.toLocaleString()}</span></p>
+                    <p class="task-card-meta">Notify: <span>${r.notifyPortal ? 'Portal' : ''} ${r.notifyMobile ? '📱 Mobile' : ''}</span></p>
+                    ${r.notes ? `<p class="task-card-description">${r.notes}</p>` : ''}
+                    <div class="task-card-actions">
+                        <button class="btn btn-outline btn-sm" onclick="deleteReminder(${r.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderSupStaff(myBuildings) {
+            const container = document.getElementById('supStaffList');
+            const myStaff = staffMembers.filter(s => s.role === 'cleaning' && s.assignedBuildings.some(b => myBuildings.includes(b)));
+            container.innerHTML = myStaff.map(s => {
+                const recentWork = workSubmissions.filter(w => w.staffId === s.id);
+                return `
+                <div class="task-card">
+                    <div class="task-card-header">
+                        <span class="task-card-title">👷 ${s.name}</span>
+                        <span class="shift-badge ${s.shift}">${s.shift}</span>
+                    </div>
+                    <p class="task-card-meta">Buildings: <span>${s.assignedBuildings.join(', ')}</span></p>
+                    <p class="task-card-meta">Tasks submitted: <span>${recentWork.length}</span> | Approved: <span>${recentWork.filter(w => w.supervisorApproved === true).length}</span></p>
+                </div>`;
+            }).join('');
+        }
+
+        function switchSupervisorTab(tab) {
+            document.getElementById('supVerifyTab').style.display = 'block';
+        }
+
+        function openReminderModal() {
+            document.getElementById('reminderModal').classList.add('active');
+        }
+
+        function saveReminder() {
+            const building = document.getElementById('reminderBuilding').value;
+            const type = document.getElementById('reminderType').value;
+            const frequency = document.getElementById('reminderFrequency').value;
+            const notifyPortal = document.getElementById('notifyPortal').checked;
+            const notifyMobile = document.getElementById('notifyMobile').checked;
+            const notes = document.getElementById('reminderNotes').value;
+
+            const freqHours = { '4h': 4, '8h': 8, '12h': 12, '24h': 24 };
+            reminders.push({
+                id: reminders.length + 10,
+                building, type, frequency,
+                notifyPortal, notifyMobile, notes,
+                createdBy: currentUser.name,
+                nextDue: new Date(Date.now() + freqHours[frequency] * 3600000)
+            });
+
+            closeModal('reminderModal');
+            renderReminders();
+            showToast(`Reminder set for ${building} — ${type} every ${frequency}`, 'success');
+        }
+
+        function deleteReminder(id) {
+            reminders = reminders.filter(r => r.id !== id);
+            renderReminders();
+            showToast('Reminder deleted');
+        }
+
+        function updateWashroomOptions() {
+            // Helper to filter washroom options based on selected building
+        }
+
+        // ──── Complaint Submission (Real API with image + AI) ────
+        function openComplaintModal() {
+            document.getElementById('complaintModal').classList.add('active');
+            document.getElementById('aiAnalysisResult').style.display = 'none';
+            document.getElementById('aiAnalysisResult').innerHTML = '';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) { preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`; };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.innerHTML = '';
+            }
+        }
+
+        let _submitting = false; // guard against double submission
+        let showComplaintPhotos = false; // Toggle for viewing complaint photos
+
+        async function submitComplaint() {
+            if (_submitting) return;
+
+            const category = document.getElementById('complaintCategory').value;
+            const room = document.getElementById('complaintRoom').value;
+            const description = document.getElementById('complaintDescription').value;
+            const imageInput = document.getElementById('complaintImage');
+
+            if (!room || !description) {
+                showToast('Please fill in room number and description');
+                return;
+            }
+            if (description.length < 10) {
+                showToast('Description must be at least 10 characters');
+                return;
+            }
+
+            const btn = document.getElementById('submitComplaintBtn');
+
+            // ── Step 1: If no category selected, show AI detection and let user review ──
+            if (!category) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span> Detecting Category...';
+
+                const catResult = await api.post('/ai/categorize', { description });
+                btn.disabled = false;
+                btn.textContent = 'Submit Complaint';
+
+                if (catResult) {
+                    showAICategoryPicker(catResult);
+                } else {
+                    showToast('AI detection failed. Please select a category manually.');
+                }
+                return;
+            }
+
+            // ── Step 2: Actually submit the complaint ──
+            _submitting = true;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Submitting...';
+
+            if (useOfflineMode) {
+                let aiData = null;
+                const aiResult = await api.post('/ai/analyze-complaint', { description, category, room_number: room });
+                if (aiResult) aiData = aiResult;
+
+                complaintsData.unshift({
+                    id: complaintsData.length + 100,
+                    category, room_number: room, description,
+                    status: 'pending',
+                    priority: aiData?.ml_analysis?.priority?.priority || 'medium',
+                    created_at: new Date().toISOString(),
+                    resident_name: currentUser.name,
+                    resident_id: currentUser.id,
+                    image_url: null, ai_analysis: aiData
+                });
+                _submitting = false;
+                resetComplaintForm();
+                refreshCurrentView();
+                showToast('Complaint submitted!', 'success');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('room_number', room);
+            formData.append('description', description);
+            formData.append('category', category);
+            if (imageInput.files && imageInput.files[0]) {
+                formData.append('image', imageInput.files[0]);
+            }
+
+            const result = await api.upload('/complaints', formData);
+            _submitting = false;
+
+            if (result && result.id) {
+                resetComplaintForm();
+                await loadComplaints();
+                refreshCurrentView();
+                showToast('Complaint #' + result.id + ' submitted successfully!', 'success');
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'Submit Complaint';
+                showToast('Failed to submit complaint. Please try again.');
+            }
+        }
+
+        // Show AI-detected categories so user can review/change before submitting
+        function showAICategoryPicker(catResult) {
+            const container = document.getElementById('aiAnalysisResult');
+            const cat = catResult?.category || {};
+            const pri = catResult?.priority || {};
+            const allScores = cat.all_scores || {};
+
+            // Sort categories by score descending
+            const sorted = Object.entries(allScores).sort((a, b) => b[1] - a[1]);
+            const topCat = cat.category || 'other';
+
+            container.style.display = 'block';
+            container.innerHTML = `
+                <div class="ai-analysis-box">
+                    <h4>🤖 AI Category Detection</h4>
+                    <p style="margin:6px 0 10px;font-size:0.85rem;color:var(--text-secondary);">
+                        AI suggests <strong>${formatCategory(topCat)}</strong> (${Math.round((cat.confidence||0)*100)}%).
+                        Review the scores and change if needed:
+                    </p>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+                        ${sorted.filter(([,s]) => s > 0.03).map(([c, s]) => `
+                            <span class="ai-tag category" style="opacity:${c === topCat ? 1 : 0.65};${c === topCat ? 'border:1.5px solid var(--cyan);' : ''}">${formatCategory(c)} ${Math.round(s*100)}%</span>
+                        `).join('')}
+                    </div>
+                    ${pri.priority ? `<p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:10px;">⚡ AI Priority: <span class="ai-tag ${priorityClass(pri.priority)}">${(pri.priority||'').toUpperCase()}</span> (${Math.round((pri.confidence||0)*100)}%)</p>` : ''}
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label style="font-size:0.85rem;">Confirm or change category:</label>
+                        <select id="aiDetectedCategory" style="margin-top:4px;">
+                            ${sorted.map(([c]) => `<option value="${c}" ${c === topCat ? 'selected' : ''}>${formatCategory(c)}</option>`).join('')}
+                        </select>
+                    </div>
+                    <button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="confirmAICategory()">Confirm & Submit</button>
+                </div>
+            `;
+        }
+
+        function confirmAICategory() {
+            const detected = document.getElementById('aiDetectedCategory');
+            if (!detected) return;
+            // Set the main category dropdown to the chosen value and submit
+            const mainCat = document.getElementById('complaintCategory');
+            mainCat.value = detected.value;
+            // If the value isn't in the main dropdown options, add it
+            if (!mainCat.value) {
+                const opt = document.createElement('option');
+                opt.value = detected.value;
+                opt.textContent = formatCategory(detected.value);
+                mainCat.appendChild(opt);
+                mainCat.value = detected.value;
+            }
+            // Hide the picker
+            const container = document.getElementById('aiAnalysisResult');
+            container.style.display = 'none';
+            container.innerHTML = '';
+            // Now submit (category is set, so it will go straight to submission)
+            submitComplaint();
+        }
+
+        function resetComplaintForm() {
+            const container = document.getElementById('aiAnalysisResult');
+            if (container._autoCloseTimer) clearInterval(container._autoCloseTimer);
+            closeModal('complaintModal');
+            document.getElementById('complaintForm').reset();
+            document.getElementById('imagePreview').innerHTML = '';
+            container.style.display = 'none';
+            container.innerHTML = '';
+            const btn = document.getElementById('submitComplaintBtn');
+            btn.disabled = false;
+            btn.style.display = '';
+            btn.textContent = 'Submit Complaint';
+            _submitting = false;
+        }
+
+        // Kept for complaint detail popup — no longer used in submit flow
+        function showAIResultInForm(ai, complaint) {}
+
+        function refreshCurrentView() {
+            if (currentUser.role === 'admin') { renderAdminComplaints(); updateStats(); }
+            else if (currentUser.role === 'supervisor') { renderSupervisorDashboard(); }
+            else if (currentUser.role === 'staff') { renderStaffComplaints(); }
+            else { renderResidentDashboard(); }
+        }
+
+        // ──── Update Complaint Status (API) ────
+        async function updateComplaintStatus(id, status) {
+            if (!useOfflineMode) {
+                const result = await api.put(`/complaints/${id}/status`, { status });
+                if (result) {
+                    await loadComplaints();
+                    refreshCurrentView();
+                    showToast(`Complaint → ${formatStatus(status)}`, 'success');
+                    return;
+                }
+            }
+            // Offline fallback
+            const c = complaintsData.find(x => x.id === id);
+            if (c) {
+                c.status = status;
+                refreshCurrentView();
+                showToast(`Complaint → ${formatStatus(status)}`, 'success');
+            }
+        }
+
+        // ──── Assign Staff Modal ────
+        function openAssignModal() {
+            renderStaffSelect();
+            document.getElementById('assignModal').classList.add('active');
+        }
+
+        function renderStaffSelect() {
+            const container = document.getElementById('staffSelectList');
+            container.innerHTML = staffMembers.filter(s => s.role === 'supervisor').map(staff => `
+                <label class="staff-option ${selectedStaff === staff.id ? 'selected' : ''}" onclick="selectStaff(${staff.id})">
+                    <input type="radio" name="staff" value="${staff.id}">
+                    <div class="staff-avatar">${staff.name.split(' ').map(n => n[0]).join('')}</div>
+                    <div class="staff-info">
+                        <h4>${staff.name}</h4>
+                        <p>${staff.assignedBuildings.length > 0 ? 'Buildings: ' + staff.assignedBuildings.join(', ') : 'No buildings assigned'} &nbsp; <span class="shift-badge ${staff.shift}">${staff.shift}</span></p>
+                    </div>
+                </label>
+            `).join('');
+        }
+
+        function selectStaff(staffId) {
+            selectedStaff = staffId;
+            document.querySelectorAll('.staff-option').forEach(opt => opt.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+        }
+
+        function assignStaff() {
+            if (!selectedStaff) { showToast('Please select a supervisor'); return; }
+            const building = document.getElementById('assignFloor').value;
+            const staff = staffMembers.find(s => s.id === selectedStaff);
+            if (staff && !staff.assignedBuildings.includes(building)) staff.assignedBuildings.push(building);
+            closeModal('assignModal');
+            selectedStaff = null;
+            renderSupervisorDashboard();
+            renderFloors();
+            showToast(`${building} assigned to Supervisor ${staff.name}`, 'success');
+        }
+
+        // ──── Utilities ────
+        function formatDate(date) {
+            if (!date) return '';
+            const now = new Date();
+            const d = new Date(date);
+            const diff = now - d;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            if (days === 0) return 'Today';
+            if (days === 1) return 'Yesterday';
+            if (days < 7) return `${days} days ago`;
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast active' + (type ? ' ' + type : '');
+            setTimeout(() => { toast.classList.remove('active'); }, 3000);
+        }
+
+        // ──── Session restore (strict token check) ────
+        (async function restoreSession() {
+            const savedUser = localStorage.getItem('hostelUser');
+            const savedToken = localStorage.getItem('authToken');
+            if (!savedUser || !savedToken) return;
+
+            authToken = savedToken;
+            const me = await api.get('/auth/me');
+            if (me && me.id) {
+                currentUser = JSON.parse(savedUser);
+                showApp();
+                return;
+            }
+
+            logout();
+        })();
+
+        // Close modal on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) this.classList.remove('active');
+            });
+        });
+
+        // ── Theme Toggle ──
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            const newTheme = isDark ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcons(newTheme);
+        }
+
+        function updateThemeIcons(theme) {
+            const icon = theme === 'dark' ? '☀️' : '🌙';
+            const loginBtn = document.getElementById('loginThemeBtn');
+            const appBtn = document.getElementById('appThemeBtn');
+            if (loginBtn) loginBtn.textContent = icon;
+            if (appBtn) appBtn.textContent = icon;
+        }
+
+        (function initTheme() {
+            const saved = localStorage.getItem('theme');
+            if (saved) { document.documentElement.setAttribute('data-theme', saved); updateThemeIcons(saved); }
+            else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-theme', 'dark'); updateThemeIcons('dark');
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ILGC Tracker - Complete System Documentation</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  @page { size: A4; margin: 20mm 15mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    color: #1a1a2e;
+    background: #fff;
+    line-height: 1.6;
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 20px 30px;
+    font-size: 11px;
+  }
+
+  /* Cover page */
+  .cover {
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 90vh;
+    text-align: center;
+  }
+  .cover h1 { font-size: 36px; color: #0a0a0a; margin-bottom: 8px; letter-spacing: -1px; }
+  .cover .accent { color: #00bcd4; }
+  .cover .subtitle { font-size: 18px; color: #555; margin-bottom: 40px; }
+  .cover .meta { font-size: 13px; color: #888; margin-top: 30px; }
+  .cover .badge {
+    display: inline-block; padding: 6px 18px; border-radius: 20px;
+    background: #00bcd4; color: #fff; font-weight: 600; font-size: 13px; margin: 5px;
+  }
+
+  h1 { font-size: 22px; color: #0a0a0a; border-bottom: 3px solid #00bcd4; padding-bottom: 6px; margin-top: 30px; page-break-after: avoid; }
+  h2 { font-size: 17px; color: #1a1a2e; margin-top: 24px; page-break-after: avoid; }
+  h3 { font-size: 14px; color: #333; margin-top: 18px; page-break-after: avoid; }
+  h4 { font-size: 12px; color: #00838f; margin-top: 14px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 18px; font-size: 10.5px; page-break-inside: auto; }
+  th { background: #0a0a0a; color: #fff; padding: 7px 8px; text-align: left; font-weight: 600; }
+  td { padding: 6px 8px; border-bottom: 1px solid #e0e0e0; vertical-align: top; }
+  tr:nth-child(even) { background: #f8f9fa; }
+  tr { page-break-inside: avoid; }
+
+  code {
+    background: #f0f0f0; padding: 1px 5px; border-radius: 3px;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 10px; color: #c62828;
+  }
+  pre {
+    background: #1a1a2e; color: #e0e0e0; padding: 12px 16px; border-radius: 6px;
+    overflow-x: auto; font-size: 10px; line-height: 1.5; page-break-inside: avoid;
+  }
+  pre code { background: none; color: inherit; padding: 0; }
+
+  .mermaid-container {
+    text-align: center; margin: 16px 0; page-break-inside: avoid;
+    background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px;
+  }
+  .mermaid-container h4 { margin-top: 0; color: #00838f; }
+  .mermaid { font-size: 11px; }
+
+  .section-break { page-break-before: always; }
+  .no-break { page-break-inside: avoid; }
+
+  .toc { margin: 20px 0; }
+  .toc a { text-decoration: none; color: #00838f; }
+  .toc li { margin: 4px 0; }
+
+  .badge-lang {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 9px; font-weight: 600; color: #fff; margin-right: 4px;
+  }
+  .lang-js { background: #f7df1e; color: #000; }
+  .lang-py { background: #3776ab; }
+  .lang-html { background: #e44d26; }
+  .lang-sql { background: #336791; }
+  .lang-yaml { background: #cb171e; }
+  .lang-bash { background: #4eaa25; }
+  .lang-docker { background: #2496ed; }
+
+  .info-box {
+    background: #e0f7fa; border-left: 4px solid #00bcd4; padding: 10px 14px;
+    border-radius: 0 6px 6px 0; margin: 12px 0; font-size: 11px;
+  }
+
+  .stat-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0;
+  }
+  .stat-card {
+    background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px;
+    padding: 12px; text-align: center; border-top: 3px solid #00bcd4;
+  }
+  .stat-card .num { font-size: 24px; font-weight: 700; color: #0a0a0a; }
+  .stat-card .label { font-size: 10px; color: #666; margin-top: 2px; }
+
+  footer { text-align: center; color: #999; font-size: 9px; margin-top: 40px; border-top: 1px solid #eee; padding-top: 10px; }
+</style>
+</head>
+<body>
+
+<!-- ==================== COVER PAGE ==================== -->
+<div class="cover">
+  <h1>ILGC <span class="accent">Tracker</span></h1>
+  <div class="subtitle">AI-Powered Campus Housekeeping &amp; Hygiene Compliance Tracker</div>
+  <div class="subtitle" style="font-size:14px; color:#888;">Complete System Documentation — A to Z</div>
+
+  <div style="max-width:600px; margin:15px auto; padding:12px 18px; background:#f8f9fa; border-left:4px solid #00e5ff; border-radius:4px; text-align:left; font-size:11px; line-height:1.6; color:#444;">
+    <strong>Problem Statement:</strong> There have been recurring housekeeping issues on campus, particularly the failure to refill essential hygiene supplies such as tissues and soaps for continuous periods of up to four days. This lapse highlights the need for more consistent monitoring and timely replenishment of basic sanitation resources to maintain acceptable hygiene standards across campus.
+  </div>
+
+  <div style="margin: 30px 0;">
+    <span class="badge">Node.js</span>
+    <span class="badge">Python</span>
+    <span class="badge">PostgreSQL</span>
+    <span class="badge">Redis</span>
+    <span class="badge">Docker</span>
+    <span class="badge">Machine Learning</span>
+    <span class="badge">React Native</span>
+  </div>
+
+  <div class="stat-grid" style="max-width: 500px;">
+    <div class="stat-card"><div class="num">59</div><div class="label">Source Files</div></div>
+    <div class="stat-card"><div class="num">11,500+</div><div class="label">Lines of Code</div></div>
+    <div class="stat-card"><div class="num">50+</div><div class="label">API Endpoints</div></div>
+    <div class="stat-card"><div class="num">6</div><div class="label">Docker Services</div></div>
+  </div>
+
+  <div class="meta">
+    <p>Version 3.1.0 &bull; Generated: 14 March 2026</p>
+    <p>Project: /Users/maruteymani/Documents/ILGC Tracker</p>
+  </div>
+</div>
+
+<!-- ==================== TABLE OF CONTENTS ==================== -->
+<h1>Table of Contents</h1>
+<div class="toc">
+<ol>
+  <li><a href="#overview">Project Overview</a></li>
+  <li><a href="#tech">Technologies Used</a></li>
+  <li><a href="#arch">System Architecture Diagram</a></li>
+  <li><a href="#docker-map">Docker Container Map</a></li>
+  <li><a href="#db-schema">Database Schema (ER Diagram)</a></li>
+  <li><a href="#req-flow">Request Flow Sequences</a></li>
+  <li><a href="#ml-pipeline">AI/ML Pipeline Diagram</a></li>
+  <li><a href="#files">Every File Explained</a>
+    <ol style="list-style-type: lower-alpha;">
+      <li>Root Level Files</li>
+      <li>Backend — Node.js API</li>
+      <li>AI Service — Python</li>
+      <li>Mobile App — React Native</li>
+      <li>Infrastructure — Nginx</li>
+    </ol>
+  </li>
+  <li><a href="#api">Complete API Endpoints (50+)</a></li>
+  <li><a href="#roles">User Roles &amp; Permissions</a></li>
+  <li><a href="#ml-models">ML Models Explained</a></li>
+  <li><a href="#security">Security Features</a></li>
+  <li><a href="#deploy">Deployment Guide</a></li>
+  <li><a href="#summary">File Count Summary</a></li>
+  <li><a href="#changelog">Changelog</a></li>
+</ol>
+</div>
+
+<!-- ==================== 1. OVERVIEW ==================== -->
+<div class="section-break"></div>
+<h1 id="overview">1. Project Overview</h1>
+
+<p><strong>ILGC Tracker</strong> is an <strong>AI-powered Campus Housekeeping &amp; Hygiene Compliance Tracker</strong> designed to solve a persistent problem on campus: the failure to refill essential hygiene supplies (tissues, soaps, sanitizers) for days at a time, and the lack of consistent monitoring of housekeeping standards. The system gives residents an instant way to report shortages and hygiene issues, uses machine learning to auto-categorize and prioritize those complaints, and gives administrators real-time visibility into compliance gaps — ensuring timely replenishment and accountability.</p>
+
+<div class="info-box" style="border-left-color:#e53935;">
+  <strong>The Problem:</strong> Recurring housekeeping lapses on campus — essential hygiene supplies (tissues, soaps) go unrefilled for up to <strong>4 consecutive days</strong>. There is no structured system for residents to report shortages, no tracking of replenishment schedules, and no accountability mechanism for housekeeping staff. This lapse in basic sanitation resources poses health and hygiene risks campus-wide.
+</div>
+
+<div class="info-box">
+  <strong>The Solution — ILGC Tracker:</strong> Track-based login (Admin / Housekeeping / Faculty-Student) with role-specific access (Admin/Supervisor/Cleaning Staff/Student&amp;Faculty) &bull; Building/Floor/Direction-wise washroom data tracking &bull; Supply inventory monitoring (soap, tissue, sanitizer levels) &bull; AI complaint analysis with 12 categories (including hygiene, supplies, cleaning) &bull; Priority prediction (hygiene issues auto-flagged high/urgent) &bull; <strong>2-way work verification</strong> (LLM image analysis + supervisor approval) &bull; False reporting detection &bull; Supervisor consumption-based reminders &bull; Restocking timeline tracking &bull; NLP sentiment analysis &bull; AI auto-categorization with review flow &bull; Complaint detail popup with full AI breakdown &bull; Image upload for photographic evidence &bull; Predictive maintenance to anticipate supply shortages &bull; Light/Dark theme &bull; Real-time dashboard for monitoring compliance &bull; Mobile app shell for on-the-go access
+</div>
+
+<h3>How It Works (Simple)</h3>
+<ol>
+  <li><strong>Student/Faculty</strong> notices that soap dispensers in the H2 – 2nd Floor South Wing washroom have been empty for 2 days. They open ILGC Tracker and submit a complaint: <em>"No soap in H2 2nd floor south wing washroom for 2 days, tissue dispensers also empty"</em> — attaches a photo as evidence, lets AI auto-detect the category</li>
+  <li><strong>AI automatically</strong> categorizes it as "hygiene" (with confidence scores across all 12 categories), predicts "high" priority (hygiene shortages get elevated priority), analyzes negative sentiment, detects urgency keywords ("empty", "2 days"), extracts entities ("soap", "tissue", "H2 2nd floor south wing"), and suggests actions ("Restock soap and tissue dispensers immediately")</li>
+  <li><strong>Student reviews</strong> AI-detected category + scores in a picker, confirms or changes, then submits</li>
+  <li><strong>Admin/Supervisor</strong> sees the complaint on the dashboard with AI tags (category, sentiment, urgency, priority). Clicks the card → <strong>detail popup</strong> shows resident info, room/location, attached photo evidence, full AI analysis with confidence bars, suggested actions, estimated resolution time. Admin can escalate false reports to supervisors; supervisors assign complaints to their own staff</li>
+  <li><strong>Cleaning Staff</strong> receives the task, restocks supplies, uploads proof photo. <strong>LLM verifies</strong> the uploaded image for cleanliness/completion. <strong>Supervisor reviews</strong> and approves the submission — <em>2-way verification ensures accountability</em></li>
+  <li><strong>System</strong> tracks supply levels building-wise (soap, tissue, sanitizer), sends consumption-based reminders to supervisors, detects false reporting patterns, logs everything with timestamps — admin can identify patterns (e.g., which buildings/floors have repeated shortages, restocking timelines) to improve scheduling</li>
+</ol>
+
+<!-- ==================== 2. TECHNOLOGIES ==================== -->
+<h1 id="tech">2. Technologies Used</h1>
+
+<table>
+  <tr><th>Layer</th><th>Technology</th><th>Language</th><th>Purpose</th></tr>
+  <tr><td>Frontend</td><td>Vanilla HTML/CSS/JS</td><td><span class="badge-lang lang-html">HTML5</span><span class="badge-lang lang-js">JS</span></td><td>Single-page web application (3,884 lines) — role-track login, admin/supervisor workflow controls, complaint detail modals, washroom/supply dashboards</td></tr>
+  <tr><td>Mobile</td><td>React Native 0.73 + WebView</td><td><span class="badge-lang lang-js">JavaScript</span></td><td>Android + iOS shell that loads website UI with cache-busting, deep-link handling, and fallback host support</td></tr>
+  <tr><td>Backend API</td><td>Express.js 4.18</td><td><span class="badge-lang lang-js">Node.js 18+</span></td><td>REST API server (9 route modules)</td></tr>
+  <tr><td>AI Service</td><td>FastAPI + Gunicorn</td><td><span class="badge-lang lang-py">Python 3.11</span></td><td>Machine learning microservice</td></tr>
+  <tr><td>Database</td><td>PostgreSQL 16</td><td><span class="badge-lang lang-sql">SQL</span></td><td>Primary data store (14 tables)</td></tr>
+  <tr><td>Cache</td><td>Redis 7</td><td>—</td><td>Caching + session store</td></tr>
+  <tr><td>ML Models</td><td>scikit-learn</td><td><span class="badge-lang lang-py">Python</span></td><td>Random Forest + Gradient Boosting</td></tr>
+  <tr><td>NLP</td><td>TextBlob + NLTK + spaCy</td><td><span class="badge-lang lang-py">Python</span></td><td>Sentiment, urgency, entity extraction</td></tr>
+  <tr><td>Reverse Proxy</td><td>Nginx 1.25</td><td>—</td><td>SSL termination, rate limiting, static files</td></tr>
+  <tr><td>Auth</td><td>JWT (jsonwebtoken)</td><td>—</td><td>Token-based authentication (access + refresh)</td></tr>
+  <tr><td>ORM</td><td>Knex.js</td><td><span class="badge-lang lang-js">JS</span></td><td>SQL query builder + migrations</td></tr>
+  <tr><td>Containers</td><td>Docker + Compose</td><td><span class="badge-lang lang-docker">Docker</span></td><td>Production deployment (6 services)</td></tr>
+  <tr><td>SSL</td><td>Certbot / Let's Encrypt</td><td>—</td><td>HTTPS certificates (auto-renew)</td></tr>
+  <tr><td>Logging</td><td>Winston + Structlog</td><td>—</td><td>Structured logging with rotation</td></tr>
+  <tr><td>Monitoring</td><td>Prometheus</td><td>—</td><td>Request/ML prediction metrics</td></tr>
+</table>
+
+<!-- ==================== 3. ARCHITECTURE ==================== -->
+<div class="section-break"></div>
+<h1 id="arch">3. System Architecture</h1>
+
+<div class="mermaid-container">
+  <h4>Full System Architecture</h4>
+  <div class="mermaid">
+graph TB
+    subgraph Client["🌐 Client Layer"]
+        Browser["Web Browser<br/><b>index.html</b><br/>HTML5 / CSS3 / Vanilla JS<br/>3150 lines"]
+        Mobile["React Native App<br/><b>HostelCareApp/</b><br/>9 Screens + API service"]
+    end
+
+    subgraph Nginx["🔒 Nginx Reverse Proxy Port 80/443"]
+        NX["nginx:1.25-alpine<br/>SSL Termination<br/>Rate Limiting<br/>Gzip Compression<br/>Static File Serving"]
+    end
+
+    subgraph Backend["⚡ Node.js API Port 5000"]
+        Express["Express.js Server<br/><b>server.js</b> 221 lines<br/>Cluster Mode 4 workers"]
+        MW["Middleware: helmet, cors,<br/>rate-limit, JWT auth, Joi validation"]
+        Routes["9 Route Modules:<br/>auth, complaints, rooms, staff,<br/>dashboard, ai, washrooms,<br/>work-submissions, reminders"]
+        Services["aiService.js + cacheService.js"]
+    end
+
+    subgraph AI["🤖 Python AI Service Port 8000"]
+        FastAPI["FastAPI + Gunicorn<br/><b>main.py</b> 186 lines<br/>4 Uvicorn Workers"]
+        MLModels["Random Forest Classifier<br/>Gradient Boosting Predictor"]
+        NLP["TextBlob Sentiment<br/>Urgency Detection<br/>Entity Extraction"]
+    end
+
+    subgraph Data["💾 Data Layer"]
+        PG["PostgreSQL 16<br/>14 Tables, UUID PKs<br/>JSONB for AI data"]
+        Redis["Redis 7<br/>Session Cache<br/>API Response Cache"]
+    end
+
+    Browser -->|HTTP/HTTPS| NX
+    Mobile -->|HTTPS API| NX
+    NX -->|"/api/*"| Express
+    NX -->|static| Browser
+    Express --> MW --> Routes --> Services
+    Services -->|HTTP + API Key| FastAPI
+    Services --> Redis
+    Routes --> PG
+    FastAPI --> MLModels
+    FastAPI --> NLP
+    FastAPI --> Redis
+  </div>
+</div>
+
+<!-- ==================== 4. DOCKER MAP ==================== -->
+<h1 id="docker-map">4. Docker Container Map</h1>
+
+<div class="mermaid-container">
+  <h4>6 Docker Containers — Production Deployment</h4>
+  <div class="mermaid">
+graph TD
+    subgraph Docker["Docker Compose Orchestration"]
+        PG["🐘 PostgreSQL 16<br/>ilgctracker-postgres-1<br/>Port: 127.0.0.1:5432<br/>Volume: pgdata"]
+        RD["🔴 Redis 7<br/>ilgctracker-redis-1<br/>Port: 127.0.0.1:6379<br/>Volume: redisdata, 128MB LRU"]
+        API["🟢 Node.js API<br/>ilgctracker-api-1<br/>Port: 127.0.0.1:5000<br/>Volumes: uploads, api_logs"]
+        AIS["🔵 Python AI Service<br/>ilgctracker-ai-service-1<br/>Port: 127.0.0.1:8000<br/>Volume: ai_models"]
+        NGX["🟩 Nginx 1.25<br/>ilgctracker-nginx-1<br/>Ports: 80, 443<br/>Volumes: frontend-dist, certbot"]
+        CB["🔒 Certbot<br/>ilgctracker-certbot-1<br/>Auto-renew every 12h"]
+    end
+
+    PG -->|"healthy → starts"| API
+    RD -->|"healthy → starts"| API
+    RD -->|"healthy → starts"| AIS
+    API -->|"healthy → starts"| NGX
+    NGX --> CB
+  </div>
+</div>
+
+<table>
+  <tr><th>Container</th><th>Image</th><th>Port</th><th>Volumes</th><th>Health Check</th></tr>
+  <tr><td>PostgreSQL</td><td>postgres:16-alpine</td><td>127.0.0.1:5432</td><td>pgdata</td><td>pg_isready</td></tr>
+  <tr><td>Redis</td><td>redis:7-alpine</td><td>127.0.0.1:6379</td><td>redisdata</td><td>redis-cli ping</td></tr>
+  <tr><td>Node API</td><td>ilgctracker-api (custom)</td><td>127.0.0.1:5000</td><td>uploads, api_logs</td><td>wget /health</td></tr>
+  <tr><td>AI Service</td><td>ilgctracker-ai-service (custom)</td><td>127.0.0.1:8000</td><td>ai_models</td><td>python httpx /health</td></tr>
+  <tr><td>Nginx</td><td>nginx:1.25-alpine</td><td>80, 443</td><td>frontend-dist, certbot</td><td>wget /health</td></tr>
+  <tr><td>Certbot</td><td>certbot/certbot</td><td>—</td><td>certbot_conf, certbot_www</td><td>—</td></tr>
+</table>
+
+<!-- ==================== 5. DATABASE SCHEMA ==================== -->
+<div class="section-break"></div>
+<h1 id="db-schema">5. Database Schema (14 Tables)</h1>
+
+<div class="mermaid-container">
+  <h4>Entity Relationship Diagram</h4>
+  <div class="mermaid">
+erDiagram
+    users {
+        UUID id PK
+        VARCHAR email UK
+        VARCHAR password
+        VARCHAR name
+        ENUM role "admin-supervisor-staff-resident"
+        VARCHAR room_number
+        VARCHAR phone
+        VARCHAR shift "morning-evening-night"
+        UUID supervisor_id FK
+        BOOLEAN is_active
+        TIMESTAMP last_login
+    }
+    floors {
+        INT id PK
+        VARCHAR name
+        VARCHAR building
+        UUID assigned_staff_id FK
+    }
+    rooms {
+        INT id PK
+        VARCHAR room_number UK
+        INT floor_id FK
+        ENUM status "pending-cleaned-maintenance"
+        UUID resident_id FK
+        UUID assigned_staff_id FK
+        TIMESTAMP last_cleaned
+    }
+    complaints {
+        INT id PK
+        VARCHAR category
+        VARCHAR room_number
+        VARCHAR building
+        TEXT description
+        ENUM status "pending-in_progress-resolved"
+        ENUM priority "low-medium-high-urgent"
+        UUID resident_id FK
+        UUID assigned_staff_id FK
+        JSONB ai_analysis
+    }
+    washrooms {
+        INT id PK
+        VARCHAR building
+        INT floor_number
+        VARCHAR direction "North-South-East-West"
+        ENUM status "clean-needs_cleaning-maintenance"
+        INT soap_level "0-100"
+        INT tissue_level "0-100"
+        INT sanitizer_level "0-100"
+        UUID assigned_staff_id FK
+        TIMESTAMP last_restocked
+    }
+    work_submissions {
+        INT id PK
+        UUID staff_id FK
+        INT washroom_id FK
+        TEXT description
+        VARCHAR image_url
+        BOOLEAN llm_verified
+        TEXT llm_feedback
+        ENUM supervisor_status "pending-approved-rejected"
+        UUID reviewed_by FK
+    }
+    supply_inventory {
+        INT id PK
+        VARCHAR building
+        VARCHAR item_name
+        INT current_stock
+        INT min_threshold
+        VARCHAR unit
+        TIMESTAMP last_restocked
+        UUID restocked_by FK
+    }
+    reminders {
+        INT id PK
+        UUID supervisor_id FK
+        VARCHAR building
+        VARCHAR reminder_type
+        TEXT message
+        BOOLEAN is_active
+        TIMESTAMP due_date
+    }
+    cleaning_logs {
+        INT id PK
+        INT room_id FK
+        UUID staff_id FK
+        VARCHAR status
+        INT duration_minutes
+    }
+    notifications {
+        INT id PK
+        UUID user_id FK
+        VARCHAR title
+        TEXT message
+        BOOLEAN read
+    }
+    ai_insights {
+        INT id PK
+        VARCHAR type
+        JSONB data
+        FLOAT confidence
+    }
+    refresh_tokens {
+        INT id PK
+        UUID user_id FK
+        VARCHAR token UK
+        TIMESTAMP expires_at
+        BOOLEAN revoked
+    }
+    audit_logs {
+        INT id PK
+        UUID user_id FK
+        VARCHAR action
+        VARCHAR entity_type
+        JSONB details
+    }
+
+    users ||--o{ users : "supervisor of"
+    users ||--o{ floors : "staff assigned"
+    floors ||--o{ rooms : "contains"
+    users ||--o{ rooms : "resident"
+    users ||--o{ complaints : "creates"
+    users ||--o{ complaints : "assigned to"
+    users ||--o{ washrooms : "assigned to"
+    users ||--o{ work_submissions : "submits"
+    users ||--o{ work_submissions : "reviews"
+    washrooms ||--o{ work_submissions : "for"
+    users ||--o{ supply_inventory : "restocks"
+    users ||--o{ reminders : "supervisor"
+    rooms ||--o{ cleaning_logs : "cleaned"
+    users ||--o{ cleaning_logs : "cleans"
+    users ||--o{ notifications : "receives"
+    users ||--o{ refresh_tokens : "has"
+    users ||--o{ audit_logs : "performs"
+  </div>
+</div>
+
+<h3>Table Details</h3>
+<table>
+  <tr><th>Table</th><th>PK Type</th><th>Key Columns</th><th>Indexes</th><th>Purpose</th></tr>
+  <tr><td><code>users</code></td><td>UUID</td><td>email (unique), role (admin/supervisor/staff/resident), password (bcrypt), shift, supervisor_id (FK → users), is_active</td><td>email, role, is_active</td><td>All system users — admin, supervisors, cleaning staff, students/faculty</td></tr>
+  <tr><td><code>floors</code></td><td>INT</td><td>name, building, assigned_staff_id (FK → users)</td><td>assigned_staff_id</td><td>Building floors with staff assignment</td></tr>
+  <tr><td><code>rooms</code></td><td>INT</td><td>room_number (unique), floor_id, status, resident_id, assigned_staff_id</td><td>floor_id, status, resident_id</td><td>Individual rooms with cleaning status</td></tr>
+  <tr><td><code>complaints</code></td><td>INT</td><td>category, description, building, status, priority, ai_analysis (JSONB)</td><td>status, priority, category, resident_id, created_at</td><td>Resident complaints with AI analysis results</td></tr>
+  <tr><td><code>cleaning_logs</code></td><td>INT</td><td>room_id, staff_id, status, duration_minutes</td><td>room_id, staff_id, created_at</td><td>Cleaning activity history</td></tr>
+  <tr><td><code>notifications</code></td><td>INT</td><td>user_id, title, message, type, read</td><td>user_id, read, created_at</td><td>In-app notifications</td></tr>
+  <tr><td><code>ai_insights</code></td><td>INT</td><td>type, data (JSONB), confidence</td><td>type, created_at</td><td>AI-generated insights and trends</td></tr>
+  <tr><td><code>refresh_tokens</code></td><td>INT</td><td>user_id, token (unique), expires_at, revoked</td><td>user_id, token, expires_at</td><td>JWT refresh token storage</td></tr>
+  <tr><td><code>audit_logs</code></td><td>INT</td><td>user_id, action, entity_type, details (JSONB), ip_address</td><td>user_id, action, created_at</td><td>Security audit trail</td></tr>
+  <tr><td><code>washrooms</code></td><td>INT</td><td>building, floor_number, direction (North/South/East/West), status, soap_level (0-100), tissue_level (0-100), sanitizer_level (0-100), assigned_staff_id FK</td><td>building, floor_number, status</td><td>Building/floor/direction-wise washroom tracking with supply levels</td></tr>
+  <tr><td><code>work_submissions</code></td><td>INT</td><td>staff_id FK, washroom_id FK, description, image_url, llm_verified, llm_feedback, supervisor_status (pending/approved/rejected), reviewed_by FK</td><td>staff_id, washroom_id, supervisor_status</td><td>Cleaning proof submissions with 2-way verification (LLM + supervisor)</td></tr>
+  <tr><td><code>supply_inventory</code></td><td>INT</td><td>building, item_name, current_stock, min_threshold, unit, last_restocked, restocked_by FK</td><td>building, item_name</td><td>Building-wise supply inventory tracking (soap, tissue, sanitizer)</td></tr>
+  <tr><td><code>reminders</code></td><td>INT</td><td>supervisor_id FK, building, reminder_type, message, is_active, due_date</td><td>supervisor_id, due_date, is_active</td><td>Supervisor consumption-based restocking reminders</td></tr>
+  <tr><td><code>knex_migrations</code></td><td>INT</td><td>name, batch, migration_time</td><td>—</td><td>Knex migration tracking (framework-managed)</td></tr>
+</table>
+
+<!-- ==================== 6. REQUEST FLOW ==================== -->
+<div class="section-break"></div>
+<h1 id="req-flow">6. Request Flow Sequences</h1>
+
+<div class="mermaid-container">
+  <h4>Login → Create Complaint → Dashboard</h4>
+  <div class="mermaid">
+sequenceDiagram
+    participant B as Browser
+    participant N as Nginx :80
+    participant E as Express API :5000
+    participant PG as PostgreSQL
+    participant R as Redis
+    participant AI as Python AI :8000
+
+    Note over B,AI: 1. User Login Flow
+    B->>N: POST /api/auth/login
+    N->>E: Proxy request
+    E->>PG: SELECT user WHERE email=?
+    PG-->>E: User record
+    E->>E: bcrypt.compare(password)
+    E->>E: jwt.sign({id, role})
+    E-->>B: {token, refreshToken, user}
+
+    Note over B,AI: 2. Create Complaint + AI Analysis
+    Note over B,AI: 2a. AI Auto-Categorization (optional)
+    B->>N: POST /api/ai/categorize + JWT
+    N->>E: Proxy
+    E->>AI: POST /api/v1/complaints/categorize
+    AI->>AI: TF-IDF + RandomForest
+    AI-->>E: {category, confidence, all_scores}
+    E-->>B: Category scores (user reviews & confirms)
+
+    Note over B,AI: 2b. Create Complaint + Full AI Analysis
+    B->>N: POST /api/complaints (FormData + image) + JWT
+    N->>E: Proxy with Bearer token
+    E->>E: JWT middleware verifies token
+    E->>E: multer processes image upload
+    E->>AI: POST /api/v1/complaints/analyze
+    AI->>AI: TF-IDF vectorize text
+    AI->>AI: RandomForest predict category
+    AI->>AI: GradientBoosting predict priority
+    AI->>AI: TextBlob sentiment analysis
+    AI->>AI: Urgency detection + entity extraction
+    AI->>R: Cache result 5min TTL
+    AI-->>E: {ml_analysis, nlp_analysis, summary}
+    E->>E: mapPriority(critical → urgent)
+    E->>PG: INSERT INTO complaints (+ ai_analysis JSONB)
+    E->>PG: Auto-assign staff based on room floor
+    E-->>B: 201 Created + full AI results
+
+    Note over B,AI: 3. Admin Dashboard Load
+    B->>N: GET /api/dashboard/admin + JWT
+    N->>E: Proxy
+    E->>R: Check cache
+    alt Cache Hit
+        R-->>E: Cached stats
+    else Cache Miss
+        E->>PG: Aggregate queries
+        PG-->>E: Stats data
+        E->>R: Cache 5min
+    end
+    E-->>B: {stats, complaints, charts}
+  </div>
+</div>
+
+<div class="mermaid-container">
+  <h4>Washroom Cleaning → Work Submission → 2-Way Verification</h4>
+  <div class="mermaid">
+sequenceDiagram
+    participant S as Cleaning Staff
+    participant N as Nginx :80
+    participant E as Express API :5000
+    participant PG as PostgreSQL
+    participant LLM as LLM Service
+
+    Note over S,LLM: 1. Staff Views Assigned Washrooms
+    S->>N: GET /api/washrooms + JWT
+    N->>E: Proxy request
+    E->>PG: SELECT washrooms WHERE assigned_staff_id=?
+    PG-->>E: Washroom list (building, floor, supplies)
+    E-->>S: Washrooms with supply levels
+
+    Note over S,LLM: 2. Staff Completes Cleaning + Submits Proof
+    S->>N: POST /api/work-submissions (FormData + photo) + JWT
+    N->>E: Proxy with Bearer token
+    E->>E: multer processes proof image
+    E->>LLM: Analyze image for cleanliness
+    LLM-->>E: {verified: true/false, feedback: "..."}
+    E->>PG: INSERT work_submissions (llm_verified, llm_feedback)
+    E-->>S: 201 Created + LLM verification result
+
+    Note over S,LLM: 3. Supervisor Reviews Submission
+    participant SV as Supervisor
+    SV->>N: GET /api/dashboard/supervisor + JWT
+    N->>E: Proxy
+    E->>PG: SELECT pending work_submissions for supervisor's staff
+    PG-->>E: Pending submissions with LLM results
+    E-->>SV: Dashboard (pendingVerifications, staff, reminders)
+
+    SV->>N: PUT /api/work-submissions/:id/approve + JWT
+    N->>E: Proxy
+    E->>PG: UPDATE supervisor_status='approved', reviewed_by=?
+    E-->>SV: Submission approved ✓
+
+    Note over S,LLM: 4. Supply Inventory Check
+    SV->>N: GET /api/washrooms/inventory/all + JWT
+    N->>E: Proxy
+    E->>PG: SELECT supply_inventory ORDER BY building
+    PG-->>E: All inventory items with stock levels
+    E-->>SV: Building-wise supply inventory
+  </div>
+</div>
+
+<!-- ==================== 7. ML PIPELINE ==================== -->
+<h1 id="ml-pipeline">7. AI/ML Analysis Pipeline</h1>
+
+<div class="mermaid-container">
+  <h4>How AI Analyzes a Complaint</h4>
+  <div class="mermaid">
+graph LR
+    subgraph Input["📝 Complaint Input"]
+        Text["User types:<br/>'The toilet in room 205<br/>is leaking badly<br/>and flooding the floor'"]
+    end
+
+    subgraph Step1["Step 1: Vectorization"]
+        TFIDF["TF-IDF Vectorizer<br/>5000 features<br/>1-3 word n-grams<br/>Sublinear TF"]
+    end
+
+    subgraph Step2["Step 2: Classification"]
+        RF["Random Forest<br/>200 trees<br/>max_depth=20"]
+        GB["Gradient Boosting<br/>200 trees<br/>learning_rate=0.1"]
+    end
+
+    subgraph Step3["Step 3: NLP"]
+        Sent["TextBlob<br/>Sentiment"]
+        Urg["Keyword<br/>Urgency"]
+        Ent["Regex<br/>Entities"]
+    end
+
+    subgraph Output["📊 Result"]
+        Res["category: plumbing 0.87<br/>priority: high 0.73<br/>sentiment: negative<br/>urgency: high<br/>keywords: toilet, leak<br/>actions: Dispatch plumber<br/>est_time: 4 hours"]
+    end
+
+    Text --> TFIDF --> RF --> Output
+    TFIDF --> GB --> Output
+    Text --> Sent --> Output
+    Text --> Urg --> Output
+    Text --> Ent --> Output
+  </div>
+</div>
+
+<h3>12 Complaint Categories</h3>
+<table>
+  <tr><th>Category</th><th>Example Keywords</th><th>Suggested Actions</th></tr>
+  <tr><td>plumbing</td><td>leak, pipe, toilet, tap, drain, clogged, water</td><td>Dispatch plumbing team, check water damage</td></tr>
+  <tr><td>electrical</td><td>wire, outlet, socket, power, switch, short circuit</td><td>Send electrician, safety inspection</td></tr>
+  <tr><td>cleaning</td><td>dirty, stain, dust, trash, garbage, hygiene</td><td>Schedule deep cleaning</td></tr>
+  <tr><td>furniture</td><td>bed, chair, table, desk, wardrobe, broken</td><td>Inspect/replace furniture</td></tr>
+  <tr><td>pest_control</td><td>cockroach, rat, ant, mosquito, bug, insect</td><td>Schedule pest treatment</td></tr>
+  <tr><td>noise</td><td>loud, noise, music, construction, disturbance</td><td>Issue warning, enforce quiet hours</td></tr>
+  <tr><td>security</td><td>theft, lock, break in, stranger, unsafe</td><td>Notify security, install cameras</td></tr>
+  <tr><td>maintenance</td><td>repair, fix, cracked, worn, paint, wall</td><td>Schedule maintenance crew</td></tr>
+  <tr><td>internet</td><td>wifi, internet, network, router, slow, disconnect</td><td>Reset router, check ISP</td></tr>
+  <tr><td>appliance</td><td>ac, fan, geyser, fridge, washing machine</td><td>Technician inspection</td></tr>
+  <tr><td>hvac</td><td>heating, cooling, ventilation, temperature</td><td>HVAC technician dispatch</td></tr>
+  <tr><td>other</td><td>general, miscellaneous</td><td>Manual review required</td></tr>
+</table>
+
+<!-- ==================== 8. EVERY FILE ==================== -->
+<div class="section-break"></div>
+<h1 id="files">8. Every File Explained</h1>
+
+<h2>8a. Root Level Files</h2>
+<table>
+  <tr><th>File</th><th>Lines</th><th>Language</th><th>What It Does</th></tr>
+  <tr><td><code>index.html</code></td><td>3,884</td><td><span class="badge-lang lang-html">HTML</span><span class="badge-lang lang-js">JS</span></td><td><strong>The entire web frontend</strong> — track-based login entry (Admin / Housekeeping / Faculty-Student), admin dashboard, supervisor dashboard, washroom status grid (building/floor/direction-wise), supply inventory tracking, room/task modules, complaints list, staff management, modals, filters, and theme toggle. Includes role-aligned controls: admin complaint view is read-only with false-report escalation to supervisors, admin building-to-supervisor assignment, and supervisor complaint assignment to their own staff. <strong>Fully integrated with backend API</strong> — real-time complaint CRUD, FormData image upload, AI auto-categorization flow, complaint detail modal with AI analysis, and dashboard refresh logic</td></tr>
+  <tr><td><code>docker-compose.yml</code></td><td>141</td><td><span class="badge-lang lang-yaml">YAML</span></td><td>Defines all 6 Docker containers (PostgreSQL, Redis, Node API, Python AI, Nginx, Certbot), their ports, volumes, health checks, environment variables, and dependency ordering</td></tr>
+  <tr><td><code>deploy.sh</code></td><td>96</td><td><span class="badge-lang lang-bash">Bash</span></td><td>One-command deployment — generates secrets (JWT, DB password, Redis password via openssl), creates self-signed SSL certs, copies frontend to frontend-dist/, builds Docker images, starts containers, runs DB migrations</td></tr>
+  <tr><td><code>.env.example</code></td><td>80</td><td>Env</td><td>Template for root-level environment variables: DB credentials, JWT secrets, Redis password, AI API key, CORS, SMTP, upload, rate limit settings</td></tr>
+  <tr><td><code>README.md</code></td><td>~100</td><td>Markdown</td><td>Project documentation</td></tr>
+</table>
+
+<h2>8b. Backend — Node.js API (backend/)</h2>
+
+<h3>Core Files</h3>
+<table>
+  <tr><th>File</th><th>Lines</th><th>What It Does</th></tr>
+  <tr><td><code>server.js</code></td><td>221</td><td><strong>Express app entry point</strong> — configures: helmet (security headers), CORS (configurable origins), rate limiting (100 req/15min API, 20 req/15min auth), compression (gzip), morgan (HTTP logging), body parsing (10MB limit). Mounts 9 route modules (auth, complaints, rooms, staff, dashboard, ai, washrooms, work-submissions, reminders). Implements cluster mode (4 workers in production). Serves frontend static files. Health check (/health) and readiness (/ready) endpoints. Graceful shutdown on SIGTERM/SIGINT</td></tr>
+  <tr><td><code>config/index.js</code></td><td>97</td><td><strong>Centralized configuration</strong> — reads ALL environment variables into structured config object with sections: app (port, host, env), jwt (secret, expiry), db (host, port, pool min/max, SSL), redis, ai (serviceUrl, apiKey), upload (maxSize, allowedTypes), rateLimit, cors, log, metrics. Validates critical vars in production</td></tr>
+  <tr><td><code>config/knexfile.js</code></td><td>~30</td><td>Knex migration config — specifies migration directory, seed directory, PostgreSQL client</td></tr>
+  <tr><td><code>package.json</code></td><td>~50</td><td>Dependencies: express, knex, pg, ioredis, jsonwebtoken, bcryptjs, helmet, hpp, cors, multer, joi, winston, morgan, compression, express-rate-limit, dotenv, axios</td></tr>
+  <tr><td><code>Dockerfile</code></td><td>~25</td><td>Multi-stage build: Stage 1 (builder) runs npm ci --production; Stage 2 (node:20-alpine) copies node_modules, app code, runs as non-root user with tini for PID 1 signal handling</td></tr>
+</table>
+
+<h3>Database Files</h3>
+<table>
+  <tr><th>File</th><th>Lines</th><th>What It Does</th></tr>
+  <tr><td><code>database/postgres.js</code></td><td>78</td><td><strong>PostgreSQL connection via Knex</strong> — creates connection pool (min:2, max:20, 30s acquire timeout), health check (SELECT 1), query logging in dev, pool event logging, graceful destroy</td></tr>
+  <tr><td><code>database/migrations/<br/>20240301000001_initial_schema.js</code></td><td>169</td><td><strong>Creates initial 10 tables</strong>: users (UUID PK, email unique, bcrypt password, role enum), floors, rooms (status enum, foreign keys), complaints (JSONB ai_analysis, priority/status enums), cleaning_logs, notifications, ai_insights, refresh_tokens, audit_logs. Each table has appropriate indexes</td></tr>
+  <tr><td><code>database/migrations/<br/>20240302000001_hygiene_monitoring.js</code></td><td>132</td><td><strong>Adds 4 new tables + schema enhancements</strong>: Adds 'supervisor' to user role enum. Adds shift (morning/evening/night) and supervisor_id (self-FK) to users. Creates washrooms table (building, floor, direction, supply levels 0-100, last_restocked). Creates work_submissions (staff proof with LLM verified + supervisor approval). Creates supply_inventory (building-wise stock tracking). Creates reminders (supervisor consumption-based). Adds building column to complaints. Widens room_number columns to varchar(200)</td></tr>
+  <tr><td><code>database/seeds/<br/>001_initial_data.js</code></td><td>201</td><td><strong>Seeds comprehensive demo data</strong>: 1 admin (admin@hostel.com), 2 supervisors (Meera Desai — morning, Suresh Nair — evening), 4 cleaning staff (with shift assignments + supervisor mapping), 4 residents (3 students + 1 faculty). 20 washrooms across 6 buildings (H1, H2, H3, Academic Block, Library, Cafeteria — H2 has North/South Wing directional data). 4 work submissions (mix of LLM verified/pending, approved/pending). 17 supply inventory items. 4 supervisor reminders. 7 hygiene-themed complaints (including false_reporting). 5 notifications. All passwords: password123 (bcrypt hashed)</td></tr>
+  <tr><td><code>scripts/initDb.js</code></td><td>~50</td><td>Runs Knex migrations (latest) then seeds. Called during deployment and via <code>npm run init-db</code></td></tr>
+</table>
+
+<h3>Middleware Files</h3>
+<table>
+  <tr><th>File</th><th>Lines</th><th>What It Does</th></tr>
+  <tr><td><code>middleware/auth.js</code></td><td>64</td><td><strong>JWT authentication</strong> — <code>authenticateToken</code>: extracts Bearer token from Authorization header, verifies with jsonwebtoken, attaches req.user = {id, role}. <code>requireRole(role)</code>: restricts routes to specific roles (admin, supervisor, staff, resident)</td></tr>
+  <tr><td><code>middleware/errorHandler.js</code></td><td>66</td><td><strong>Global error handler</strong> — catches all errors, maps: DB duplicate key → 409 Conflict, foreign key violation → 400, validation error → 400, JWT error → 401/403. Returns consistent JSON: {error, details}</td></tr>
+  <tr><td><code>middleware/validator.js</code></td><td>102</td><td><strong>Request validation using Joi</strong> — schemas for: login (email + password), register (name + email + password + role), complaint (category + description + room_number), room status update, password change. <code>validate(schema)</code> middleware function</td></tr>
+  <tr><td><code>middleware/requestLogger.js</code></td><td>38</td><td>Logs every request: method, URL, response time (ms), user ID if authenticated, status code</td></tr>
+</table>
+
+<h3>Route Files (API Endpoints)</h3>
+<table>
+  <tr><th>File</th><th>Lines</th><th>Endpoints</th><th>What It Does</th></tr>
+  <tr><td><code>routes/auth.js</code></td><td>219</td><td>POST /login, POST /register, GET /me, PUT /me, PUT /password, POST /refresh</td><td>User authentication — bcrypt password verification, JWT token generation (access 7d + refresh 30d), profile CRUD, token refresh with rotation</td></tr>
+  <tr><td><code>routes/complaints.js</code></td><td>339</td><td>GET /, POST /, GET /:id, PUT /:id/status, PUT /:id/assign, PUT /:id/priority, DELETE /:id</td><td>Complaint CRUD — file upload (multer, 10MB limit), filtering by status/priority/category/date, pagination, triggers async AI analysis on creation, requires JWT auth. Supervisors can see their assigned staff's complaints, assign complaints, and update priority. <strong>Priority mapping</strong>: AI may return "critical" but DB allows only low/medium/high/urgent — mapPriority() maps critical→urgent</td></tr>
+  <tr><td><code>routes/dashboard.js</code></td><td>278</td><td>GET /admin, GET /staff, GET /supervisor, GET /resident, GET /notifications, PUT /notifications/:id/read, PUT /notifications/read-all</td><td>Dashboard data — aggregates room counts by status, complaint counts by priority/status, recent items. <strong>Supervisor dashboard</strong>: pending verifications count, approvedToday, staff list, pending work submissions, reminders. <strong>Admin dashboard</strong>: now includes washroomStats (total, needsCleaning, restockedToday), verificationStats (pending, approved, rejected). Notification management. Role-specific data</td></tr>
+  <tr><td><code>routes/rooms.js</code></td><td>162</td><td>GET /, GET /by-floor, GET /my/tasks, PUT /:id/status</td><td>Room management — list with filters, group by floor, update status + auto-create cleaning_log entry. /my/tasks accessible by both staff and supervisor roles</td></tr>
+  <tr><td><code>routes/staff.js</code></td><td>152</td><td>GET /, GET /:id, GET /:id/assignments</td><td>Staff management — list all staff with stats, get individual details, view room/floor assignments. Supervisors can view their assigned staff with role/shift/supervisor_id fields</td></tr>
+  <tr><td><code>routes/ai.js</code></td><td>196</td><td>GET /status, POST /analyze-complaint, POST /categorize, GET /optimize-tasks, GET /predictions, GET /responses/:id, GET /insights</td><td><strong>AI integration layer</strong> — bridges Node.js to Python AI service via HTTP, has complete fallback system (keyword-based categorization + rule-based priority) when AI service is unavailable</td></tr>
+  <tr><td><code>routes/washrooms.js</code></td><td>170</td><td>GET /, GET /by-building, GET /:id, PUT /:id/supplies, PUT /:id/status, PUT /:id/assign, GET /inventory/all, PUT /inventory/:id</td><td><strong>Washroom &amp; supply management</strong> — list all washrooms with building/floor/direction data, group by building, update supply levels (soap/tissue/sanitizer 0-100), change cleaning status, assign staff. Inventory endpoints for building-wise supply stock tracking with min threshold alerts</td></tr>
+  <tr><td><code>routes/work-submissions.js</code></td><td>217</td><td>GET /, POST /, PUT /:id/approve, GET /pending/count</td><td><strong>2-way work verification</strong> — staff upload cleaning proof photos (multer), simulated LLM verifies image for cleanliness (returns verified/feedback). Supervisors approve or reject submissions. Role-based filtering: staff see own, supervisors see their team's, admin sees all. Pending count for dashboard badges</td></tr>
+  <tr><td><code>routes/reminders.js</code></td><td>134</td><td>GET /, POST /, PUT /:id, DELETE /:id, GET /due/now</td><td><strong>Supervisor reminders</strong> — CRUD for consumption-based restocking reminders. Supervisors own their reminders (enforced by middleware). Due reminders endpoint returns active reminders past due date. Reminder types: restocking, inspection, follow_up, custom</td></tr>
+</table>
+
+<h3>Service Files</h3>
+<table>
+  <tr><th>File</th><th>Lines</th><th>What It Does</th></tr>
+  <tr><td><code>services/aiService.js</code></td><td>229</td><td><strong>Python AI bridge</strong> — makes HTTP calls to FastAPI (http://ai-service:8000) with 10s timeout, implements complete fallback: keyword-based categorization (maps words to categories), rule-based priority (urgency keywords), basic sentiment (positive/negative word counts). Caches results</td></tr>
+  <tr><td><code>services/cacheService.js</code></td><td>109</td><td><strong>Redis wrapper</strong> — connect(), disconnect(), get(key), set(key, value, ttl), del(key), getClient(). Uses ioredis. Gracefully degrades to no-cache if Redis unavailable</td></tr>
+  <tr><td><code>utils/logger.js</code></td><td>74</td><td><strong>Winston logger</strong> — console transport (colorized in dev) + rotating file transport (5MB max × 5 files). JSON format in production. Exposes morgan stream for HTTP logging</td></tr>
+</table>
+
+<h2>8c. AI Service — Python (ai-service/)</h2>
+
+<h3>Core Files</h3>
+<table>
+  <tr><th>File</th><th>Lines</th><th>What It Does</th></tr>
+  <tr><td><code>main.py</code></td><td>186</td><td><strong>FastAPI application</strong> — CORS + GZip middleware, API key authentication (X-API-Key header), request logging with structlog (ISO timestamps, JSON in production), Prometheus metrics (request_count, latency, ml_predictions), lifespan manager (loads ML models on startup, connects Redis on start, disconnects on shutdown). Mounts 5 routers</td></tr>
+  <tr><td><code>config.py</code></td><td>55</td><td>Pydantic-style settings: MODEL_DIR, REDIS_URL, API_KEY, ALLOWED_ORIGINS, OPENAI_API_KEY, DEBUG flag, APP_VERSION</td></tr>
+  <tr><td><code>Dockerfile</code></td><td>~37</td><td>Python 3.11-slim, installs build-essential, pip install requirements.txt, downloads NLTK data to <code>NLTK_DATA=/usr/local/share/nltk_data</code> (punkt, averaged_perceptron_tagger, wordnet, punkt_tab, averaged_perceptron_tagger_eng), TextBlob corpora (full, not lite), spaCy en_core_web_sm. Runs as non-root appuser with Gunicorn + 4 Uvicorn workers. <strong>Fixed</strong>: NLTK_DATA path set globally so corpora are accessible to non-root appuser</td></tr>
+  <tr><td><code>worker.py</code></td><td>58</td><td>Celery worker for async tasks (batch model retraining, scheduled insights generation)</td></tr>
+  <tr><td><code>requirements.txt</code></td><td>~25</td><td>fastapi, uvicorn[standard], gunicorn, scikit-learn, numpy, pandas, textblob, nltk, spacy, openai, redis, structlog, prometheus-client, httpx, joblib, pydantic</td></tr>
+</table>
+
+<h3>ML Service Files</h3>
+<table>
+  <tr><th>File</th><th>Lines</th><th>What It Does</th></tr>
+  <tr><td><code>services/ml_service.py</code></td><td>483</td><td><strong>Core ML engine</strong> — MLService class with full lifecycle: loads pre-trained models from disk (joblib) or bootstraps training with ~100+ labeled examples. <b>Model 1</b>: TF-IDF (5000 features, 1-3 grams) → RandomForest (200 trees, max_depth=20, balanced weights) for 12-category classification. <b>Model 2</b>: TF-IDF → GradientBoosting (200 trees, lr=0.1, depth=6) for 4-level priority prediction. Also: keyword extraction via TF-IDF scores, action suggestion map (per category), resolution time estimation, cross-validation logging</td></tr>
+  <tr><td><code>services/nlp_service.py</code></td><td>174</td><td><strong>NLP processing</strong> — TextBlob sentiment (polarity -1→1, subjectivity 0→1, 5 labels), keyword urgency detection (4 levels × ~15 keywords each), regex entity extraction (rooms, items like "toilet"/"AC"/"fan", locations like "bathroom"/"corridor"), room number inference from text, language quality assessment (clarity score)</td></tr>
+  <tr><td><code>services/openai_service.py</code></td><td>166</td><td><strong>Optional GPT-4 integration</strong> — generates human-readable complaint responses, smart resolution suggestions, maintenance summaries. Falls back gracefully if no OPENAI_API_KEY configured</td></tr>
+  <tr><td><code>services/predictive_service.py</code></td><td>207</td><td><strong>Predictive analytics</strong> — maintenance forecasting based on historical complaint patterns, peak time analysis, seasonal trends, room-level risk scoring, complaint volume projection</td></tr>
+  <tr><td><code>services/cache_service.py</code></td><td>105</td><td><strong>Redis cache for Python</strong> — async connect/disconnect, get/set with JSON serialization, TTL support, caches ML predictions to avoid recomputation</td></tr>
+</table>
+
+<h3>AI Router Files</h3>
+<table>
+  <tr><th>File</th><th>Lines</th><th>Endpoints</th><th>What It Does</th></tr>
+  <tr><td><code>routers/complaints.py</code></td><td>132</td><td>POST /analyze, POST /categorize, POST /generate-response</td><td>Full ML analysis pipeline, quick-categorize, AI-generated human response text</td></tr>
+  <tr><td><code>routers/tasks.py</code></td><td>130</td><td>POST /optimize, GET /workload</td><td>Cleaning task route optimization, staff workload balancing algorithms</td></tr>
+  <tr><td><code>routers/predictions.py</code></td><td>128</td><td>GET /maintenance, GET /complaints-forecast</td><td>Predictive maintenance schedules, complaint volume forecasting</td></tr>
+  <tr><td><code>routers/insights.py</code></td><td>143</td><td>GET /dashboard, GET /trends</td><td>Dashboard AI insights with recommendations, trend analysis</td></tr>
+  <tr><td><code>routers/health.py</code></td><td>36</td><td>GET /health</td><td>Service health (model status, cache status, features list, version)</td></tr>
+</table>
+
+<h2>8d. Mobile App — React Native (HostelCareApp/)</h2>
+<table>
+  <tr><th>File</th><th>Lines</th><th>What It Does</th></tr>
+  <tr><td><code>App.js</code></td><td>293</td><td><strong>WebView app shell</strong> — loads the web app URL with versioned cache-busting, host fallback logic, external-link bridge, download handling, and retry UI for network failures</td></tr>
+  <tr><td><code>mobile-src/App.js</code></td><td>293</td><td>Mirrored React Native app entry for alternate mobile workspace, kept in sync with the same WebView runtime behavior</td></tr>
+  <tr><td><code>src/services/api.js</code></td><td>129</td><td><strong>API client module</strong> — fetch-based helper with token-aware headers, auth helpers, and endpoint wrappers used by legacy native screen flows</td></tr>
+  <tr><td><code>src/screens/LoginScreen.js</code></td><td>~150</td><td>Login form with email/password, role selection buttons, demo login shortcuts</td></tr>
+  <tr><td><code>src/screens/AdminDashboard.js</code></td><td>~120</td><td>Admin overview: stats cards (rooms/complaints/staff counts), recent complaints list, quick action buttons</td></tr>
+  <tr><td><code>src/screens/StaffDashboard.js</code></td><td>~100</td><td>Staff view: assigned tasks list, pending complaints, room status updates</td></tr>
+  <tr><td><code>src/screens/ResidentDashboard.js</code></td><td>~120</td><td>Resident view: own complaints history, room info, new complaint button</td></tr>
+  <tr><td><code>src/screens/ComplaintsScreen.js</code></td><td>~100</td><td>Complaint list with filter/search, status badges, assign/update actions</td></tr>
+  <tr><td><code>src/screens/NewComplaintScreen.js</code></td><td>~100</td><td>Complaint form: category picker, text description, image capture/upload</td></tr>
+  <tr><td><code>src/screens/TasksScreen.js</code></td><td>~100</td><td>Staff cleaning tasks and maintenance issue tracking</td></tr>
+  <tr><td><code>src/screens/RoomManagementScreen.js</code></td><td>~80</td><td>Room grid organized by floor, color-coded status indicators</td></tr>
+  <tr><td><code>src/screens/ProfileScreen.js</code></td><td>~80</td><td>User profile display, settings, logout functionality</td></tr>
+  <tr><td><code>src/theme/colors.js</code></td><td>~30</td><td>Color palette constants matching web theme</td></tr>
+</table>
+
+<h2>8e. Infrastructure Files (nginx/)</h2>
+<table>
+  <tr><th>File</th><th>Lines</th><th>What It Does</th></tr>
+  <tr><td><code>nginx/nginx.conf</code></td><td>53</td><td><strong>Main Nginx config</strong> — worker_processes auto, worker_connections 1024, gzip on (min 1000 bytes), rate limit zones: "api" (30 req/s per IP), "auth" (5 req/min per IP), upstream api_backend → api:5000</td></tr>
+  <tr><td><code>nginx/conf.d/default.conf</code></td><td>109</td><td><strong>Site configuration</strong> — HTTP server (port 80): serves frontend + proxies /api/* to Express, SPA fallback (try_files → index.html). HTTPS server (port 443): TLS 1.2/1.3, strong ciphers, HSTS (2 years), SSL cert/key from /etc/letsencrypt, rate-limited /api/auth/ (5 req/min). Static asset caching (30 days, immutable). Certbot challenge location</td></tr>
+</table>
+
+<!-- ==================== 9. API ENDPOINTS ==================== -->
+<div class="section-break"></div>
+<h1 id="api">9. Complete API Endpoints (50+)</h1>
+
+<table>
+  <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Role</th><th>Purpose</th></tr>
+  <tr><td><strong>POST</strong></td><td>/api/auth/login</td><td>No</td><td>Any</td><td>Login, returns JWT access + refresh tokens</td></tr>
+  <tr><td><strong>POST</strong></td><td>/api/auth/register</td><td>No</td><td>Any</td><td>Create new user account</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/auth/me</td><td>Yes</td><td>Any</td><td>Get current user profile</td></tr>
+  <tr><td><strong>PUT</strong></td><td>/api/auth/me</td><td>Yes</td><td>Any</td><td>Update profile (name, phone, avatar)</td></tr>
+  <tr><td><strong>PUT</strong></td><td>/api/auth/password</td><td>Yes</td><td>Any</td><td>Change password (requires old password)</td></tr>
+  <tr><td><strong>POST</strong></td><td>/api/auth/refresh</td><td>No</td><td>Any</td><td>Refresh JWT token using refresh token</td></tr>
+  <tr style="background:#e0f7fa;"><td colspan="5"><strong>Complaints</strong></td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/complaints</td><td>Yes</td><td>Any</td><td>List complaints (filter, paginate, search)</td></tr>
+  <tr><td><strong>POST</strong></td><td>/api/complaints</td><td>Yes</td><td>Any</td><td>Create complaint + trigger AI analysis</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/complaints/:id</td><td>Yes</td><td>Any</td><td>Get single complaint with AI analysis</td></tr>
+  <tr><td><strong>PUT</strong></td><td>/api/complaints/:id/status</td><td>Yes</td><td>Admin/Staff/Supervisor</td><td>Update complaint status + assign staff</td></tr>
+  <tr><td><strong>PUT</strong></td><td>/api/complaints/:id/assign</td><td>Yes</td><td>Admin/Supervisor</td><td>Assign complaint to specific staff member</td></tr>
+  <tr><td><strong>PUT</strong></td><td>/api/complaints/:id/priority</td><td>Yes</td><td>Admin/Supervisor</td><td>Update complaint priority level</td></tr>
+  <tr><td><strong>DELETE</strong></td><td>/api/complaints/:id</td><td>Yes</td><td>Admin</td><td>Delete complaint</td></tr>
+  <tr style="background:#e0f7fa;"><td colspan="5"><strong>Rooms</strong></td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/rooms</td><td>Yes</td><td>Any</td><td>List rooms with filters (status, floor)</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/rooms/by-floor</td><td>Yes</td><td>Any</td><td>Rooms grouped by floor</td></tr>
+  <tr><td><strong>PUT</strong></td><td>/api/rooms/:id/status</td><td>Yes</td><td>Staff/Supervisor/Admin</td><td>Update room status + create cleaning log</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/rooms/my/tasks</td><td>Yes</td><td>Staff/Supervisor</td><td>Get assigned room tasks for current user</td></tr>
+  <tr style="background:#e0f7fa;"><td colspan="5"><strong>Staff</strong></td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/staff</td><td>Yes</td><td>Admin/Supervisor</td><td>List all staff (supervisors see their assigned staff)</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/staff/:id</td><td>Yes</td><td>Admin/Supervisor</td><td>Staff details with role, shift, supervisor_id</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/staff/:id/assignments</td><td>Yes</td><td>Admin/Supervisor</td><td>Staff room/floor assignments</td></tr>
+  <tr style="background:#e0f7fa;"><td colspan="5"><strong>Dashboard</strong></td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/dashboard/admin</td><td>Yes</td><td>Admin</td><td>Admin stats (rooms, complaints, staff, washroomStats, verificationStats)</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/dashboard/staff</td><td>Yes</td><td>Staff/Supervisor</td><td>Staff tasks and assigned items</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/dashboard/supervisor</td><td>Yes</td><td>Supervisor</td><td>Pending verifications, approved today, staff list, pending submissions, reminders</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/dashboard/resident</td><td>Yes</td><td>Resident</td><td>Resident's complaints and room info</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/dashboard/notifications</td><td>Yes</td><td>Any</td><td>User's notifications</td></tr>
+  <tr><td><strong>PUT</strong></td><td>/api/dashboard/notifications/:id/read</td><td>Yes</td><td>Any</td><td>Mark notification as read</td></tr>
+  <tr><td><strong>PUT</strong></td><td>/api/dashboard/notifications/read-all</td><td>Yes</td><td>Any</td><td>Mark all notifications read</td></tr>
+  <tr style="background:#e0f7fa;"><td colspan="5"><strong>AI Services</strong></td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/ai/status</td><td>Yes</td><td>Any</td><td>AI service health + available features</td></tr>
+  <tr><td><strong>POST</strong></td><td>/api/ai/analyze-complaint</td><td>Yes</td><td>Any</td><td>Full ML + NLP analysis of complaint text</td></tr>
+  <tr><td><strong>POST</strong></td><td>/api/ai/categorize</td><td>Yes</td><td>Any</td><td>Quick category prediction only</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/ai/optimize-tasks</td><td>Yes</td><td>Admin/Staff</td><td>Task optimization recommendations</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/ai/predictions</td><td>Yes</td><td>Admin</td><td>Predictive maintenance forecasts</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/ai/responses/:id</td><td>Yes</td><td>Any</td><td>AI-generated response suggestions</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/ai/insights</td><td>Yes</td><td>Admin</td><td>Dashboard AI insights + recommendations</td></tr>
+  <tr style="background:#e0f7fa;"><td colspan="5"><strong>Washrooms</strong></td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/washrooms</td><td>Yes</td><td>Any</td><td>List all washrooms with supply levels</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/washrooms/by-building</td><td>Yes</td><td>Any</td><td>Washrooms grouped by building</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/washrooms/:id</td><td>Yes</td><td>Any</td><td>Single washroom details</td></tr>
+  <tr><td><strong>PUT</strong></td><td>/api/washrooms/:id/supplies</td><td>Yes</td><td>Staff/Supervisor/Admin</td><td>Update supply levels (soap, tissue, sanitizer 0-100)</td></tr>
+  <tr><td><strong>PUT</strong></td><td>/api/washrooms/:id/status</td><td>Yes</td><td>Staff/Supervisor/Admin</td><td>Update washroom cleaning status</td></tr>
+  <tr><td><strong>PUT</strong></td><td>/api/washrooms/:id/assign</td><td>Yes</td><td>Supervisor/Admin</td><td>Assign staff to washroom</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/washrooms/inventory/all</td><td>Yes</td><td>Supervisor/Admin</td><td>Building-wise supply inventory</td></tr>
+  <tr><td><strong>PUT</strong></td><td>/api/washrooms/inventory/:id</td><td>Yes</td><td>Supervisor/Admin</td><td>Update inventory stock level</td></tr>
+  <tr style="background:#e0f7fa;"><td colspan="5"><strong>Work Submissions (2-Way Verification)</strong></td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/work-submissions</td><td>Yes</td><td>Any</td><td>List submissions (role-filtered: staff=own, supervisor=team, admin=all)</td></tr>
+  <tr><td><strong>POST</strong></td><td>/api/work-submissions</td><td>Yes</td><td>Staff</td><td>Submit cleaning proof (photo + description, LLM auto-verifies)</td></tr>
+  <tr><td><strong>PUT</strong></td><td>/api/work-submissions/:id/approve</td><td>Yes</td><td>Supervisor/Admin</td><td>Approve or reject work submission</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/work-submissions/pending/count</td><td>Yes</td><td>Supervisor/Admin</td><td>Count of pending submissions for badge display</td></tr>
+  <tr style="background:#e0f7fa;"><td colspan="5"><strong>Reminders</strong></td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/reminders</td><td>Yes</td><td>Supervisor/Admin</td><td>List reminders (supervisors see own only)</td></tr>
+  <tr><td><strong>POST</strong></td><td>/api/reminders</td><td>Yes</td><td>Supervisor/Admin</td><td>Create consumption-based restocking reminder</td></tr>
+  <tr><td><strong>PUT</strong></td><td>/api/reminders/:id</td><td>Yes</td><td>Supervisor/Admin</td><td>Update reminder (message, due_date, is_active)</td></tr>
+  <tr><td><strong>DELETE</strong></td><td>/api/reminders/:id</td><td>Yes</td><td>Supervisor/Admin</td><td>Delete a reminder</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/reminders/due/now</td><td>Yes</td><td>Supervisor/Admin</td><td>Reminders past due date that are still active</td></tr>
+</table>
+
+<!-- ==================== 10. ROLES ==================== -->
+<h1 id="roles">10. User Roles &amp; Permissions</h1>
+
+<table>
+  <tr><th>Role</th><th>Login</th><th>Can Do</th><th>Dashboard Shows</th></tr>
+  <tr><td><strong>Admin</strong></td><td>admin@hostel.com<br/>password123</td><td>Manage rooms, staff, washrooms, and inventory. Assign buildings to supervisors. View complaints and complaint details with AI analysis. For false-report complaints, send message/escalation to supervisor. <strong>Admin does not mark complaints in-progress/resolved in current UI flow</strong></td><td>Total stats (rooms/complaints/staff/washrooms/verifications), complaint list with AI tags, complaint detail popup, building-to-supervisor assignment controls, washroom status overview, supply inventory, AI recommendations</td></tr>
+  <tr><td><strong>Supervisor</strong></td><td>meera@hostel.com<br/>password123</td><td>Manage assigned cleaning staff and buildings. Review &amp; approve/reject work submissions (2-way verification). View assigned-building room/staff mapping. Assign complaints in assigned buildings to their own staff. Create restocking reminders and update inventory context</td><td>Pending verifications count, approved today count, assigned staff list, assigned-building mapping cards, complaints in assigned buildings with assignment actions, active reminders, inventory visibility by building</td></tr>
+  <tr><td><strong>Cleaning Staff</strong></td><td>rajesh@hostel.com<br/>password123</td><td>Update room/washroom status (clean/maintain). Handle assigned complaints. View assigned floors/rooms/washrooms. Log cleaning activities. <strong>Upload cleaning proof photos</strong> — LLM auto-verifies for cleanliness. Submit work for supervisor approval</td><td>Assigned tasks, pending complaints, cleaning schedule, room/washroom status of assigned areas, own work submission history with verification status</td></tr>
+  <tr><td><strong>Student/Faculty</strong></td><td>student1@hostel.com<br/>password123</td><td>File new complaints (with image upload, building/direction selection). <strong>AI auto-categorization</strong>: can leave category blank, AI detects with scores, user reviews and confirms. View own complaint status with AI analysis. Update profile. View notifications. Report false cleaning/maintenance claims</td><td>Own complaints history with AI analysis, complaint status tracking, room info, uploaded images, building washroom status</td></tr>
+</table>
+
+<!-- ==================== 11. ML MODELS ==================== -->
+<div class="section-break"></div>
+<h1 id="ml-models">11. ML Models — Detailed</h1>
+
+<h3>Model 1: Complaint Classifier</h3>
+<div class="no-break">
+<table>
+  <tr><th>Property</th><th>Value</th></tr>
+  <tr><td>Algorithm</td><td>Random Forest (ensemble of decision trees)</td></tr>
+  <tr><td>Number of Trees</td><td>200 (n_estimators=200)</td></tr>
+  <tr><td>Max Depth</td><td>20</td></tr>
+  <tr><td>Class Weighting</td><td>Balanced (handles imbalanced categories)</td></tr>
+  <tr><td>Input</td><td>Complaint text → TF-IDF vector (5000 features, 1-3 word n-grams, sublinear TF)</td></tr>
+  <tr><td>Output</td><td>Category (1 of 12) + confidence score (0-1) + all category probabilities</td></tr>
+  <tr><td>Training Data</td><td>~100+ labeled examples per category (bootstrap data)</td></tr>
+  <tr><td>Accuracy</td><td>~85% (3-fold cross-validation)</td></tr>
+  <tr><td>Saved As</td><td>/app/models/complaint_classifier.joblib</td></tr>
+</table>
+</div>
+
+<h3>Model 2: Priority Predictor</h3>
+<div class="no-break">
+<table>
+  <tr><th>Property</th><th>Value</th></tr>
+  <tr><td>Algorithm</td><td>Gradient Boosting (sequential ensemble)</td></tr>
+  <tr><td>Number of Trees</td><td>200 (n_estimators=200)</td></tr>
+  <tr><td>Max Depth</td><td>6</td></tr>
+  <tr><td>Learning Rate</td><td>0.1</td></tr>
+  <tr><td>Input</td><td>Same TF-IDF vector as classifier</td></tr>
+  <tr><td>Output</td><td>Priority (low/medium/high/critical) + confidence + all level probabilities</td></tr>
+  <tr><td>Saved As</td><td>/app/models/priority_predictor.joblib</td></tr>
+</table>
+</div>
+
+<h3>NLP Pipeline Components</h3>
+<table>
+  <tr><th>Component</th><th>Library</th><th>Input</th><th>Output</th></tr>
+  <tr><td>Sentiment Analysis</td><td>TextBlob</td><td>Raw text</td><td>Polarity (-1.0 to 1.0), Subjectivity (0 to 1.0), Label (very_negative → very_positive)</td></tr>
+  <tr><td>Urgency Detection</td><td>Custom keywords</td><td>Lowercased text</td><td>Level (critical/high/medium/low), matched keywords, score (0-1)</td></tr>
+  <tr><td>Entity Extraction</td><td>Regex patterns</td><td>Raw text</td><td>Locations (room numbers, floors), Items (toilet, fan, AC), room_info</td></tr>
+  <tr><td>Language Quality</td><td>TextBlob</td><td>Word list</td><td>is_descriptive, has_specifics, clarity_score (0-1)</td></tr>
+  <tr><td>Text Summary</td><td>TextBlob</td><td>Sentences</td><td>First sentence truncated to max_length</td></tr>
+</table>
+
+<!-- ==================== 12. SECURITY ==================== -->
+<h1 id="security">12. Security Features</h1>
+
+<table>
+  <tr><th>Feature</th><th>Implementation</th><th>Details</th></tr>
+  <tr><td>Password Hashing</td><td>bcryptjs (10 salt rounds)</td><td>Passwords never stored in plaintext</td></tr>
+  <tr><td>Authentication</td><td>JWT tokens</td><td>Access token (7 day expiry) + Refresh token (30 day expiry)</td></tr>
+  <tr><td>HTTPS/SSL</td><td>Nginx TLS 1.2/1.3 + Certbot</td><td>Self-signed for dev, Let's Encrypt for production</td></tr>
+  <tr><td>Rate Limiting</td><td>Nginx + Express</td><td>100 req/15min (API), 20 req/15min (auth), 30 req/s (Nginx)</td></tr>
+  <tr><td>Security Headers</td><td>Helmet.js</td><td>CSP, HSTS (2 years), X-Frame-Options, X-Content-Type-Options, X-XSS-Protection</td></tr>
+  <tr><td>Input Validation</td><td>Joi schemas</td><td>All request bodies validated before processing</td></tr>
+  <tr><td>SQL Injection Prevention</td><td>Knex parameterized queries</td><td>No raw SQL string concatenation</td></tr>
+  <tr><td>CORS</td><td>cors middleware</td><td>Configurable allowed origins via CORS_ORIGINS env var</td></tr>
+  <tr><td>API Key Auth</td><td>X-API-Key header</td><td>AI service requires internal API key</td></tr>
+  <tr><td>Non-root Containers</td><td>Docker USER directive</td><td>Both API and AI containers run as appuser</td></tr>
+  <tr><td>Parameter Pollution</td><td>hpp middleware</td><td>Prevents HTTP parameter pollution attacks</td></tr>
+  <tr><td>Request Size Limit</td><td>Express body parser</td><td>10MB max for JSON/URL-encoded bodies</td></tr>
+  <tr><td>File Upload Security</td><td>Multer</td><td>10MB limit, allowed types: jpeg, png, webp only</td></tr>
+  <tr><td>Audit Logging</td><td>audit_logs table</td><td>Tracks user actions with IP address</td></tr>
+</table>
+
+<!-- ==================== 13. DEPLOYMENT ==================== -->
+<h1 id="deploy">13. Deployment Guide</h1>
+
+<h3>Prerequisites</h3>
+<ul>
+  <li>Docker &amp; Docker Compose V2</li>
+  <li>macOS, Linux, or Windows with WSL2</li>
+</ul>
+
+<h3>One-Command Deploy</h3>
+<pre><code>cd "/Users/maruteymani/Documents/ILGC Tracker"
+chmod +x deploy.sh
+./deploy.sh</code></pre>
+
+<h3>What deploy.sh Does (step by step)</h3>
+<ol>
+  <li>Checks Docker &amp; Docker Compose installed</li>
+  <li>Creates <code>.env</code> from template with auto-generated secrets (JWT, DB password, Redis password)</li>
+  <li>Generates self-signed SSL certificates</li>
+  <li>Copies <code>index.html</code> → <code>frontend-dist/</code></li>
+  <li>Builds all Docker images (<code>docker compose build --no-cache</code>)</li>
+  <li>Starts 6 containers (<code>docker compose up -d</code>)</li>
+  <li>Waits for PostgreSQL to be ready</li>
+  <li>Runs database migrations and seeds</li>
+</ol>
+
+<h3>Access After Deploy</h3>
+<table>
+  <tr><th>Service</th><th>URL</th></tr>
+  <tr><td><strong>Web App</strong></td><td>http://localhost</td></tr>
+  <tr><td>API (direct)</td><td>http://localhost:5000</td></tr>
+  <tr><td>AI Service (direct)</td><td>http://localhost:8000</td></tr>
+  <tr><td>PostgreSQL</td><td>localhost:5432</td></tr>
+  <tr><td>Redis</td><td>localhost:6379</td></tr>
+</table>
+
+<h3>Useful Commands</h3>
+<pre><code>docker compose ps            # Check container status
+docker compose logs -f       # Live logs (all services)
+docker compose logs api      # Logs for specific service
+docker compose down          # Stop everything
+docker compose up -d         # Start everything
+docker compose restart nginx # Restart single service
+docker compose exec -T api node scripts/initDb.js  # Re-run migrations</code></pre>
+
+<!-- ==================== 14. SUMMARY ==================== -->
+<h1 id="summary">14. File Count Summary</h1>
+
+<div class="stat-grid">
+  <div class="stat-card"><div class="num">22</div><div class="label">Backend (Node.js)</div></div>
+  <div class="stat-card"><div class="num">14</div><div class="label">AI Service (Python)</div></div>
+  <div class="stat-card"><div class="num">1</div><div class="label">Frontend (HTML/JS)</div></div>
+  <div class="stat-card"><div class="num">13</div><div class="label">Mobile (React Native)</div></div>
+</div>
+
+<table>
+  <tr><th>Category</th><th>Files</th><th>Total Lines</th><th>Languages</th></tr>
+  <tr><td>Backend (Node.js)</td><td>22 files</td><td>~3,600</td><td>JavaScript (ES6+)</td></tr>
+  <tr><td>AI Service (Python)</td><td>14 files</td><td>~2,100</td><td>Python 3.11</td></tr>
+  <tr><td>Frontend</td><td>1 file</td><td>3,884</td><td>HTML5 + CSS3 + JavaScript</td></tr>
+  <tr><td>Mobile App</td><td>13 files</td><td>~8,080</td><td>JavaScript (React Native)</td></tr>
+  <tr><td>Infrastructure</td><td>5 files</td><td>~400</td><td>YAML, Bash, Nginx conf</td></tr>
+  <tr><td>Config/Env</td><td>4 files</td><td>~250</td><td>Env, JSON</td></tr>
+  <tr><td><strong>TOTAL</strong></td><td><strong>59 files</strong></td><td><strong>~11,500+</strong></td><td><strong>5 languages</strong></td></tr>
+</table>
+
+<div class="info-box">
+  <strong>Demo Credentials:</strong><br/>
+  Admin: admin@hostel.com / password123<br/>
+  Supervisor: meera@hostel.com / password123<br/>
+  Cleaning Staff: rajesh@hostel.com / password123<br/>
+  Student: student1@hostel.com / password123
+</div>
+
+<!-- ==================== 15. CHANGELOG ==================== -->
+<div class="section-break"></div>
+<h1 id="changelog">15. Changelog</h1>
+
+<!-- v3.1.0 -->
+<h2>v3.1.0 — 14 March 2026 (Role Workflow Alignment + App Sync)</h2>
+
+<div class="info-box">
+  <strong>Summary:</strong> Updated role workflow alignment across website and app shell parity. Admin complaint actions were made read-only for status updates, with false-report escalation to supervisor. Supervisor workflow expanded with assigned-building mapping and complaint-to-staff assignment. React Native app shell and alternate mobile workspace were synchronized to load latest website build with versioned cache busting. Installable debug/release APK artifacts generated.
+</div>
+
+<h3>Frontend — index.html (3,150 → 3,884 lines, +734 lines)</h3>
+<table>
+  <tr><th>Change</th><th>Details</th></tr>
+  <tr><td><strong>Track-Based Login Entry</strong></td><td>Login entry now uses 3 tracks: Admin, Housekeeping (Supervisor + Cleaning Staff), and Faculty-Student. Role-track matching is enforced in UI flow</td></tr>
+  <tr><td><strong>Admin Complaint Controls Tightened</strong></td><td>Removed admin "In Progress" and "Resolve" actions from complaint cards and detail modal. Added "Write to Supervisor" action only for false-report complaints</td></tr>
+  <tr><td><strong>Supervisor Operations Expanded</strong></td><td>Added assigned-building room/staff mapping section and complaints-in-my-buildings section with assign-to-staff action for supervisor-owned teams</td></tr>
+  <tr><td><strong>Assignment UX Update</strong></td><td>Admin assignment modal changed from staff-floor assignment to building-to-supervisor assignment</td></tr>
+</table>
+
+<h3>Mobile — React Native App Shell Sync</h3>
+<table>
+  <tr><th>Change</th><th>Details</th></tr>
+  <tr><td><strong>HostelCareApp/App.js</strong></td><td>WebView shell cache version bumped and URL parity maintained with deployed frontend copy</td></tr>
+  <tr><td><strong>mobile-src/App.js</strong></td><td>Synced to same WebView shell behavior and versioning strategy</td></tr>
+  <tr><td><strong>APK Packaging</strong></td><td>Generated installable Android artifacts: release and debug APK for device installation/testing</td></tr>
+</table>
+
+<h3>Current vs Historical Notes</h3>
+<div class="info-box">
+  <strong>Current behavior (v3.1.0):</strong> Admin complaint status actions are read-only, with false-report escalation via "Write to Supervisor". Supervisors handle assignment inside their mapped buildings. Login entry uses 3 tracks (Admin, Housekeeping, Faculty-Student) that route to role-specific dashboards.<br/><br/>
+  <strong>Historical behavior (v3.0.0 section below):</strong> The v3.0.0 notes capture rollout-era capabilities and should be read as release history, not as the latest permission model.
+</div>
+
+<!-- v3.0.0 -->
+<h2>v3.0.0 — 13 March 2026 (Campus Hygiene Monitoring Overhaul)</h2>
+
+<div class="info-box">
+  <strong>Summary:</strong> Major system overhaul aligned with the campus hygiene monitoring problem statement. Added supervisor role, building/floor/direction-wise washroom tracking, supply inventory management, 2-way work verification (LLM + supervisor approval), consumption-based reminders, false reporting detection. Frontend redesigned for 4 user roles. Backend expanded with 3 new route modules, 4 new database tables, and 20+ new API endpoints.
+</div>
+
+<h3>Frontend — index.html (2,343 → 3,150 lines, +807 lines)</h3>
+<table>
+  <tr><th>Change</th><th>Details</th></tr>
+  <tr><td><strong>4 User Roles</strong></td><td>Login page updated from 3 to 4 roles: Admin, Supervisor, Cleaning Staff, Student/Faculty. Supervisor demo login: meera@hostel.com. Each role has distinct dashboard and permissions</td></tr>
+  <tr><td><strong>Washroom Data — Building/Floor/Direction</strong></td><td>New washroom management section showing all washrooms organized by building (H1, H2, H3, Academic Block, Library, Cafeteria), floor number, and wing direction (North/South/East/West). Supply level indicators for soap, tissue, sanitizer (0-100%)</td></tr>
+  <tr><td><strong>Supply Inventory Dashboard</strong></td><td>Building-wise supply tracking table showing current stock, minimum thresholds, last restocked dates. Low-stock items highlighted for immediate attention</td></tr>
+  <tr><td><strong>2-Way Work Verification UI</strong></td><td>Staff can upload cleaning proof photos. LLM verification status displayed (verified/unverified with feedback). Supervisor approval queue with approve/reject buttons. Status badges: pending (yellow), approved (green), rejected (red)</td></tr>
+  <tr><td><strong>Supervisor Dashboard</strong></td><td>Dedicated supervisor view showing: pending verification count, today's approvals, assigned staff list, pending work submissions queue, active reminders, supply inventory overview</td></tr>
+  <tr><td><strong>Restocking Timeline</strong></td><td>Visual timeline showing when supplies were last restocked per building, helping identify patterns of delayed replenishment</td></tr>
+  <tr><td><strong>False Reporting Detection</strong></td><td>Complaints can be flagged as false reports. System tracks false reporting patterns to maintain data integrity</td></tr>
+  <tr><td><strong>Supervisor Reminders</strong></td><td>Consumption-based reminder system. Supervisors can set reminders tied to supply levels and buildings with custom due dates</td></tr>
+</table>
+
+<h3>Backend — New Database Migration (20240302000001_hygiene_monitoring.js, 132 lines)</h3>
+<table>
+  <tr><th>Change</th><th>Details</th></tr>
+  <tr><td><strong>Supervisor Role</strong></td><td>Added 'supervisor' to users role enum constraint. Added <code>shift</code> (morning/evening/night) and <code>supervisor_id</code> (self-referencing FK) columns to users table</td></tr>
+  <tr><td><strong>washrooms Table</strong></td><td>New table: building, floor_number, direction (N/S/E/W), status (clean/needs_cleaning/maintenance), soap_level (0-100), tissue_level (0-100), sanitizer_level (0-100), assigned_staff_id FK, last_restocked timestamp</td></tr>
+  <tr><td><strong>work_submissions Table</strong></td><td>New table: staff_id FK, washroom_id FK, description, image_url (photo proof), llm_verified (boolean), llm_feedback (text), supervisor_status (pending/approved/rejected), reviewed_by FK</td></tr>
+  <tr><td><strong>supply_inventory Table</strong></td><td>New table: building, item_name, current_stock, min_threshold, unit, last_restocked, restocked_by FK. Tracks soap, tissue, sanitizer per building</td></tr>
+  <tr><td><strong>reminders Table</strong></td><td>New table: supervisor_id FK, building, reminder_type (restocking/inspection/follow_up/custom), message, is_active, due_date</td></tr>
+  <tr><td><strong>complaints Updated</strong></td><td>Added <code>building</code> column. Widened room_number to varchar(200) for descriptive location names like "H2 - Ground Floor South Wing"</td></tr>
+</table>
+
+<h3>Backend — 3 New Route Modules (+521 lines)</h3>
+<table>
+  <tr><th>Change</th><th>Details</th></tr>
+  <tr><td><strong>routes/washrooms.js</strong> (170 lines)</td><td>8 endpoints: CRUD for washrooms, supply level updates (soap/tissue/sanitizer 0-100), status changes, staff assignment, building-wise inventory tracking</td></tr>
+  <tr><td><strong>routes/work-submissions.js</strong> (217 lines)</td><td>4 endpoints: staff photo proof upload with simulated LLM verification, role-based listing (staff=own, supervisor=team, admin=all), supervisor approve/reject, pending count for badges</td></tr>
+  <tr><td><strong>routes/reminders.js</strong> (134 lines)</td><td>5 endpoints: CRUD for consumption-based reminders with supervisor ownership enforcement, due-now query for overdue alerts</td></tr>
+</table>
+
+<h3>Backend — Updated Existing Routes</h3>
+<table>
+  <tr><th>Change</th><th>Details</th></tr>
+  <tr><td><strong>routes/complaints.js</strong></td><td>Supervisor role-based filtering (sees their staff's complaints via subquery). New endpoints: PUT /:id/assign (admin/supervisor), PUT /:id/priority (admin/supervisor)</td></tr>
+  <tr><td><strong>routes/dashboard.js</strong></td><td>New GET /supervisor endpoint with pendingVerifications, approvedToday, staffCount, staff list, pending submissions, reminders. Admin dashboard now includes washroomStats and verificationStats</td></tr>
+  <tr><td><strong>routes/staff.js</strong></td><td>Supervisors can view their assigned staff. Returns role, shift, supervisor_id fields</td></tr>
+  <tr><td><strong>routes/rooms.js</strong></td><td>/my/tasks now accepts supervisor role. Updated room status endpoint for supervisor access</td></tr>
+  <tr><td><strong>middleware/validator.js</strong></td><td>Register schema now accepts 'supervisor' role</td></tr>
+  <tr><td><strong>server.js</strong></td><td>Added imports and route registrations for 3 new modules: /api/washrooms, /api/work-submissions, /api/reminders</td></tr>
+</table>
+
+<h3>Data — Comprehensive Seed Data Rewrite</h3>
+<table>
+  <tr><th>Change</th><th>Details</th></tr>
+  <tr><td><strong>11 Users</strong></td><td>1 admin, 2 supervisors (Meera Desai — morning shift, Suresh Nair — evening shift), 4 cleaning staff (with shift assignments + supervisor mapping), 3 students + 1 faculty member</td></tr>
+  <tr><td><strong>20 Washrooms</strong></td><td>Across 6 buildings: H1, H2, H3, Academic Block, Library, Cafeteria. H2 includes North/South Wing directional data. Various supply levels and cleaning statuses</td></tr>
+  <tr><td><strong>4 Work Submissions</strong></td><td>Mix of LLM verified/unverified, supervisor approved/pending — demonstrates the 2-way verification pipeline</td></tr>
+  <tr><td><strong>17 Supply Inventory Items</strong></td><td>Soap, tissue rolls, sanitizer bottles across all 6 buildings with realistic stock levels and thresholds</td></tr>
+  <tr><td><strong>4 Reminders</strong></td><td>Restocking and inspection reminders tied to specific buildings</td></tr>
+  <tr><td><strong>7 Complaints</strong></td><td>Hygiene-themed (empty soap, clogged drains, pest sightings) including false_reporting category</td></tr>
+</table>
+
+<!-- v2.1.0 -->
+<h2>v2.1.0 — 12 March 2026 (API Integration + AI Features)</h2>
+
+<div class="info-box">
+  <strong>Summary:</strong> Frontend fully connected to backend APIs. AI features are now real and functional — auto-categorization, priority prediction, sentiment analysis, urgency detection all work end-to-end. New complaint detail popup modal. Image upload and display. Bug fixes in backend.
+</div>
+
+<h3>Frontend — index.html (1,921 → 2,343 lines, +422 lines)</h3>
+<table>
+  <tr><th>Change</th><th>Details</th></tr>
+  <tr><td><strong>Full API Integration</strong></td><td>Frontend was operating in offline/demo mode (complaints stored in local JS array, no API calls). Rewritten with real <code>fetch()</code> calls to backend — login via <code>/api/auth/login</code>, complaints via <code>/api/complaints</code>, AI via <code>/api/ai/categorize</code></td></tr>
+  <tr><td><strong>AI Auto-Categorization Flow</strong></td><td>2-step submission when "Let AI Detect" is selected: (1) Click Submit → calls <code>/api/ai/categorize</code> → shows all 12 category scores with percentages, AI-suggested category highlighted, AI priority with confidence. (2) User reviews scores, can change category via dropdown, clicks "Confirm &amp; Submit" to actually submit. Prevents accidental miscategorization</td></tr>
+  <tr><td><strong>Complaint Detail Modal</strong></td><td>New popup overlay (not full-screen) when clicking any complaint card in admin or staff view. Shows: resident name, room number, status badge, priority badge, full description, attached image (clickable to open full-size), complete AI analysis with confidence bars (ML category + %, ML priority + %, sentiment + polarity, urgency level), suggested actions list, estimated resolution hours, summary</td></tr>
+  <tr><td><strong>Image Upload &amp; Display</strong></td><td>Complaint form uses <code>FormData</code> for multipart upload. Images stored in shared Docker volume. Displayed in: admin complaint cards (📷 indicator), detail popup (full image), resident dashboard</td></tr>
+  <tr><td><strong>AI Tags on Complaint Cards</strong></td><td>Admin/staff complaint cards show colored AI tags: 🤖 category with confidence %, sentiment emoji, ⚡ urgency level, priority badge. Visual at-a-glance AI information</td></tr>
+  <tr><td><strong>Category Made Optional</strong></td><td>Category dropdown default: "🤖 Let AI Detect Automatically". Expanded from 6 to 12 categories matching backend ML model. Category label shows "(optional — AI will detect)"</td></tr>
+  <tr><td><strong>New CSS</strong></td><td>~120 lines added: <code>.ai-analysis-box</code>, <code>.ai-tag</code> variants (category, priority-*, sentiment), <code>.confidence-bar</code>, <code>.detail-modal</code>, <code>.detail-grid</code>, <code>.detail-ai-grid</code>, <code>.detail-ai-card</code>, <code>.detail-image</code>, <code>.spinner</code> animation, disabled button styles</td></tr>
+  <tr><td><strong>Double-Submission Prevention</strong></td><td>Global <code>_submitting</code> guard blocks duplicate API calls. Button disabled with spinner during submission. Submit button hidden after successful submission until form reset</td></tr>
+</table>
+
+<h3>Backend — routes/complaints.js</h3>
+<table>
+  <tr><th>Change</th><th>Details</th></tr>
+  <tr><td><strong>Bug Fix: AI Analysis Path</strong></td><td><code>analysis?.priority?.priority</code> → <code>analysis?.ml_analysis?.priority?.priority</code> (and same for category). The AI service returns nested structure under <code>ml_analysis</code>, but the backend was reading from wrong path, so AI-suggested priority/category were never being applied to the DB row</td></tr>
+  <tr><td><strong>Priority Mapping</strong></td><td>Added <code>mapPriority()</code> function. DB check constraint allows only: low, medium, high, urgent. AI model can return "critical". Mapping: critical→urgent, unknown→medium. Prevents <code>complaints_priority_check</code> constraint violations</td></tr>
+</table>
+
+<h3>AI Service — Dockerfile</h3>
+<table>
+  <tr><th>Change</th><th>Details</th></tr>
+  <tr><td><strong>Bug Fix: NLTK Corpora Path</strong></td><td>NLTK corpora were downloaded as root during Docker build but app runs as <code>appuser</code>. Added <code>ENV NLTK_DATA=/usr/local/share/nltk_data</code> and <code>-d $NLTK_DATA</code> flag to download command. Changed from <code>textblob.download_corpora lite</code> to full download. Fixes <code>MissingCorpusError</code> that was causing AI service 500 errors on the <code>/analyze</code> endpoint</td></tr>
+</table>
+
+<h3>Data — AI Analysis Backfill</h3>
+<table>
+  <tr><th>Change</th><th>Details</th></tr>
+  <tr><td><strong>Seed Complaints Updated</strong></td><td>All 8 seed complaints that were created before AI integration now have full AI analysis data (ml_analysis + nlp_analysis + summary) populated via backfill script that called the AI analyze endpoint and updated the DB</td></tr>
+</table>
+
+<footer>
+  <p>ILGC Tracker v3.1.0 — Complete System Documentation</p>
+  <p>Generated: 14 March 2026 &bull; 59 source files &bull; ~11,500+ lines of code &bull; 5 languages</p>
+</footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    securityLevel: 'loose',
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+    sequence: { useMaxWidth: true, actorFontSize: 11, messageFontSize: 11 },
+    er: { useMaxWidth: true, fontSize: 10 }
+  });
+</script>
+</body>
+</html>

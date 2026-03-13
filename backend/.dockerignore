@@ -1,0 +1,9 @@
+node_modules
+npm-debug.log
+data/*.db
+uploads/*
+!uploads/.gitkeep
+logs/*
+.env
+.git
+.vscode

@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+venv/
+__pycache__/
+
+# Environment
+.env
+backend/.env
+ai-service/.env
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+data/*.db
+backend/data/*.db
+uploads/*
+!uploads/.gitkeep
+backend/uploads/*
+!backend/uploads/.gitkeep
+ai-service/models/*.joblib
+
+# Build outputs
+frontend-dist/
+*.pyc
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# SSL certs
+certbot/
+
+# Docker volumes
+pgdata/
+redisdata/
+
+# React Native / Android / iOS generated files
+HostelCareApp/android/.gradle/
+HostelCareApp/android/build/
+HostelCareApp/android/app/build/
+HostelCareApp/android/local.properties
+HostelCareApp/ios/Pods/
+HostelCareApp/ios/build/
+HostelCareApp/.gradle/
+
+# Packaged app artifacts
+*.apk
+*.aab
+apk-download/
