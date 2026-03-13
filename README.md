@@ -1,10 +1,10 @@
-# ILGC Tracker
+# University Housekeeping Management System
 
 AI-powered campus housekeeping and hygiene compliance platform with role-aware workflows, complaint intelligence, and mobile access.
 
 ## Why This Project Stands Out
 
-ILGC Tracker turns hygiene operations into a measurable, auditable system:
+University Housekeeping Management System turns hygiene operations into a measurable, auditable system:
 - Multi-role operations across Admin, Supervisor, Cleaning Staff, and Student/Faculty
 - Building-floor-direction washroom tracking with supply visibility
 - AI-assisted complaint analysis with category, priority, sentiment, and urgency signals
