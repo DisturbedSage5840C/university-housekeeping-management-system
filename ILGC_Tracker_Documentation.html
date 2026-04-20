@@ -132,7 +132,7 @@
   </div>
 
   <div class="meta">
-    <p>Version 3.1.0 &bull; Generated: 14 March 2026</p>
+    <p>Version 3.2.0 &bull; Generated: 20 April 2026</p>
     <p>Project: /Users/maruteymani/Documents/ILGC Tracker</p>
   </div>
 </div>
@@ -178,7 +178,7 @@
 </div>
 
 <div class="info-box">
-  <strong>The Solution — ILGC Tracker:</strong> Track-based login (Admin / Housekeeping / Faculty-Student) with role-specific access (Admin/Supervisor/Cleaning Staff/Student&amp;Faculty) &bull; Building/Floor/Direction-wise washroom data tracking &bull; Supply inventory monitoring (soap, tissue, sanitizer levels) &bull; AI complaint analysis with 12 categories (including hygiene, supplies, cleaning) &bull; Priority prediction (hygiene issues auto-flagged high/urgent) &bull; <strong>2-way work verification</strong> (LLM image analysis + supervisor approval) &bull; False reporting detection &bull; Supervisor consumption-based reminders &bull; Restocking timeline tracking &bull; NLP sentiment analysis &bull; AI auto-categorization with review flow &bull; Complaint detail popup with full AI breakdown &bull; Image upload for photographic evidence &bull; Predictive maintenance to anticipate supply shortages &bull; Light/Dark theme &bull; Real-time dashboard for monitoring compliance &bull; Mobile app shell for on-the-go access
+  <strong>The Solution — ILGC Tracker:</strong> Home-first website entry with Supervisor/Admin sign-in and role-aware routing &bull; Building/Floor/Direction-wise washroom data tracking &bull; Supply inventory monitoring (soap, tissue, sanitizer levels) &bull; AI complaint analysis with 12 categories (including hygiene, supplies, cleaning) &bull; Priority prediction (hygiene issues auto-flagged high/urgent) &bull; <strong>2-way work verification backend pipeline</strong> (LLM image analysis + supervisor approval endpoint) &bull; False reporting detection &bull; Supervisor complaints overview + supply stats updater + Open Staff Tools access &bull; Restocking timeline tracking &bull; NLP sentiment analysis &bull; AI auto-categorization with review flow &bull; Complaint detail popup with full AI breakdown &bull; Image upload for photographic evidence &bull; Predictive maintenance to anticipate supply shortages &bull; Light/Dark theme &bull; Real-time dashboard for monitoring compliance &bull; Mobile app shell for on-the-go access
 </div>
 
 <h3>How It Works (Simple)</h3>
@@ -196,7 +196,7 @@
 
 <table>
   <tr><th>Layer</th><th>Technology</th><th>Language</th><th>Purpose</th></tr>
-  <tr><td>Frontend</td><td>Vanilla HTML/CSS/JS</td><td><span class="badge-lang lang-html">HTML5</span><span class="badge-lang lang-js">JS</span></td><td>Single-page web application (3,884 lines) — role-track login, admin/supervisor workflow controls, complaint detail modals, washroom/supply dashboards</td></tr>
+  <tr><td>Frontend</td><td>Vanilla HTML/CSS/JS</td><td><span class="badge-lang lang-html">HTML5</span><span class="badge-lang lang-js">JS</span></td><td>Single-page web application (4,692 lines) — home-first sign-in, admin/supervisor workflow controls, complaint detail modals, and washroom/supply dashboards</td></tr>
   <tr><td>Mobile</td><td>React Native 0.73 + WebView</td><td><span class="badge-lang lang-js">JavaScript</span></td><td>Android + iOS shell that loads website UI with cache-busting, deep-link handling, and fallback host support</td></tr>
   <tr><td>Backend API</td><td>Express.js 4.18</td><td><span class="badge-lang lang-js">Node.js 18+</span></td><td>REST API server (9 route modules)</td></tr>
   <tr><td>AI Service</td><td>FastAPI + Gunicorn</td><td><span class="badge-lang lang-py">Python 3.11</span></td><td>Machine learning microservice</td></tr>
@@ -222,7 +222,7 @@
   <div class="mermaid">
 graph TB
     subgraph Client["🌐 Client Layer"]
-        Browser["Web Browser<br/><b>index.html</b><br/>HTML5 / CSS3 / Vanilla JS<br/>3150 lines"]
+    Browser["Web Browser<br/><b>index.html</b><br/>HTML5 / CSS3 / Vanilla JS<br/>4692 lines"]
         Mobile["React Native App<br/><b>HostelCareApp/</b><br/>9 Screens + API service"]
     end
 
@@ -231,7 +231,7 @@ graph TB
     end
 
     subgraph Backend["⚡ Node.js API Port 5000"]
-        Express["Express.js Server<br/><b>server.js</b> 221 lines<br/>Cluster Mode 4 workers"]
+      Express["Express.js Server<br/><b>server.js</b> 275 lines<br/>Cluster Mode 4 workers"]
         MW["Middleware: helmet, cors,<br/>rate-limit, JWT auth, Joi validation"]
         Routes["9 Route Modules:<br/>auth, complaints, rooms, staff,<br/>dashboard, ai, washrooms,<br/>work-submissions, reminders"]
         Services["aiService.js + cacheService.js"]
@@ -636,7 +636,7 @@ graph LR
 <h2>8a. Root Level Files</h2>
 <table>
   <tr><th>File</th><th>Lines</th><th>Language</th><th>What It Does</th></tr>
-  <tr><td><code>index.html</code></td><td>3,884</td><td><span class="badge-lang lang-html">HTML</span><span class="badge-lang lang-js">JS</span></td><td><strong>The entire web frontend</strong> — track-based login entry (Admin / Housekeeping / Faculty-Student), admin dashboard, supervisor dashboard, washroom status grid (building/floor/direction-wise), supply inventory tracking, room/task modules, complaints list, staff management, modals, filters, and theme toggle. Includes role-aligned controls: admin complaint view is read-only with false-report escalation to supervisors, admin building-to-supervisor assignment, and supervisor complaint assignment to their own staff. <strong>Fully integrated with backend API</strong> — real-time complaint CRUD, FormData image upload, AI auto-categorization flow, complaint detail modal with AI analysis, and dashboard refresh logic</td></tr>
+  <tr><td><code>index.html</code></td><td>4,692</td><td><span class="badge-lang lang-html">HTML</span><span class="badge-lang lang-js">JS</span></td><td><strong>The entire web frontend</strong> — home-first entry, Supervisor/Admin sign-in with back-to-landing navigation, admin tabs (Washroom Map, Supply Inventory, Staff &amp; Shifts, Live Updates), supervisor dashboard (complaints in assigned buildings + supply stats updater), and supervisor access to full staff-tools mode (My Tasks, Assigned Issues, Upload Work). Includes complaint detail modals, multilingual UI support, theme toggle, and API-driven data refresh flows</td></tr>
   <tr><td><code>docker-compose.yml</code></td><td>141</td><td><span class="badge-lang lang-yaml">YAML</span></td><td>Defines all 6 Docker containers (PostgreSQL, Redis, Node API, Python AI, Nginx, Certbot), their ports, volumes, health checks, environment variables, and dependency ordering</td></tr>
   <tr><td><code>deploy.sh</code></td><td>96</td><td><span class="badge-lang lang-bash">Bash</span></td><td>One-command deployment — generates secrets (JWT, DB password, Redis password via openssl), creates self-signed SSL certs, copies frontend to frontend-dist/, builds Docker images, starts containers, runs DB migrations</td></tr>
   <tr><td><code>.env.example</code></td><td>80</td><td>Env</td><td>Template for root-level environment variables: DB credentials, JWT secrets, Redis password, AI API key, CORS, SMTP, upload, rate limit settings</td></tr>
@@ -648,7 +648,7 @@ graph LR
 <h3>Core Files</h3>
 <table>
   <tr><th>File</th><th>Lines</th><th>What It Does</th></tr>
-  <tr><td><code>server.js</code></td><td>221</td><td><strong>Express app entry point</strong> — configures: helmet (security headers), CORS (configurable origins), rate limiting (100 req/15min API, 20 req/15min auth), compression (gzip), morgan (HTTP logging), body parsing (10MB limit). Mounts 9 route modules (auth, complaints, rooms, staff, dashboard, ai, washrooms, work-submissions, reminders). Implements cluster mode (4 workers in production). Serves frontend static files. Health check (/health) and readiness (/ready) endpoints. Graceful shutdown on SIGTERM/SIGINT</td></tr>
+  <tr><td><code>server.js</code></td><td>275</td><td><strong>Express app entry point</strong> — configures: helmet (security headers), CORS (configurable origins), rate limiting (100 req/15min API, 20 req/15min auth), compression (gzip), morgan (HTTP logging), body parsing (10MB limit). Mounts 9 route modules (auth, complaints, rooms, staff, dashboard, ai, washrooms, work-submissions, reminders). Implements cluster mode (4 workers in production). Serves frontend static files. Health check (/health) and readiness (/ready) endpoints. Graceful shutdown on SIGTERM/SIGINT</td></tr>
   <tr><td><code>config/index.js</code></td><td>97</td><td><strong>Centralized configuration</strong> — reads ALL environment variables into structured config object with sections: app (port, host, env), jwt (secret, expiry), db (host, port, pool min/max, SSL), redis, ai (serviceUrl, apiKey), upload (maxSize, allowedTypes), rateLimit, cors, log, metrics. Validates critical vars in production</td></tr>
   <tr><td><code>config/knexfile.js</code></td><td>~30</td><td>Knex migration config — specifies migration directory, seed directory, PostgreSQL client</td></tr>
   <tr><td><code>package.json</code></td><td>~50</td><td>Dependencies: express, knex, pg, ioredis, jsonwebtoken, bcryptjs, helmet, hpp, cors, multer, joi, winston, morgan, compression, express-rate-limit, dotenv, axios</td></tr>
@@ -677,9 +677,9 @@ graph LR
 <h3>Route Files (API Endpoints)</h3>
 <table>
   <tr><th>File</th><th>Lines</th><th>Endpoints</th><th>What It Does</th></tr>
-  <tr><td><code>routes/auth.js</code></td><td>219</td><td>POST /login, POST /register, GET /me, PUT /me, PUT /password, POST /refresh</td><td>User authentication — bcrypt password verification, JWT token generation (access 7d + refresh 30d), profile CRUD, token refresh with rotation</td></tr>
-  <tr><td><code>routes/complaints.js</code></td><td>339</td><td>GET /, POST /, GET /:id, PUT /:id/status, PUT /:id/assign, PUT /:id/priority, DELETE /:id</td><td>Complaint CRUD — file upload (multer, 10MB limit), filtering by status/priority/category/date, pagination, triggers async AI analysis on creation, requires JWT auth. Supervisors can see their assigned staff's complaints, assign complaints, and update priority. <strong>Priority mapping</strong>: AI may return "critical" but DB allows only low/medium/high/urgent — mapPriority() maps critical→urgent</td></tr>
-  <tr><td><code>routes/dashboard.js</code></td><td>278</td><td>GET /admin, GET /staff, GET /supervisor, GET /resident, GET /notifications, PUT /notifications/:id/read, PUT /notifications/read-all</td><td>Dashboard data — aggregates room counts by status, complaint counts by priority/status, recent items. <strong>Supervisor dashboard</strong>: pending verifications count, approvedToday, staff list, pending work submissions, reminders. <strong>Admin dashboard</strong>: now includes washroomStats (total, needsCleaning, restockedToday), verificationStats (pending, approved, rejected). Notification management. Role-specific data</td></tr>
+  <tr><td><code>routes/auth.js</code></td><td>355</td><td>POST /register, POST /login, POST /forgot-password/request-otp, POST /forgot-password/reset, GET /me, PUT /me, PUT /password, POST /refresh, POST /logout</td><td>User authentication — bcrypt password verification, JWT token generation (access + refresh), profile CRUD, OTP-based password reset, token refresh with rotation, and logout/revoke flow</td></tr>
+  <tr><td><code>routes/complaints.js</code></td><td>361</td><td>GET /, POST /, GET /:id, PUT /:id/status, PUT /:id/assign, PUT /:id/priority, DELETE /:id</td><td>Complaint CRUD — file upload (multer, 10MB limit), filtering by status/priority/category/date, pagination, triggers async AI analysis on creation, requires JWT auth. Supervisors can see their assigned staff's complaints, assign complaints, and update priority. <strong>Priority mapping</strong>: AI may return "critical" but DB allows only low/medium/high/urgent — mapPriority() maps critical→urgent</td></tr>
+  <tr><td><code>routes/dashboard.js</code></td><td>278</td><td>GET /admin, GET /staff, GET /supervisor, GET /resident, GET /notifications, PUT /notifications/:id/read, PUT /notifications/read-all</td><td>Dashboard data — aggregates room, complaint, washroom, and verification stats with recent items/trends. Backend <strong>GET /dashboard/supervisor</strong> returns pendingVerifications, approvedToday, staff list, pending submissions, and reminders. Current website supervisor view emphasizes complaints-in-my-buildings, supply updater, and Open Staff Tools entry</td></tr>
   <tr><td><code>routes/rooms.js</code></td><td>162</td><td>GET /, GET /by-floor, GET /my/tasks, PUT /:id/status</td><td>Room management — list with filters, group by floor, update status + auto-create cleaning_log entry. /my/tasks accessible by both staff and supervisor roles</td></tr>
   <tr><td><code>routes/staff.js</code></td><td>152</td><td>GET /, GET /:id, GET /:id/assignments</td><td>Staff management — list all staff with stats, get individual details, view room/floor assignments. Supervisors can view their assigned staff with role/shift/supervisor_id fields</td></tr>
   <tr><td><code>routes/ai.js</code></td><td>196</td><td>GET /status, POST /analyze-complaint, POST /categorize, GET /optimize-tasks, GET /predictions, GET /responses/:id, GET /insights</td><td><strong>AI integration layer</strong> — bridges Node.js to Python AI service via HTTP, has complete fallback system (keyword-based categorization + rule-based priority) when AI service is unavailable</td></tr>
@@ -785,7 +785,7 @@ graph LR
   <tr style="background:#e0f7fa;"><td colspan="5"><strong>Dashboard</strong></td></tr>
   <tr><td><strong>GET</strong></td><td>/api/dashboard/admin</td><td>Yes</td><td>Admin</td><td>Admin stats (rooms, complaints, staff, washroomStats, verificationStats)</td></tr>
   <tr><td><strong>GET</strong></td><td>/api/dashboard/staff</td><td>Yes</td><td>Staff/Supervisor</td><td>Staff tasks and assigned items</td></tr>
-  <tr><td><strong>GET</strong></td><td>/api/dashboard/supervisor</td><td>Yes</td><td>Supervisor</td><td>Pending verifications, approved today, staff list, pending submissions, reminders</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/dashboard/supervisor</td><td>Yes</td><td>Supervisor</td><td>Backend payload includes pending verifications, approved today, staff list, pending submissions, reminders; website supervisor UI currently focuses on complaints overview, supply updates, and staff-tools entry</td></tr>
   <tr><td><strong>GET</strong></td><td>/api/dashboard/resident</td><td>Yes</td><td>Resident</td><td>Resident's complaints and room info</td></tr>
   <tr><td><strong>GET</strong></td><td>/api/dashboard/notifications</td><td>Yes</td><td>Any</td><td>User's notifications</td></tr>
   <tr><td><strong>PUT</strong></td><td>/api/dashboard/notifications/:id/read</td><td>Yes</td><td>Any</td><td>Mark notification as read</td></tr>
@@ -825,8 +825,8 @@ graph LR
 
 <table>
   <tr><th>Role</th><th>Login</th><th>Can Do</th><th>Dashboard Shows</th></tr>
-  <tr><td><strong>Admin</strong></td><td>admin@hostel.com<br/>password123</td><td>Manage rooms, staff, washrooms, and inventory. Assign buildings to supervisors. View complaints and complaint details with AI analysis. For false-report complaints, send message/escalation to supervisor. <strong>Admin does not mark complaints in-progress/resolved in current UI flow</strong></td><td>Total stats (rooms/complaints/staff/washrooms/verifications), complaint list with AI tags, complaint detail popup, building-to-supervisor assignment controls, washroom status overview, supply inventory, AI recommendations</td></tr>
-  <tr><td><strong>Supervisor</strong></td><td>meera@hostel.com<br/>password123</td><td>Manage assigned cleaning staff and buildings. Review &amp; approve/reject work submissions (2-way verification). View assigned-building room/staff mapping. Assign complaints in assigned buildings to their own staff. Create restocking reminders and update inventory context</td><td>Pending verifications count, approved today count, assigned staff list, assigned-building mapping cards, complaints in assigned buildings with assignment actions, active reminders, inventory visibility by building</td></tr>
+  <tr><td><strong>Admin</strong></td><td>admin@hostel.com<br/>password123</td><td>Manage rooms, staff, washrooms, and inventory. Assign buildings to supervisors. Monitor live work updates in read-only mode. Review operational stats and trends</td><td>Total stats (rooms/complaints/staff/washrooms/verifications), washroom map, supply inventory, staff/shift overview, live updates, building-to-supervisor assignment controls</td></tr>
+  <tr><td><strong>Supervisor</strong></td><td>meera@hostel.com<br/>password123</td><td>Monitor complaints in assigned buildings, update washroom supply stats, and open full staff-tools mode (My Tasks, Assigned Issues, Upload Work). Resolve issues from staff-tools view</td><td>Complaints-in-my-buildings overview, open complaints/buildings counters, supply stats updater, Open Staff Tools entry point</td></tr>
   <tr><td><strong>Cleaning Staff</strong></td><td>rajesh@hostel.com<br/>password123</td><td>Update room/washroom status (clean/maintain). Handle assigned complaints. View assigned floors/rooms/washrooms. Log cleaning activities. <strong>Upload cleaning proof photos</strong> — LLM auto-verifies for cleanliness. Submit work for supervisor approval</td><td>Assigned tasks, pending complaints, cleaning schedule, room/washroom status of assigned areas, own work submission history with verification status</td></tr>
   <tr><td><strong>Student/Faculty</strong></td><td>student1@hostel.com<br/>password123</td><td>File new complaints (with image upload, building/direction selection). <strong>AI auto-categorization</strong>: can leave category blank, AI detects with scores, user reviews and confirms. View own complaint status with AI analysis. Update profile. View notifications. Report false cleaning/maintenance claims</td><td>Own complaints history with AI analysis, complaint status tracking, room info, uploaded images, building washroom status</td></tr>
 </table>
@@ -955,7 +955,7 @@ docker compose exec -T api node scripts/initDb.js  # Re-run migrations</code></p
   <tr><th>Category</th><th>Files</th><th>Total Lines</th><th>Languages</th></tr>
   <tr><td>Backend (Node.js)</td><td>22 files</td><td>~3,600</td><td>JavaScript (ES6+)</td></tr>
   <tr><td>AI Service (Python)</td><td>14 files</td><td>~2,100</td><td>Python 3.11</td></tr>
-  <tr><td>Frontend</td><td>1 file</td><td>3,884</td><td>HTML5 + CSS3 + JavaScript</td></tr>
+  <tr><td>Frontend</td><td>1 file</td><td>4,692</td><td>HTML5 + CSS3 + JavaScript</td></tr>
   <tr><td>Mobile App</td><td>13 files</td><td>~8,080</td><td>JavaScript (React Native)</td></tr>
   <tr><td>Infrastructure</td><td>5 files</td><td>~400</td><td>YAML, Bash, Nginx conf</td></tr>
   <tr><td>Config/Env</td><td>4 files</td><td>~250</td><td>Env, JSON</td></tr>
@@ -973,6 +973,22 @@ docker compose exec -T api node scripts/initDb.js  # Re-run migrations</code></p
 <!-- ==================== 15. CHANGELOG ==================== -->
 <div class="section-break"></div>
 <h1 id="changelog">15. Changelog</h1>
+
+<!-- v3.2.0 -->
+<h2>v3.2.0 — 20 April 2026 (Latest Website Workflow Alignment)</h2>
+
+<div class="info-box">
+  <strong>Summary:</strong> Documentation updated to match the latest repository and live website workflow. Login remains home-first with back navigation, supervisor dashboard focuses on complaints + supply updates, full staff tools are available to supervisors, and admin view remains limited to admin-centric sections.
+</div>
+
+<h3>Frontend — index.html (3,884 → 4,692 lines, +808 lines)</h3>
+<table>
+  <tr><th>Change</th><th>Details</th></tr>
+  <tr><td><strong>Home-First Login Update</strong></td><td>Landing page remains primary entry and login includes explicit "Back to Landing Page" navigation</td></tr>
+  <tr><td><strong>Supervisor Dashboard Focus</strong></td><td>Supervisor dashboard now highlights complaints in assigned buildings and a direct "Update Supply Stats (Home)" section</td></tr>
+  <tr><td><strong>Supervisor Staff Tools Restored</strong></td><td>Supervisors can open full staff-tools mode (My Tasks, Assigned Issues, Upload Work) from dashboard</td></tr>
+  <tr><td><strong>Admin/Supervisor Separation</strong></td><td>Admin tabs remain washroom/inventory/staff/live-updates while supervisor-specific sections remain supervisor-only</td></tr>
+</table>
 
 <!-- v3.1.0 -->
 <h2>v3.1.0 — 14 March 2026 (Role Workflow Alignment + App Sync)</h2>
@@ -1000,7 +1016,7 @@ docker compose exec -T api node scripts/initDb.js  # Re-run migrations</code></p
 
 <h3>Current vs Historical Notes</h3>
 <div class="info-box">
-  <strong>Current behavior (v3.1.0):</strong> Admin complaint status actions are read-only, with false-report escalation via "Write to Supervisor". Supervisors handle assignment inside their mapped buildings. Login entry uses 3 tracks (Admin, Housekeeping, Faculty-Student) that route to role-specific dashboards.<br/><br/>
+  <strong>Current behavior (v3.2.0):</strong> Home-first entry uses "Supervisor/Admin? Sign in." with a login back button. Admin view focuses on washroom, inventory, staff, and live-update oversight. Supervisor view keeps complaints-in-my-buildings, supply stats updates, and direct access to full staff tools.<br/><br/>
   <strong>Historical behavior (v3.0.0 section below):</strong> The v3.0.0 notes capture rollout-era capabilities and should be read as release history, not as the latest permission model.
 </div>
 
@@ -1105,8 +1121,8 @@ docker compose exec -T api node scripts/initDb.js  # Re-run migrations</code></p
 </table>
 
 <footer>
-  <p>ILGC Tracker v3.1.0 — Complete System Documentation</p>
-  <p>Generated: 14 March 2026 &bull; 59 source files &bull; ~11,500+ lines of code &bull; 5 languages</p>
+  <p>ILGC Tracker v3.2.0 — Complete System Documentation</p>
+  <p>Generated: 20 April 2026 &bull; 59 source files &bull; ~11,500+ lines of code &bull; 5 languages</p>
 </footer>
 
 <script>

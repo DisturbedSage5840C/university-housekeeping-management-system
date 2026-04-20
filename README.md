@@ -5,15 +5,17 @@ AI-powered campus housekeeping and hygiene compliance platform with role-aware w
 ## Why This Project Stands Out
 
 University Housekeeping Management System turns hygiene operations into a measurable, auditable system:
+
 - Multi-role operations across Admin, Supervisor, Cleaning Staff, and Student/Faculty
 - Building-floor-direction washroom tracking with supply visibility
 - AI-assisted complaint analysis with category, priority, sentiment, and urgency signals
-- Supervisor-led verification pipeline and assignment controls
+- Supervisor operations with complaints overview, full staff tools access, and supply stats updates
 - Web platform plus Android app shell for on-the-go access
 
 ## Product Snapshot
 
 ### Core Modules
+
 - Authentication and role-based dashboards
 - Complaints lifecycle with AI metadata and media evidence
 - Washroom status and consumables monitoring (soap, tissue, sanitizer)
@@ -21,28 +23,33 @@ University Housekeeping Management System turns hygiene operations into a measur
 - Reporting-ready documentation (HTML + PDF)
 
 ### Role Experience
-- Admin: governance, building-to-supervisor mapping, oversight dashboards
-- Supervisor: building-scoped operations, complaint assignment, approvals
+
+- Admin: governance, building-to-supervisor mapping, washroom/inventory/staff oversight, and live work monitoring
+- Supervisor: complaints in assigned buildings, supply stats updates, and full staff-tools mode (tasks/issues/upload)
 - Cleaning Staff: assigned task execution and updates
 - Student/Faculty: complaint submission and tracking
 
 ## Architecture
 
 ### Frontend
+
 - Single-page web app in [index.html](index.html)
 - Deployment mirror in [frontend-dist/index.html](frontend-dist/index.html)
 
 ### Backend
+
 - Node.js/Express API in [backend/server.js](backend/server.js)
 - Routes in [backend/routes](backend/routes)
 - Database access in [backend/database](backend/database)
 - Middleware stack in [backend/middleware](backend/middleware)
 
 ### AI Service
+
 - Python microservice in [ai-service/main.py](ai-service/main.py)
 - ML and NLP logic in [ai-service/services](ai-service/services)
 
 ### Mobile
+
 - React Native app shell in [HostelCareApp/App.js](HostelCareApp/App.js)
 - Alternate mobile workspace in [mobile-src/App.js](mobile-src/App.js)
 - Android artifacts for manual install under [apk-download](apk-download)
@@ -52,7 +59,7 @@ University Housekeeping Management System turns hygiene operations into a measur
 - Frontend: HTML, CSS, JavaScript
 - Backend: Node.js, Express
 - AI: Python, NLP/ML services
-- Data: SQLite/PostgreSQL support paths
+- Data: PostgreSQL + Redis
 - Mobile: React Native + WebView
 - DevOps: Docker Compose, Nginx
 
@@ -94,14 +101,15 @@ npx react-native run-android
 
 ## Demo Credentials
 
-- Admin: admin@hostel.com / password123
-- Supervisor: meera@hostel.com / password123
-- Cleaning Staff: rajesh@hostel.com / password123
-- Student: student1@hostel.com / password123
+- Admin: `admin@hostel.com` / `password123`
+- Supervisor: `meera@hostel.com` / `password123`
+- Cleaning Staff: `rajesh@hostel.com` / `password123`
+- Student: `student1@hostel.com` / `password123`
 
 ## API Surface
 
 Representative endpoint groups:
+
 - /api/auth
 - /api/complaints
 - /api/dashboard
