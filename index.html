@@ -1608,13 +1608,16 @@
                 <h1>Housekeeping <span>Tracker</span></h1>
                 <p>Campus Hygiene Monitoring System</p>
             </div>
+            <div style="margin-bottom:12px;text-align:center;">
+                <button type="button" class="btn btn-outline btn-sm" onclick="showHomeScreen()" id="backToLandingBtn">← Back to Landing Page</button>
+            </div>
             <div id="loginRoleChooser">
                 <div class="login-role-grid">
                     <button type="button" class="login-role-btn" onclick="chooseLoginTrack('admin')"><span id="loginAdminTitleText">👔 Admin</span>
                         <small id="loginAdminSubtitleText">Campus-level operations and live monitoring</small>
                     </button>
                     <button type="button" class="login-role-btn" onclick="chooseLoginTrack('supervisor')"><span id="loginSupervisorTitleText">🧭 Supervisor</span>
-                        <small id="loginSupervisorSubtitleText">Operations, approvals, and staff tools</small>
+                        <small id="loginSupervisorSubtitleText">Complaints in assigned buildings</small>
                     </button>
                 </div>
             </div>
@@ -1752,7 +1755,6 @@
             <div class="tabs" id="adminTabs">
                 <button class="tab-btn active" onclick="switchAdminTab('washrooms')">Washroom Map</button>
                 <button class="tab-btn" onclick="switchAdminTab('inventory')">Supply Inventory</button>
-                <button class="tab-btn" onclick="switchAdminTab('complaints')">Complaints</button>
                 <button class="tab-btn" onclick="switchAdminTab('shifts')">Staff & Shifts</button>
                 <button class="tab-btn" onclick="switchAdminTab('liveupdates')">Live Updates</button>
             </div>
@@ -1859,9 +1861,9 @@
                 <button class="btn btn-outline btn-sm" id="backToSupervisorBtn" type="button" onclick="exitSupervisorStaffMode()">← Back to Supervisor Dashboard</button>
             </div>
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchStaffTab('tasks')">My Tasks</button>
-                <button class="tab-btn" onclick="switchStaffTab('complaints')">Assigned Issues</button>
-                <button class="tab-btn" onclick="switchStaffTab('upload')">📷 Upload Work</button>
+                <button class="tab-btn active" id="staffTasksTabBtn" onclick="switchStaffTab('tasks')">My Tasks</button>
+                <button class="tab-btn" id="staffComplaintsTabBtn" onclick="switchStaffTab('complaints')">Assigned Issues</button>
+                <button class="tab-btn" id="staffUploadTabBtn" onclick="switchStaffTab('upload')">📷 Upload Work</button>
             </div>
 
             <!-- Tasks Section -->
@@ -1938,7 +1940,7 @@
                     <div class="stat-card-header">
                         <div>
                             <h3 id="supPendingVerify">3</h3>
-                            <p>Pending Verification</p>
+                            <p>Complaints in My Buildings</p>
                         </div>
                         <div class="stat-card-icon yellow">⏳</div>
                     </div>
@@ -1947,7 +1949,7 @@
                     <div class="stat-card-header">
                         <div>
                             <h3 id="supApproved">12</h3>
-                            <p>Approved Today</p>
+                            <p>Open Complaints</p>
                         </div>
                         <div class="stat-card-icon green">✅</div>
                     </div>
@@ -1964,27 +1966,13 @@
             </div>
 
             <div class="section-header" style="margin-bottom: 14px;">
-                <h2>📋 My Tasks</h2>
+                <h2>📬 Complaints Overview</h2>
                 <button class="btn btn-outline btn-sm" type="button" id="openStaffModeBtn" onclick="openSupervisorStaffMode()">👷 Open Staff Tools</button>
             </div>
 
             <!-- My Tasks -->
             <div id="supVerifyTab">
                 <div class="section-header">
-                    <h2>📋 Work Submissions — Pending Your Approval</h2>
-                </div>
-                <div class="cards-grid" id="supervisorVerifyList">
-                    <!-- Rendered dynamically -->
-                </div>
-
-                <div class="section-header" style="margin-top: 22px;">
-                    <h2>🏢 My Assigned Buildings & Room Staff Mapping</h2>
-                </div>
-                <div class="cards-grid" id="supervisorAssignmentList">
-                    <!-- Rendered dynamically -->
-                </div>
-
-                <div class="section-header" style="margin-top: 22px;">
                     <h2>📬 Complaints in My Buildings</h2>
                 </div>
                 <div class="cards-grid" id="supervisorComplaintsList">
@@ -2325,10 +2313,11 @@
                 complaintBoxTitle: 'Complaint Box',
                 complaintBoxSubtitle: 'Open Plaksha helpdesk to submit your request',
                 supervisorSignin: 'Supervisor/Admin? Sign in.',
+                backToLanding: '← Back to Landing Page',
                 loginAdminTitle: '👔 Admin',
                 loginAdminSubtitle: 'Campus-level operations and live monitoring',
                 loginSupervisorTitle: '🧭 Supervisor',
-                loginSupervisorSubtitle: 'Operations, approvals, and staff tools',
+                loginSupervisorSubtitle: 'Complaints in assigned buildings',
                 selectedLogin: 'Selected',
                 selectedTrackAdmin: 'Admin Login',
                 selectedTrackSupervisor: 'Supervisor Login',
@@ -2357,10 +2346,11 @@
                 complaintBoxTitle: 'कम्प्लेंट बॉक्स',
                 complaintBoxSubtitle: 'अनुरोध दर्ज करने के लिए प्लाक्षा हेल्पडेस्क खोलें',
                 supervisorSignin: 'सुपरवाइज़र/एडमिन? साइन इन करें।',
+                backToLanding: '← लैंडिंग पेज पर वापस',
                 loginAdminTitle: '👔 एडमिन',
                 loginAdminSubtitle: 'कैंपस-स्तरीय संचालन और निगरानी',
                 loginSupervisorTitle: '🧭 सुपरवाइज़र',
-                loginSupervisorSubtitle: 'ऑपरेशन्स, अनुमोदन और स्टाफ टूल्स',
+                loginSupervisorSubtitle: 'असाइन किए गए भवनों की शिकायतें',
                 selectedLogin: 'चयनित',
                 selectedTrackAdmin: 'एडमिन लॉगिन',
                 selectedTrackSupervisor: 'सुपरवाइज़र लॉगिन',
@@ -2389,10 +2379,11 @@
                 complaintBoxTitle: 'ਸ਼ਿਕਾਇਤ ਬਾਕਸ',
                 complaintBoxSubtitle: 'ਬੇਨਤੀ ਲਈ ਪਲਾਕਸ਼ਾ ਹੈਲਪਡੈਸਕ ਖੋਲ੍ਹੋ',
                 supervisorSignin: 'ਸੁਪਰਵਾਈਜ਼ਰ/ਐਡਮਿਨ? ਸਾਈਨ ਇਨ ਕਰੋ।',
+                backToLanding: '← ਲੈਂਡਿੰਗ ਪੇਜ ਤੇ ਵਾਪਸ',
                 loginAdminTitle: '👔 ਐਡਮਿਨ',
                 loginAdminSubtitle: 'ਕੈਂਪਸ ਪੱਧਰ ਦੀ ਨਿਗਰਾਨੀ ਅਤੇ ਓਪਰੇਸ਼ਨ',
                 loginSupervisorTitle: '🧭 ਸੁਪਰਵਾਈਜ਼ਰ',
-                loginSupervisorSubtitle: 'ਓਪਰੇਸ਼ਨ, ਮਨਜ਼ੂਰੀ ਅਤੇ ਸਟਾਫ ਟੂਲ',
+                loginSupervisorSubtitle: 'ਅਸਾਈਨ ਇਮਾਰਤਾਂ ਦੀਆਂ ਸ਼ਿਕਾਇਤਾਂ',
                 selectedLogin: 'ਚੁਣਿਆ',
                 selectedTrackAdmin: 'ਐਡਮਿਨ ਲਾਗਇਨ',
                 selectedTrackSupervisor: 'ਸੁਪਰਵਾਈਜ਼ਰ ਲਾਗਇਨ',
@@ -2659,6 +2650,7 @@
                 complaintBoxTitleText: 'complaintBoxTitle',
                 complaintBoxSubtitleText: 'complaintBoxSubtitle',
                 homeSigninText: 'supervisorSignin',
+                backToLandingBtn: 'backToLanding',
                 loginAdminTitleText: 'loginAdminTitle',
                 loginAdminSubtitleText: 'loginAdminSubtitle',
                 loginSupervisorTitleText: 'loginSupervisorTitle',
@@ -2998,6 +2990,9 @@
             document.getElementById('homeScreen').style.display = 'none';
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('appContainer').classList.add('active');
+            document.getElementById('supervisorDashboard').style.display = '';
+            document.getElementById('staffDashboard').style.display = '';
+            document.getElementById('staffModeHeader').style.display = 'none';
             // Map supervisor to staff role for backend, but keep UI role
             const uiRole = currentUser.role === 'supervisor' ? 'supervisor' : currentUser.role;
             document.getElementById('appContainer').setAttribute('data-role', uiRole);
@@ -3006,6 +3001,7 @@
             document.getElementById('userRoleBadge').textContent = roleLabels[currentUser.role] || currentUser.role;
 
             if (currentUser.role === 'admin') {
+                document.getElementById('supervisorDashboard').style.display = 'none';
                 renderAdminDashboard();
             } else if (currentUser.role === 'supervisor') {
                 isSupervisorStaffMode = false;
@@ -3028,7 +3024,7 @@
             localStorage.removeItem('hostelUser');
             localStorage.removeItem('authToken');
             document.getElementById('appContainer').classList.remove('active');
-            document.getElementById('supervisorDashboard').style.display = 'block';
+            document.getElementById('supervisorDashboard').style.display = '';
             document.getElementById('staffDashboard').style.display = '';
             document.getElementById('staffModeHeader').style.display = 'none';
             isSupervisorStaffMode = false;
@@ -3062,7 +3058,6 @@
             await loadComplaints();
             updateStats();
             renderFloors();
-            renderAdminComplaints();
         }
 
         function updateStats() {
@@ -3659,7 +3654,7 @@
         function switchAdminTab(tab) {
             document.querySelectorAll('#adminDashboard .tab-btn').forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
-            const tabs = ['washrooms', 'inventory', 'complaints', 'shifts', 'liveupdates'];
+            const tabs = ['washrooms', 'inventory', 'shifts', 'liveupdates'];
             tabs.forEach(t => {
                 const el = document.getElementById('admin' + t.charAt(0).toUpperCase() + t.slice(1) + 'Tab');
                 if (el) el.style.display = t === tab ? 'block' : 'none';
@@ -3718,7 +3713,6 @@
                 }).join('');
             }
 
-            // Populate work upload dropdown
             populateWorkWashrooms(myWashrooms);
             renderStaffComplaints();
         }
@@ -4024,17 +4018,21 @@
         // ──── Supervisor Dashboard ────
         async function renderSupervisorDashboard() {
             await loadComplaints();
-            const supInfo = staffMembers.find(s => s.role === 'supervisor') || staffMembers[4];
+            const supInfo =
+                staffMembers.find(s => s.role === 'supervisor' && s.name === currentUser?.name) ||
+                staffMembers.find(s => s.role === 'supervisor') ||
+                staffMembers[4];
             const myBuildings = supInfo.assignedBuildings || [];
-            const pendingVerify = workSubmissions.filter(w => myBuildings.includes(w.building) && w.supervisorApproved === null);
-            const approvedToday = workSubmissions.filter(w => myBuildings.includes(w.building) && w.supervisorApproved === true);
+            const scopedComplaints = complaintsData.filter(c => {
+                const building = getComplaintBuilding(c);
+                return building && myBuildings.includes(building);
+            });
+            const openComplaints = scopedComplaints.filter(c => c.status !== 'resolved');
 
-            document.getElementById('supPendingVerify').textContent = pendingVerify.length;
-            document.getElementById('supApproved').textContent = approvedToday.length;
+            document.getElementById('supPendingVerify').textContent = scopedComplaints.length;
+            document.getElementById('supApproved').textContent = openComplaints.length;
             document.getElementById('supBuildings').textContent = myBuildings.length;
 
-            renderSupervisorVerify(pendingVerify);
-            renderSupervisorAssignments(supInfo, myBuildings);
             renderSupervisorComplaints(supInfo, myBuildings);
             renderSupervisorSupplyEditor(myBuildings);
         }
@@ -4151,7 +4149,6 @@
             const container = document.getElementById('supervisorComplaintsList');
             if (!container) return;
 
-            const team = getSupervisorTeam(supervisor, myBuildings);
             const scopedComplaints = complaintsData.filter(c => {
                 const b = getComplaintBuilding(c);
                 return b && myBuildings.includes(b);
@@ -4164,8 +4161,6 @@
 
             container.innerHTML = scopedComplaints.map(c => {
                 const complaintBuilding = getComplaintBuilding(c);
-                const eligibleStaff = team.filter(s => s.assignedBuildings.includes(complaintBuilding));
-                const assignedText = c.assigned_staff_name ? `Assigned to ${c.assigned_staff_name}` : 'Not assigned';
                 return `
                 <div class="task-card ${c.status}">
                     <div class="task-card-header">
@@ -4174,13 +4169,7 @@
                     </div>
                     <p class="task-card-meta">Building: <span>${complaintBuilding || 'N/A'}</span> | Room: <span>${c.room_number || c.room || 'N/A'}</span></p>
                     <p class="task-card-description">${truncate(c.description, 130)}</p>
-                    <p class="task-card-meta">${assignedText}</p>
                     <div class="task-card-actions">
-                        <select id="supAssignStaff-${c.id}" style="flex:1;min-width:180px;">
-                            <option value="">Select staff to assign</option>
-                            ${eligibleStaff.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
-                        </select>
-                        <button class="btn btn-primary btn-sm" onclick="supervisorAssignComplaint(${c.id})">Assign</button>
                         <button class="btn btn-outline btn-sm" onclick="openComplaintDetail(${c.id})">Details</button>
                     </div>
                 </div>`;
