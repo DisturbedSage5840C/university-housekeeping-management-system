@@ -145,6 +145,60 @@ function startWorker() {
         res.status(dbHealthy ? 200 : 503).json({ ready: dbHealthy });
     });
 
+    // Public home stats for landing screen (no auth required)
+    app.get('/api/home-stats', async (req, res, next) => {
+        try {
+            const requestsTodayResult = await db('complaints')
+                .whereRaw('created_at >= CURRENT_DATE')
+                .count('* as count')
+                .first();
+
+            const completedResult = await db('complaints')
+                .where({ status: 'resolved' })
+                .count('* as count')
+                .first();
+
+            const pendingResult = await db('complaints')
+                .where({ status: 'pending' })
+                .count('* as count')
+                .first();
+
+            let supplyStats = {
+                totalPoints: 0,
+                lowSupplyPoints: 0,
+                supplyHealth: 0,
+            };
+
+            try {
+                const supplyResult = await db('washrooms')
+                    .select(
+                        db.raw('COUNT(*)::int as total_points'),
+                        db.raw("COUNT(CASE WHEN ((soap_level + tissue_level + sanitizer_level) / 3.0) < 35 THEN 1 END)::int as low_supply_points"),
+                        db.raw('COALESCE(AVG((soap_level + tissue_level + sanitizer_level) / 3.0), 0)::numeric(10,1) as supply_health')
+                    )
+                    .first();
+
+                supplyStats = {
+                    totalPoints: parseInt(supplyResult.total_points, 10) || 0,
+                    lowSupplyPoints: parseInt(supplyResult.low_supply_points, 10) || 0,
+                    supplyHealth: Math.round(parseFloat(supplyResult.supply_health) || 0),
+                };
+            } catch (_error) {
+                // If washrooms table is not ready, keep zeroed supply stats.
+            }
+
+            res.json({
+                requestsToday: parseInt(requestsTodayResult.count, 10) || 0,
+                completedRequests: parseInt(completedResult.count, 10) || 0,
+                pendingRequests: parseInt(pendingResult.count, 10) || 0,
+                supplyStats,
+                updatedAt: new Date().toISOString(),
+            });
+        } catch (error) {
+            next(error);
+        }
+    });
+
     // API Routes
     app.use('/api/auth', authRoutes);
     app.use('/api/rooms', authenticateToken, roomRoutes);

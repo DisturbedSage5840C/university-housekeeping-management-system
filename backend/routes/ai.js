@@ -55,8 +55,8 @@ router.post('/categorize', async (req, res, next) => {
 // Get optimized task schedule for staff
 router.get('/optimize-tasks', async (req, res, next) => {
     try {
-        if (req.user.role !== 'staff') {
-            return res.status(403).json({ error: 'Staff only' });
+        if (!['staff', 'supervisor'].includes(req.user.role)) {
+            return res.status(403).json({ error: 'Staff or supervisor only' });
         }
 
         const rooms = await db('rooms')
@@ -108,7 +108,7 @@ router.get('/predictions', requireRole('admin'), async (req, res, next) => {
 });
 
 // Get response suggestions for a complaint
-router.get('/responses/:complaintId', requireRole('admin', 'staff'), async (req, res, next) => {
+router.get('/responses/:complaintId', requireRole('admin', 'supervisor', 'staff'), async (req, res, next) => {
     try {
         const complaint = await db('complaints').where('id', req.params.complaintId).first();
 

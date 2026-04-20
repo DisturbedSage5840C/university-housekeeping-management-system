@@ -19,7 +19,7 @@ const WEBSITE_URLS = Platform.select({
   default: ['http://localhost', 'http://10.1.61.30'],
 });
 
-const APP_WEB_VERSION = '2026-03-14-3';
+const APP_WEB_VERSION = '2026-04-19-home-v1';
 
 const HTTP_PROTOCOLS = new Set(['http:', 'https:']);
 

@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ILGC WhatsApp Bot Demo Chat</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #22c55e;
+      --accent-2: #16a34a;
+      --user: #2563eb;
+      --bot: #374151;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top right, #1e293b, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: min(900px, 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.1));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+    }
+
+    .header {
+      padding: 14px 16px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    select, input, button {
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
+    button {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #052e16;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover { background: var(--accent-2); border-color: var(--accent-2); }
+
+    .chat {
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+      height: 420px;
+      overflow-y: auto;
+      background: rgba(15, 23, 42, 0.55);
+    }
+
+    .msg {
+      max-width: 82%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      font-size: 14px;
+      border: 1px solid transparent;
+    }
+
+    .msg.user {
+      margin-left: auto;
+      background: var(--user);
+      color: #eff6ff;
+      border-color: #1d4ed8;
+    }
+
+    .msg.bot {
+      background: var(--bot);
+      color: #f3f4f6;
+      border-color: #4b5563;
+    }
+
+    .composer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    .hint {
+      padding: 10px 14px 14px;
+      border-top: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .hint code {
+      color: #bbf7d0;
+      background: rgba(34, 197, 94, 0.15);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="header">
+      <div>
+        <div class="title">ILGC Tracker Chat Bot Demo</div>
+        <div class="subtitle">WhatsApp-style simulation in browser</div>
+      </div>
+
+      <div class="controls">
+        <label for="phoneSelect">Demo user</label>
+        <select id="phoneSelect">
+          <option value="+911000000001">Admin (+911000000001)</option>
+          <option value="+911000000002">Supervisor (+911000000002)</option>
+          <option value="+911000000003">Staff (+911000000003)</option>
+          <option value="+911000000004" selected>Resident (+911000000004)</option>
+        </select>
+        <button id="resetBtn" type="button">Reset Chat</button>
+      </div>
+    </section>
+
+    <section id="chat" class="chat"></section>
+
+    <form id="composer" class="composer">
+      <input id="messageInput" type="text" placeholder="Type a message (try: menu)" autocomplete="off" required>
+      <button type="submit">Send</button>
+    </form>
+
+    <section class="hint">
+      Quick commands: <code>menu</code>, <code>1</code>, <code>2</code>, <code>2 C-1001 +911000000003</code>, <code>2 T-2001</code>
+    </section>
+  </main>
+
+  <script>
+    const chat = document.getElementById("chat");
+    const composer = document.getElementById("composer");
+    const messageInput = document.getElementById("messageInput");
+    const phoneSelect = document.getElementById("phoneSelect");
+    const resetBtn = document.getElementById("resetBtn");
+
+    function addMessage(kind, text) {
+      const bubble = document.createElement("div");
+      bubble.className = `msg ${kind}`;
+      bubble.textContent = text;
+      chat.appendChild(bubble);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function send(text) {
+      const from = phoneSelect.value;
+      addMessage("user", text);
+
+      try {
+        const res = await fetch("/simulate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ from, text })
+        });
+
+        const data = await res.json();
+        const reply = data?.bot?.response || data?.error || "No response";
+        addMessage("bot", reply);
+      } catch (error) {
+        addMessage("bot", `Error: ${error.message}`);
+      }
+    }
+
+    composer.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = messageInput.value.trim();
+      if (!text) return;
+      messageInput.value = "";
+      await send(text);
+      messageInput.focus();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      chat.innerHTML = "";
+      addMessage("bot", "Chat cleared. Send 'menu' to start.");
+      messageInput.focus();
+    });
+
+    addMessage("bot", "Welcome. Send 'menu' to begin.");
+  </script>
+</body>
+</html>

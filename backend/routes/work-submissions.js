@@ -94,8 +94,8 @@ router.get('/', async (req, res, next) => {
     }
 });
 
-// Submit work proof (staff only)
-router.post('/', upload.single('image'), requireRole('staff'), async (req, res, next) => {
+// Submit work proof (staff and supervisors)
+router.post('/', upload.single('image'), requireRole('staff', 'supervisor'), async (req, res, next) => {
     try {
         const { washroom_id, building, floor, task_type, notes } = req.body;
 
