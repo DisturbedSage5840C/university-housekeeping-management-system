@@ -1348,6 +1348,61 @@
             display: block;
         }
 
+        /* Supervisor digital checklist */
+        .checklist-grid {
+            display: grid;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .checklist-row {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            background: var(--bg-elevated);
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .checklist-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+            font-size: 0.84rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .checklist-check input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent);
+        }
+
+        .checklist-camera-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .checklist-file-input {
+            display: none;
+        }
+
+        .checklist-photo-name {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            max-width: 260px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         /* AI Analysis Box */
         .ai-analysis-box {
             background: var(--accent-glow);
@@ -2003,6 +2058,103 @@
                     </div>
                     <button class="btn btn-primary btn-sm" type="button" id="supSupplySaveBtn" onclick="updateSupplyStatsBySupervisor()">Update Supply Stats</button>
                 </div>
+
+                <div class="section-header" style="margin-top: 22px;">
+                    <h2>📝 Digital Washroom Checklist</h2>
+                    <span style="color: var(--text-muted); font-size: 0.78rem;" id="supChecklistLastSaved">No recent submission</span>
+                </div>
+
+                <div class="task-card">
+                    <div class="info-box" style="background: var(--accent-glow); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 12px; font-size: 0.83rem; color: var(--text-secondary);">
+                        Supervisors can complete each washroom checklist item and capture evidence using camera for every completed parameter.
+                    </div>
+
+                    <div class="form-group">
+                        <label for="supChecklistWashroom">Washroom</label>
+                        <select id="supChecklistWashroom" onchange="loadLatestSupervisorChecklist(this.value)"></select>
+                    </div>
+
+                    <div id="supChecklistItems" class="checklist-grid">
+                        <div class="checklist-row">
+                            <label class="checklist-check" for="supChecklistDone-soap_refill">
+                                <input type="checkbox" id="supChecklistDone-soap_refill">
+                                <span>Soap refill completed</span>
+                            </label>
+                            <div class="checklist-camera-actions">
+                                <button type="button" class="btn btn-outline btn-sm" onclick="openChecklistCamera('soap_refill')">📷 Open Camera</button>
+                                <input class="checklist-file-input" type="file" id="supChecklistPhoto-soap_refill" accept="image/*" capture="environment" onchange="onChecklistPhotoSelected('soap_refill', this)">
+                                <span id="supChecklistPhotoName-soap_refill" class="checklist-photo-name">No photo</span>
+                            </div>
+                        </div>
+
+                        <div class="checklist-row">
+                            <label class="checklist-check" for="supChecklistDone-tissue_refill">
+                                <input type="checkbox" id="supChecklistDone-tissue_refill">
+                                <span>Tissue paper refill completed</span>
+                            </label>
+                            <div class="checklist-camera-actions">
+                                <button type="button" class="btn btn-outline btn-sm" onclick="openChecklistCamera('tissue_refill')">📷 Open Camera</button>
+                                <input class="checklist-file-input" type="file" id="supChecklistPhoto-tissue_refill" accept="image/*" capture="environment" onchange="onChecklistPhotoSelected('tissue_refill', this)">
+                                <span id="supChecklistPhotoName-tissue_refill" class="checklist-photo-name">No photo</span>
+                            </div>
+                        </div>
+
+                        <div class="checklist-row">
+                            <label class="checklist-check" for="supChecklistDone-sanitizer_refill">
+                                <input type="checkbox" id="supChecklistDone-sanitizer_refill">
+                                <span>Sanitizer refill completed</span>
+                            </label>
+                            <div class="checklist-camera-actions">
+                                <button type="button" class="btn btn-outline btn-sm" onclick="openChecklistCamera('sanitizer_refill')">📷 Open Camera</button>
+                                <input class="checklist-file-input" type="file" id="supChecklistPhoto-sanitizer_refill" accept="image/*" capture="environment" onchange="onChecklistPhotoSelected('sanitizer_refill', this)">
+                                <span id="supChecklistPhotoName-sanitizer_refill" class="checklist-photo-name">No photo</span>
+                            </div>
+                        </div>
+
+                        <div class="checklist-row">
+                            <label class="checklist-check" for="supChecklistDone-sink_cleaning">
+                                <input type="checkbox" id="supChecklistDone-sink_cleaning">
+                                <span>Sink cleaned</span>
+                            </label>
+                            <div class="checklist-camera-actions">
+                                <button type="button" class="btn btn-outline btn-sm" onclick="openChecklistCamera('sink_cleaning')">📷 Open Camera</button>
+                                <input class="checklist-file-input" type="file" id="supChecklistPhoto-sink_cleaning" accept="image/*" capture="environment" onchange="onChecklistPhotoSelected('sink_cleaning', this)">
+                                <span id="supChecklistPhotoName-sink_cleaning" class="checklist-photo-name">No photo</span>
+                            </div>
+                        </div>
+
+                        <div class="checklist-row">
+                            <label class="checklist-check" for="supChecklistDone-floor_mopping">
+                                <input type="checkbox" id="supChecklistDone-floor_mopping">
+                                <span>Floor mopping completed</span>
+                            </label>
+                            <div class="checklist-camera-actions">
+                                <button type="button" class="btn btn-outline btn-sm" onclick="openChecklistCamera('floor_mopping')">📷 Open Camera</button>
+                                <input class="checklist-file-input" type="file" id="supChecklistPhoto-floor_mopping" accept="image/*" capture="environment" onchange="onChecklistPhotoSelected('floor_mopping', this)">
+                                <span id="supChecklistPhotoName-floor_mopping" class="checklist-photo-name">No photo</span>
+                            </div>
+                        </div>
+
+                        <div class="checklist-row">
+                            <label class="checklist-check" for="supChecklistDone-dustbin_cleared">
+                                <input type="checkbox" id="supChecklistDone-dustbin_cleared">
+                                <span>Dustbin cleared</span>
+                            </label>
+                            <div class="checklist-camera-actions">
+                                <button type="button" class="btn btn-outline btn-sm" onclick="openChecklistCamera('dustbin_cleared')">📷 Open Camera</button>
+                                <input class="checklist-file-input" type="file" id="supChecklistPhoto-dustbin_cleared" accept="image/*" capture="environment" onchange="onChecklistPhotoSelected('dustbin_cleared', this)">
+                                <span id="supChecklistPhotoName-dustbin_cleared" class="checklist-photo-name">No photo</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label for="supChecklistNotes">Checklist Notes (optional)</label>
+                        <textarea id="supChecklistNotes" placeholder="Any observations from this washroom check"></textarea>
+                    </div>
+
+                    <button class="btn btn-primary btn-sm" type="button" id="supChecklistSubmitBtn" onclick="submitSupervisorChecklist()">Submit Checklist</button>
+                </div>
             </div>
         </main>
 
@@ -2205,6 +2357,7 @@
                 <div class="form-group">
                     <label>Frequency (based on consumption)</label>
                     <select id="reminderFrequency">
+                        <option value="2h">Every 2 Hours (Supervisor Sweep)</option>
                         <option value="4h">Every 4 Hours (High Traffic)</option>
                         <option value="8h">Every 8 Hours (Medium Traffic)</option>
                         <option value="12h">Every 12 Hours (Low Traffic)</option>
@@ -2808,6 +2961,18 @@
             { id: 2, building: 'H2', type: 'cleaning', frequency: '12h', notifyPortal: true, notifyMobile: true, notes: '', createdBy: 'Vikram Singh', nextDue: new Date(Date.now() + 3600000 * 8) },
             { id: 3, building: 'H3', type: 'restocking', frequency: '4h', notifyPortal: true, notifyMobile: false, notes: 'Exam period - high usage', createdBy: 'Meera Desai', nextDue: new Date(Date.now() + 3600000) },
         ];
+
+        const supervisorChecklistItems = [
+            { key: 'soap_refill', label: 'Soap refill completed' },
+            { key: 'tissue_refill', label: 'Tissue paper refill completed' },
+            { key: 'sanitizer_refill', label: 'Sanitizer refill completed' },
+            { key: 'sink_cleaning', label: 'Sink cleaned' },
+            { key: 'floor_mopping', label: 'Floor mopping completed' },
+            { key: 'dustbin_cleared', label: 'Dustbin cleared' },
+        ];
+
+        let supervisorChecklistPhotos = {};
+        let supervisorChecklistLocalLog = [];
 
         // Keep rooms for backwards compatibility with room management
         let rooms = [];
@@ -4035,6 +4200,7 @@
 
             renderSupervisorComplaints(supInfo, myBuildings);
             renderSupervisorSupplyEditor(myBuildings);
+            renderSupervisorChecklistEditor(myBuildings);
         }
 
         function renderSupervisorSupplyEditor(myBuildings) {
@@ -4103,6 +4269,258 @@
             }
             loadHomeStats();
             showToast('Supply stats updated successfully', 'success');
+        }
+
+        function getChecklistDateTimeToken(date = new Date()) {
+            const pad2 = (num) => String(num).padStart(2, '0');
+            const pad3 = (num) => String(num).padStart(3, '0');
+
+            return `${date.getFullYear()}${pad2(date.getMonth() + 1)}${pad2(date.getDate())}_${pad2(date.getHours())}${pad2(date.getMinutes())}${pad2(date.getSeconds())}${pad3(date.getMilliseconds())}`;
+        }
+
+        function setSupervisorChecklistLastSavedText(value) {
+            const el = document.getElementById('supChecklistLastSaved');
+            if (!el) return;
+
+            if (!value) {
+                el.textContent = 'No recent submission';
+                return;
+            }
+
+            const date = value instanceof Date ? value : new Date(value);
+            if (Number.isNaN(date.getTime())) {
+                el.textContent = String(value);
+                return;
+            }
+
+            el.textContent = `Last submitted: ${date.toLocaleString(localeByLanguage[currentLanguage] || 'en-US')}`;
+        }
+
+        function resetSupervisorChecklistForm({ clearPhotos = true, clearChecks = true, clearNotes = true } = {}) {
+            if (clearChecks) {
+                supervisorChecklistItems.forEach((item) => {
+                    const checkbox = document.getElementById(`supChecklistDone-${item.key}`);
+                    if (checkbox) checkbox.checked = false;
+                });
+            }
+
+            if (clearPhotos) {
+                supervisorChecklistPhotos = {};
+                supervisorChecklistItems.forEach((item) => {
+                    const input = document.getElementById(`supChecklistPhoto-${item.key}`);
+                    if (input) input.value = '';
+                    const label = document.getElementById(`supChecklistPhotoName-${item.key}`);
+                    if (label) label.textContent = 'No photo';
+                });
+            }
+
+            if (clearNotes) {
+                const notes = document.getElementById('supChecklistNotes');
+                if (notes) notes.value = '';
+            }
+        }
+
+        function applyChecklistSnapshot(snapshotItems, notes) {
+            const items = snapshotItems || {};
+            supervisorChecklistPhotos = {};
+
+            supervisorChecklistItems.forEach((item) => {
+                const entry = items[item.key] || {};
+                const checkbox = document.getElementById(`supChecklistDone-${item.key}`);
+                if (checkbox) checkbox.checked = !!entry.completed;
+
+                const input = document.getElementById(`supChecklistPhoto-${item.key}`);
+                if (input) input.value = '';
+
+                const label = document.getElementById(`supChecklistPhotoName-${item.key}`);
+                if (label) {
+                    if (entry.photo_filename) {
+                        label.textContent = `Saved: ${entry.photo_filename}`;
+                    } else if (entry.photo_url) {
+                        label.textContent = 'Saved photo on file';
+                    } else {
+                        label.textContent = 'No photo';
+                    }
+                }
+            });
+
+            const notesInput = document.getElementById('supChecklistNotes');
+            if (notesInput) notesInput.value = notes || '';
+        }
+
+        function renderSupervisorChecklistEditor(myBuildings) {
+            const select = document.getElementById('supChecklistWashroom');
+            const submitBtn = document.getElementById('supChecklistSubmitBtn');
+            if (!select) return;
+
+            const availableWashrooms = washroomData.filter((w) => myBuildings.includes(w.building));
+            const previousSelection = select.value;
+
+            select.innerHTML = availableWashrooms.length
+                ? availableWashrooms
+                    .map((w) => `<option value="${w.id}">${w.building} — ${w.label}${w.direction ? ` (${w.direction})` : ''}</option>`)
+                    .join('')
+                : '<option value="">No washrooms assigned</option>';
+
+            if (availableWashrooms.length) {
+                if (previousSelection && availableWashrooms.some((w) => w.id === previousSelection)) {
+                    select.value = previousSelection;
+                }
+                if (submitBtn) submitBtn.disabled = false;
+                loadLatestSupervisorChecklist(select.value);
+                return;
+            }
+
+            if (submitBtn) submitBtn.disabled = true;
+            resetSupervisorChecklistForm();
+            setSupervisorChecklistLastSavedText('No washrooms assigned');
+        }
+
+        function openChecklistCamera(itemKey) {
+            const input = document.getElementById(`supChecklistPhoto-${itemKey}`);
+            if (input) input.click();
+        }
+
+        function onChecklistPhotoSelected(itemKey, input) {
+            const label = document.getElementById(`supChecklistPhotoName-${itemKey}`);
+            const file = input?.files?.[0];
+
+            if (!file) {
+                delete supervisorChecklistPhotos[itemKey];
+                if (label) label.textContent = 'No photo';
+                return;
+            }
+
+            const ext = (() => {
+                const parts = file.name.split('.');
+                return parts.length > 1 ? `.${parts.pop().toLowerCase()}` : '.jpg';
+            })();
+
+            const generatedName = `checklist_${itemKey}_${getChecklistDateTimeToken(new Date())}${ext}`;
+
+            supervisorChecklistPhotos[itemKey] = {
+                file,
+                generatedName,
+            };
+
+            if (label) {
+                label.textContent = generatedName;
+            }
+        }
+
+        async function loadLatestSupervisorChecklist(washroomId) {
+            if (!washroomId) {
+                resetSupervisorChecklistForm();
+                setSupervisorChecklistLastSavedText('No washroom selected');
+                return;
+            }
+
+            resetSupervisorChecklistForm();
+            setSupervisorChecklistLastSavedText('Loading latest checklist...');
+
+            const result = await api.get(`/washrooms/${washroomId}/checklist/latest`);
+            if (result && Object.prototype.hasOwnProperty.call(result, 'checklist')) {
+                if (result.checklist) {
+                    applyChecklistSnapshot(result.checklist.checklist_items, result.checklist.notes);
+                    setSupervisorChecklistLastSavedText(result.checklist.submitted_at || result.checklist.created_at);
+                } else {
+                    setSupervisorChecklistLastSavedText('No recent submission');
+                }
+                return;
+            }
+
+            const localSnapshot = supervisorChecklistLocalLog
+                .filter((entry) => entry.washroom_id === washroomId)
+                .sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))[0];
+
+            if (localSnapshot) {
+                applyChecklistSnapshot(localSnapshot.checklist_items, localSnapshot.notes);
+                setSupervisorChecklistLastSavedText(localSnapshot.submitted_at);
+            } else {
+                setSupervisorChecklistLastSavedText('No recent submission');
+            }
+        }
+
+        async function submitSupervisorChecklist() {
+            const washroomId = document.getElementById('supChecklistWashroom')?.value;
+            if (!washroomId) {
+                showToast('Please choose a washroom');
+                return;
+            }
+
+            const checklistItemsPayload = {};
+            const completedKeys = [];
+            const missingPhotoLabels = [];
+
+            supervisorChecklistItems.forEach((item) => {
+                const checked = !!document.getElementById(`supChecklistDone-${item.key}`)?.checked;
+                checklistItemsPayload[item.key] = { completed: checked };
+
+                if (checked) {
+                    completedKeys.push(item.key);
+                    if (!supervisorChecklistPhotos[item.key]?.file) {
+                        missingPhotoLabels.push(item.label);
+                    }
+                }
+            });
+
+            if (!completedKeys.length) {
+                showToast('Mark at least one checklist item as completed');
+                return;
+            }
+
+            if (missingPhotoLabels.length) {
+                showToast(`Capture photo for: ${missingPhotoLabels.join(', ')}`);
+                return;
+            }
+
+            const notes = document.getElementById('supChecklistNotes')?.value?.trim() || '';
+            const submitBtn = document.getElementById('supChecklistSubmitBtn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner"></span> Submitting...';
+            }
+
+            const formData = new FormData();
+            formData.append('items', JSON.stringify(checklistItemsPayload));
+            if (notes) formData.append('notes', notes);
+
+            completedKeys.forEach((key) => {
+                const photo = supervisorChecklistPhotos[key]?.file;
+                if (photo) formData.append(`photo_${key}`, photo);
+            });
+
+            let submittedOnline = false;
+
+            if (!useOfflineMode) {
+                const result = await api.upload(`/washrooms/${washroomId}/checklist`, formData);
+                if (result && result.id) {
+                    submittedOnline = true;
+                    await loadLatestSupervisorChecklist(washroomId);
+                    loadHomeStats();
+                    showToast('Checklist submitted successfully', 'success');
+                }
+            }
+
+            if (!submittedOnline) {
+                const submittedAt = new Date().toISOString();
+                supervisorChecklistLocalLog.unshift({
+                    id: `local-${Date.now()}`,
+                    washroom_id: washroomId,
+                    checklist_items: checklistItemsPayload,
+                    notes: notes || null,
+                    submitted_at: submittedAt,
+                });
+
+                applyChecklistSnapshot(checklistItemsPayload, notes || null);
+                setSupervisorChecklistLastSavedText(submittedAt);
+                showToast('Checklist saved locally (offline mode)', 'success');
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Checklist';
+            }
         }
 
         function getSupervisorTeam(supervisor, myBuildings) {
@@ -4332,7 +4750,7 @@
             const notifyMobile = document.getElementById('notifyMobile').checked;
             const notes = document.getElementById('reminderNotes').value;
 
-            const freqHours = { '4h': 4, '8h': 8, '12h': 12, '24h': 24 };
+            const freqHours = { '2h': 2, '4h': 4, '8h': 8, '12h': 12, '24h': 24 };
             reminders.push({
                 id: reminders.length + 10,
                 building, type, frequency,

@@ -4,6 +4,8 @@ const { requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 
+const VALID_FREQS = ['2h', '4h', '8h', '12h', '24h'];
+
 // Get all reminders (supervisor sees own, admin sees all)
 router.get('/', async (req, res, next) => {
     try {
@@ -36,8 +38,7 @@ router.post('/', requireRole('supervisor', 'admin'), async (req, res, next) => {
             return res.status(400).json({ error: 'Invalid reminder type' });
         }
 
-        const validFreqs = ['4h', '8h', '12h', '24h'];
-        if (!validFreqs.includes(frequency)) {
+        if (!VALID_FREQS.includes(frequency)) {
             return res.status(400).json({ error: 'Invalid frequency' });
         }
 
@@ -81,6 +82,9 @@ router.put('/:id', requireRole('supervisor', 'admin'), async (req, res, next) =>
         if (building) updates.building = building;
         if (reminder_type) updates.reminder_type = reminder_type;
         if (frequency) {
+            if (!VALID_FREQS.includes(frequency)) {
+                return res.status(400).json({ error: 'Invalid frequency' });
+            }
             updates.frequency = frequency;
             const freqHours = parseInt(frequency);
             updates.next_due = new Date(Date.now() + freqHours * 3600000);

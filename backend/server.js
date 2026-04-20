@@ -18,6 +18,7 @@ const config = require('./config');
 const logger = require('./utils/logger');
 const db = require('./database/postgres');
 const cache = require('./services/cacheService');
+const reminderService = require('./services/reminderService');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -249,9 +250,16 @@ function startWorker() {
                 });
             });
 
+            // Run scheduler on a single process to avoid duplicate reminder loops.
+            const shouldRunReminderScheduler = !cluster.isWorker || cluster.worker?.id === 1;
+            if (shouldRunReminderScheduler) {
+                reminderService.startSupervisorReminderScheduler();
+            }
+
             // Graceful shutdown
             const shutdown = async (signal) => {
                 logger.info(`${signal} received, shutting down gracefully`);
+                reminderService.stopSupervisorReminderScheduler();
                 server.close(async () => {
                     await cache.disconnect();
                     await db.destroy();

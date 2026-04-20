@@ -94,10 +94,9 @@ async function sendViaTextbelt(phone, message) {
     return { provider: 'textbelt', messageId: data.textId || null };
 }
 
-async function sendOtpSMS(rawPhone, otp) {
+async function sendSMS(rawPhone, message, context = 'SMS') {
     const phone = normalizePhone(rawPhone);
     const provider = (process.env.SMS_PROVIDER || '').toLowerCase().trim();
-    const message = `Your ILGC Tracker OTP is ${otp}. It expires in 10 minutes.`;
 
     if (!phone) {
         throw new Error('Invalid phone number');
@@ -118,7 +117,7 @@ async function sendOtpSMS(rawPhone, otp) {
 
         throw new Error('SMS provider is not configured');
     } catch (error) {
-        logger.error('OTP SMS send failed', {
+        logger.error(`${context} send failed`, {
             provider: provider || 'none',
             phone,
             error: error.message,
@@ -127,4 +126,9 @@ async function sendOtpSMS(rawPhone, otp) {
     }
 }
 
-module.exports = { sendOtpSMS, normalizePhone };
+async function sendOtpSMS(rawPhone, otp) {
+    const message = `Your ILGC Tracker OTP is ${otp}. It expires in 10 minutes.`;
+    return sendSMS(rawPhone, message, 'OTP SMS');
+}
+
+module.exports = { sendOtpSMS, sendSMS, normalizePhone };
