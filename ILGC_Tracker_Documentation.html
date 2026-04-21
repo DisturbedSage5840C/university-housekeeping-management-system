@@ -127,7 +127,7 @@
   <div class="stat-grid" style="max-width: 500px;">
     <div class="stat-card"><div class="num">59</div><div class="label">Source Files</div></div>
     <div class="stat-card"><div class="num">11,500+</div><div class="label">Lines of Code</div></div>
-    <div class="stat-card"><div class="num">50+</div><div class="label">API Endpoints</div></div>
+    <div class="stat-card"><div class="num">65+</div><div class="label">API Endpoints</div></div>
     <div class="stat-card"><div class="num">6</div><div class="label">Docker Services</div></div>
   </div>
 
@@ -157,7 +157,7 @@
       <li>Infrastructure — Nginx</li>
     </ol>
   </li>
-  <li><a href="#api">Complete API Endpoints (50+)</a></li>
+  <li><a href="#api">Complete API Endpoints (65+)</a></li>
   <li><a href="#roles">User Roles &amp; Permissions</a></li>
   <li><a href="#ml-models">ML Models Explained</a></li>
   <li><a href="#security">Security Features</a></li>
@@ -178,7 +178,7 @@
 </div>
 
 <div class="info-box">
-  <strong>The Solution — ILGC Tracker:</strong> Home-first website entry with Supervisor/Admin sign-in and role-aware routing &bull; Building/Floor/Direction-wise washroom data tracking &bull; Supply inventory monitoring (soap, tissue, sanitizer levels) &bull; AI complaint analysis with 12 categories (including hygiene, supplies, cleaning) &bull; Priority prediction (hygiene issues auto-flagged high/urgent) &bull; <strong>2-way work verification backend pipeline</strong> (LLM image analysis + supervisor approval endpoint) &bull; False reporting detection &bull; Supervisor complaints overview + supply stats updater + Open Staff Tools access &bull; Restocking timeline tracking &bull; NLP sentiment analysis &bull; AI auto-categorization with review flow &bull; Complaint detail popup with full AI breakdown &bull; Image upload for photographic evidence &bull; Predictive maintenance to anticipate supply shortages &bull; Light/Dark theme &bull; Real-time dashboard for monitoring compliance &bull; Mobile app shell for on-the-go access
+  <strong>The Solution — ILGC Tracker:</strong> Home-first website entry with Supervisor/Admin sign-in and role-aware routing &bull; Building/Floor/Direction-wise washroom data tracking &bull; Supply inventory monitoring (soap, tissue, sanitizer levels) &bull; AI complaint analysis with 12 categories (including hygiene, supplies, cleaning) &bull; Priority prediction (hygiene issues auto-flagged high/urgent) &bull; <strong>2-way work verification backend pipeline</strong> (simulated LLM verification + supervisor approval endpoint) &bull; Supervisor washroom checklists with per-item photo proof &bull; Passive 2-hour supervisor check reminders &bull; False reporting detection &bull; Supervisor complaints overview + supply stats updater + Open Staff Tools access &bull; Restocking timeline tracking &bull; NLP sentiment analysis &bull; AI auto-categorization with review flow &bull; Complaint detail popup with full AI breakdown &bull; Image upload for photographic evidence &bull; Predictive maintenance to anticipate supply shortages &bull; Light/Dark theme &bull; Real-time dashboard for monitoring compliance &bull; Mobile app shell for on-the-go access
 </div>
 
 <h3>How It Works (Simple)</h3>
@@ -187,7 +187,7 @@
   <li><strong>AI automatically</strong> categorizes it as "hygiene" (with confidence scores across all 12 categories), predicts "high" priority (hygiene shortages get elevated priority), analyzes negative sentiment, detects urgency keywords ("empty", "2 days"), extracts entities ("soap", "tissue", "H2 2nd floor south wing"), and suggests actions ("Restock soap and tissue dispensers immediately")</li>
   <li><strong>Student reviews</strong> AI-detected category + scores in a picker, confirms or changes, then submits</li>
   <li><strong>Admin/Supervisor</strong> sees the complaint on the dashboard with AI tags (category, sentiment, urgency, priority). Clicks the card → <strong>detail popup</strong> shows resident info, room/location, attached photo evidence, full AI analysis with confidence bars, suggested actions, estimated resolution time. Admin can escalate false reports to supervisors; supervisors assign complaints to their own staff</li>
-  <li><strong>Cleaning Staff</strong> receives the task, restocks supplies, uploads proof photo. <strong>LLM verifies</strong> the uploaded image for cleanliness/completion. <strong>Supervisor reviews</strong> and approves the submission — <em>2-way verification ensures accountability</em></li>
+  <li><strong>Cleaning Staff</strong> receives the task, restocks supplies, uploads proof photo. The current backend applies <strong>simulated LLM verification</strong> and records verification feedback. <strong>Supervisor reviews</strong> and approves the submission — <em>2-way verification ensures accountability</em></li>
   <li><strong>System</strong> tracks supply levels building-wise (soap, tissue, sanitizer), sends consumption-based reminders to supervisors, detects false reporting patterns, logs everything with timestamps — admin can identify patterns (e.g., which buildings/floors have repeated shortages, restocking timelines) to improve scheduling</li>
 </ol>
 
@@ -200,7 +200,7 @@
   <tr><td>Mobile</td><td>React Native 0.73 + WebView</td><td><span class="badge-lang lang-js">JavaScript</span></td><td>Android + iOS shell that loads website UI with cache-busting, deep-link handling, and fallback host support</td></tr>
   <tr><td>Backend API</td><td>Express.js 4.18</td><td><span class="badge-lang lang-js">Node.js 18+</span></td><td>REST API server (9 route modules)</td></tr>
   <tr><td>AI Service</td><td>FastAPI + Gunicorn</td><td><span class="badge-lang lang-py">Python 3.11</span></td><td>Machine learning microservice</td></tr>
-  <tr><td>Database</td><td>PostgreSQL 16</td><td><span class="badge-lang lang-sql">SQL</span></td><td>Primary data store (14 tables)</td></tr>
+  <tr><td>Database</td><td>PostgreSQL 16</td><td><span class="badge-lang lang-sql">SQL</span></td><td>Primary data store (16 tables)</td></tr>
   <tr><td>Cache</td><td>Redis 7</td><td>—</td><td>Caching + session store</td></tr>
   <tr><td>ML Models</td><td>scikit-learn</td><td><span class="badge-lang lang-py">Python</span></td><td>Random Forest + Gradient Boosting</td></tr>
   <tr><td>NLP</td><td>TextBlob + NLTK + spaCy</td><td><span class="badge-lang lang-py">Python</span></td><td>Sentiment, urgency, entity extraction</td></tr>
@@ -244,7 +244,7 @@ graph TB
     end
 
     subgraph Data["💾 Data Layer"]
-        PG["PostgreSQL 16<br/>14 Tables, UUID PKs<br/>JSONB for AI data"]
+        PG["PostgreSQL 16<br/>16 Tables, UUID PKs<br/>JSONB for AI data"]
         Redis["Redis 7<br/>Session Cache<br/>API Response Cache"]
     end
 
@@ -298,7 +298,7 @@ graph TD
 
 <!-- ==================== 5. DATABASE SCHEMA ==================== -->
 <div class="section-break"></div>
-<h1 id="db-schema">5. Database Schema (14 Tables)</h1>
+<h1 id="db-schema">5. Database Schema (16 Tables)</h1>
 
 <div class="mermaid-container">
   <h4>Entity Relationship Diagram</h4>
@@ -386,6 +386,21 @@ erDiagram
         BOOLEAN is_active
         TIMESTAMP due_date
     }
+      washroom_checklists {
+        INT id PK
+        INT washroom_id FK
+        UUID supervisor_id FK
+        JSONB checklist_items
+        VARCHAR photo_url
+        TIMESTAMP checked_at
+      }
+      supervisor_check_reminders {
+        INT id PK
+        UUID supervisor_id FK
+        TEXT message
+        BOOLEAN is_active
+        TIMESTAMP reminder_time
+      }
     cleaning_logs {
         INT id PK
         INT room_id FK
@@ -433,6 +448,9 @@ erDiagram
     washrooms ||--o{ work_submissions : "for"
     users ||--o{ supply_inventory : "restocks"
     users ||--o{ reminders : "supervisor"
+    users ||--o{ supervisor_check_reminders : "receives"
+    washrooms ||--o{ washroom_checklists : "has"
+    users ||--o{ washroom_checklists : "submits"
     rooms ||--o{ cleaning_logs : "cleaned"
     users ||--o{ cleaning_logs : "cleans"
     users ||--o{ notifications : "receives"
@@ -457,6 +475,9 @@ erDiagram
   <tr><td><code>work_submissions</code></td><td>INT</td><td>staff_id FK, washroom_id FK, description, image_url, llm_verified, llm_feedback, supervisor_status (pending/approved/rejected), reviewed_by FK</td><td>staff_id, washroom_id, supervisor_status</td><td>Cleaning proof submissions with 2-way verification (LLM + supervisor)</td></tr>
   <tr><td><code>supply_inventory</code></td><td>INT</td><td>building, item_name, current_stock, min_threshold, unit, last_restocked, restocked_by FK</td><td>building, item_name</td><td>Building-wise supply inventory tracking (soap, tissue, sanitizer)</td></tr>
   <tr><td><code>reminders</code></td><td>INT</td><td>supervisor_id FK, building, reminder_type, message, is_active, due_date</td><td>supervisor_id, due_date, is_active</td><td>Supervisor consumption-based restocking reminders</td></tr>
+  <tr><td><code>password_reset_otps</code></td><td>INT</td><td>phone_number, otp_hash, expires_at, attempts, used</td><td>phone_number, expires_at, used</td><td>OTP-based password reset records with expiry and attempt limits</td></tr>
+  <tr><td><code>washroom_checklists</code></td><td>INT</td><td>washroom_id FK, supervisor_id FK, checklist_items (JSONB), photo_url, checked_at</td><td>washroom_id, supervisor_id, checked_at</td><td>Supervisor washroom verification checklist submissions with photo evidence</td></tr>
+  <tr><td><code>supervisor_check_reminders</code></td><td>INT</td><td>supervisor_id FK, message, reminder_time, is_active</td><td>supervisor_id, reminder_time, is_active</td><td>Passive 2-hour reminder schedule for supervisor checklist actions</td></tr>
   <tr><td><code>knex_migrations</code></td><td>INT</td><td>name, batch, migration_time</td><td>—</td><td>Knex migration tracking (framework-managed)</td></tr>
 </table>
 
@@ -547,10 +568,10 @@ sequenceDiagram
     S->>N: POST /api/work-submissions (FormData + photo) + JWT
     N->>E: Proxy with Bearer token
     E->>E: multer processes proof image
-    E->>LLM: Analyze image for cleanliness
-    LLM-->>E: {verified: true/false, feedback: "..."}
+    E->>E: Simulated LLM verification (current implementation)
+    E-->>S: verification score + feedback
     E->>PG: INSERT work_submissions (llm_verified, llm_feedback)
-    E-->>S: 201 Created + LLM verification result
+    E-->>S: 201 Created + verification result
 
     Note over S,LLM: 3. Supervisor Reviews Submission
     participant SV as Supervisor
@@ -661,6 +682,8 @@ graph LR
   <tr><td><code>database/postgres.js</code></td><td>78</td><td><strong>PostgreSQL connection via Knex</strong> — creates connection pool (min:2, max:20, 30s acquire timeout), health check (SELECT 1), query logging in dev, pool event logging, graceful destroy</td></tr>
   <tr><td><code>database/migrations/<br/>20240301000001_initial_schema.js</code></td><td>169</td><td><strong>Creates initial 10 tables</strong>: users (UUID PK, email unique, bcrypt password, role enum), floors, rooms (status enum, foreign keys), complaints (JSONB ai_analysis, priority/status enums), cleaning_logs, notifications, ai_insights, refresh_tokens, audit_logs. Each table has appropriate indexes</td></tr>
   <tr><td><code>database/migrations/<br/>20240302000001_hygiene_monitoring.js</code></td><td>132</td><td><strong>Adds 4 new tables + schema enhancements</strong>: Adds 'supervisor' to user role enum. Adds shift (morning/evening/night) and supervisor_id (self-FK) to users. Creates washrooms table (building, floor, direction, supply levels 0-100, last_restocked). Creates work_submissions (staff proof with LLM verified + supervisor approval). Creates supply_inventory (building-wise stock tracking). Creates reminders (supervisor consumption-based). Adds building column to complaints. Widens room_number columns to varchar(200)</td></tr>
+  <tr><td><code>database/migrations/<br/>20240313000001_password_reset_otps.js</code></td><td>~20</td><td><strong>Adds OTP reset table</strong>: Creates password_reset_otps with hash-based OTP storage, expiry, attempt tracking, and used-state for secure forgot-password flow</td></tr>
+  <tr><td><code>database/migrations/<br/>20260420000001_supervisor_washroom_checklists.js</code></td><td>~50</td><td><strong>Adds 2 checklist tables</strong>: Creates washroom_checklists for supervisor daily verification records (JSON checklist + photo proof) and supervisor_check_reminders for passive 2-hour supervisor reminder scheduling</td></tr>
   <tr><td><code>database/seeds/<br/>001_initial_data.js</code></td><td>201</td><td><strong>Seeds comprehensive demo data</strong>: 1 admin (admin@hostel.com), 2 supervisors (Meera Desai — morning, Suresh Nair — evening), 4 cleaning staff (with shift assignments + supervisor mapping), 4 residents (3 students + 1 faculty). 20 washrooms across 6 buildings (H1, H2, H3, Academic Block, Library, Cafeteria — H2 has North/South Wing directional data). 4 work submissions (mix of LLM verified/pending, approved/pending). 17 supply inventory items. 4 supervisor reminders. 7 hygiene-themed complaints (including false_reporting). 5 notifications. All passwords: password123 (bcrypt hashed)</td></tr>
   <tr><td><code>scripts/initDb.js</code></td><td>~50</td><td>Runs Knex migrations (latest) then seeds. Called during deployment and via <code>npm run init-db</code></td></tr>
 </table>
@@ -678,12 +701,12 @@ graph LR
 <table>
   <tr><th>File</th><th>Lines</th><th>Endpoints</th><th>What It Does</th></tr>
   <tr><td><code>routes/auth.js</code></td><td>355</td><td>POST /register, POST /login, POST /forgot-password/request-otp, POST /forgot-password/reset, GET /me, PUT /me, PUT /password, POST /refresh, POST /logout</td><td>User authentication — bcrypt password verification, JWT token generation (access + refresh), profile CRUD, OTP-based password reset, token refresh with rotation, and logout/revoke flow</td></tr>
-  <tr><td><code>routes/complaints.js</code></td><td>361</td><td>GET /, POST /, GET /:id, PUT /:id/status, PUT /:id/assign, PUT /:id/priority, DELETE /:id</td><td>Complaint CRUD — file upload (multer, 10MB limit), filtering by status/priority/category/date, pagination, triggers async AI analysis on creation, requires JWT auth. Supervisors can see their assigned staff's complaints, assign complaints, and update priority. <strong>Priority mapping</strong>: AI may return "critical" but DB allows only low/medium/high/urgent — mapPriority() maps critical→urgent</td></tr>
+  <tr><td><code>routes/complaints.js</code></td><td>361</td><td>GET /, POST /, GET /:id, PUT /:id/status, PUT /:id/assign, PUT /:id/priority, DELETE /:id, GET /my/list, GET /assigned/list</td><td>Complaint CRUD — file upload (multer, 10MB limit), filtering by status/priority/category/date, pagination, triggers async AI analysis on creation, requires JWT auth. Includes role-scoped listing endpoints for resident and assigned-team views. <strong>Priority mapping</strong>: AI may return "critical" but DB allows only low/medium/high/urgent — mapPriority() maps critical→urgent</td></tr>
   <tr><td><code>routes/dashboard.js</code></td><td>278</td><td>GET /admin, GET /staff, GET /supervisor, GET /resident, GET /notifications, PUT /notifications/:id/read, PUT /notifications/read-all</td><td>Dashboard data — aggregates room, complaint, washroom, and verification stats with recent items/trends. Backend <strong>GET /dashboard/supervisor</strong> returns pendingVerifications, approvedToday, staff list, pending submissions, and reminders. Current website supervisor view emphasizes complaints-in-my-buildings, supply updater, and Open Staff Tools entry</td></tr>
-  <tr><td><code>routes/rooms.js</code></td><td>162</td><td>GET /, GET /by-floor, GET /my/tasks, PUT /:id/status</td><td>Room management — list with filters, group by floor, update status + auto-create cleaning_log entry. /my/tasks accessible by both staff and supervisor roles</td></tr>
-  <tr><td><code>routes/staff.js</code></td><td>152</td><td>GET /, GET /:id, GET /:id/assignments</td><td>Staff management — list all staff with stats, get individual details, view room/floor assignments. Supervisors can view their assigned staff with role/shift/supervisor_id fields</td></tr>
-  <tr><td><code>routes/ai.js</code></td><td>196</td><td>GET /status, POST /analyze-complaint, POST /categorize, GET /optimize-tasks, GET /predictions, GET /responses/:id, GET /insights</td><td><strong>AI integration layer</strong> — bridges Node.js to Python AI service via HTTP, has complete fallback system (keyword-based categorization + rule-based priority) when AI service is unavailable</td></tr>
-  <tr><td><code>routes/washrooms.js</code></td><td>170</td><td>GET /, GET /by-building, GET /:id, PUT /:id/supplies, PUT /:id/status, PUT /:id/assign, GET /inventory/all, PUT /inventory/:id</td><td><strong>Washroom &amp; supply management</strong> — list all washrooms with building/floor/direction data, group by building, update supply levels (soap/tissue/sanitizer 0-100), change cleaning status, assign staff. Inventory endpoints for building-wise supply stock tracking with min threshold alerts</td></tr>
+  <tr><td><code>routes/rooms.js</code></td><td>162</td><td>GET /, GET /by-floor, GET /:id, PUT /:id/status, PUT /:id/assign, GET /my/tasks, GET /:id/history</td><td>Room management — list with filters, group by floor, fetch single room/history views, assign staff, and update status with automatic cleaning log creation. /my/tasks accessible by both staff and supervisor roles</td></tr>
+  <tr><td><code>routes/staff.js</code></td><td>152</td><td>GET /, GET /:id, POST /:id/floors, DELETE /:id/floors/:floorId, GET /:id/performance, GET /residents/list</td><td>Staff management — list staff, view details, map floors to staff, remove floor assignments, view performance metrics, and list residents. Supervisors see only their assigned staff where enforced</td></tr>
+  <tr><td><code>routes/ai.js</code></td><td>196</td><td>GET /status, POST /analyze-complaint, POST /categorize, GET /optimize-tasks, GET /predictions, GET /responses/:id, GET /insights, POST /batch-analyze</td><td><strong>AI integration layer</strong> — bridges Node.js to Python AI service via HTTP, has complete fallback system (keyword-based categorization + rule-based priority) when AI service is unavailable, and supports batch analysis workflows</td></tr>
+  <tr><td><code>routes/washrooms.js</code></td><td>170</td><td>GET /, GET /by-building, GET /:id, GET /:id/checklist/latest, POST /:id/checklist, PUT /:id/supplies, PUT /:id/status, PUT /:id/assign, GET /inventory/all, PUT /inventory/:id</td><td><strong>Washroom &amp; supply management</strong> — list all washrooms with building/floor/direction data, group by building, submit/read supervisor checklists, update supply levels (soap/tissue/sanitizer 0-100), change cleaning status, assign staff, and manage inventory with threshold alerts</td></tr>
   <tr><td><code>routes/work-submissions.js</code></td><td>217</td><td>GET /, POST /, PUT /:id/approve, GET /pending/count</td><td><strong>2-way work verification</strong> — staff upload cleaning proof photos (multer), simulated LLM verifies image for cleanliness (returns verified/feedback). Supervisors approve or reject submissions. Role-based filtering: staff see own, supervisors see their team's, admin sees all. Pending count for dashboard badges</td></tr>
   <tr><td><code>routes/reminders.js</code></td><td>134</td><td>GET /, POST /, PUT /:id, DELETE /:id, GET /due/now</td><td><strong>Supervisor reminders</strong> — CRUD for consumption-based restocking reminders. Supervisors own their reminders (enforced by middleware). Due reminders endpoint returns active reminders past due date. Reminder types: restocking, inspection, follow_up, custom</td></tr>
 </table>
@@ -755,7 +778,7 @@ graph LR
 
 <!-- ==================== 9. API ENDPOINTS ==================== -->
 <div class="section-break"></div>
-<h1 id="api">9. Complete API Endpoints (50+)</h1>
+<h1 id="api">9. Complete API Endpoints (65+)</h1>
 
 <table>
   <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Role</th><th>Purpose</th></tr>
@@ -765,6 +788,7 @@ graph LR
   <tr><td><strong>PUT</strong></td><td>/api/auth/me</td><td>Yes</td><td>Any</td><td>Update profile (name, phone, avatar)</td></tr>
   <tr><td><strong>PUT</strong></td><td>/api/auth/password</td><td>Yes</td><td>Any</td><td>Change password (requires old password)</td></tr>
   <tr><td><strong>POST</strong></td><td>/api/auth/refresh</td><td>No</td><td>Any</td><td>Refresh JWT token using refresh token</td></tr>
+  <tr><td><strong>POST</strong></td><td>/api/auth/logout</td><td>Yes</td><td>Any</td><td>Logout and revoke refresh token</td></tr>
   <tr style="background:#e0f7fa;"><td colspan="5"><strong>Complaints</strong></td></tr>
   <tr><td><strong>GET</strong></td><td>/api/complaints</td><td>Yes</td><td>Any</td><td>List complaints (filter, paginate, search)</td></tr>
   <tr><td><strong>POST</strong></td><td>/api/complaints</td><td>Yes</td><td>Any</td><td>Create complaint + trigger AI analysis</td></tr>
@@ -773,15 +797,23 @@ graph LR
   <tr><td><strong>PUT</strong></td><td>/api/complaints/:id/assign</td><td>Yes</td><td>Admin/Supervisor</td><td>Assign complaint to specific staff member</td></tr>
   <tr><td><strong>PUT</strong></td><td>/api/complaints/:id/priority</td><td>Yes</td><td>Admin/Supervisor</td><td>Update complaint priority level</td></tr>
   <tr><td><strong>DELETE</strong></td><td>/api/complaints/:id</td><td>Yes</td><td>Admin</td><td>Delete complaint</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/complaints/my/list</td><td>Yes</td><td>Any</td><td>List complaints created by current user</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/complaints/assigned/list</td><td>Yes</td><td>Staff/Supervisor</td><td>List complaints assigned to current staff or supervisor team</td></tr>
   <tr style="background:#e0f7fa;"><td colspan="5"><strong>Rooms</strong></td></tr>
   <tr><td><strong>GET</strong></td><td>/api/rooms</td><td>Yes</td><td>Any</td><td>List rooms with filters (status, floor)</td></tr>
   <tr><td><strong>GET</strong></td><td>/api/rooms/by-floor</td><td>Yes</td><td>Any</td><td>Rooms grouped by floor</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/rooms/:id</td><td>Yes</td><td>Any</td><td>Get single room details</td></tr>
   <tr><td><strong>PUT</strong></td><td>/api/rooms/:id/status</td><td>Yes</td><td>Staff/Supervisor/Admin</td><td>Update room status + create cleaning log</td></tr>
+  <tr><td><strong>PUT</strong></td><td>/api/rooms/:id/assign</td><td>Yes</td><td>Admin</td><td>Assign room to staff member</td></tr>
   <tr><td><strong>GET</strong></td><td>/api/rooms/my/tasks</td><td>Yes</td><td>Staff/Supervisor</td><td>Get assigned room tasks for current user</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/rooms/:id/history</td><td>Yes</td><td>Any</td><td>Get cleaning history for a room</td></tr>
   <tr style="background:#e0f7fa;"><td colspan="5"><strong>Staff</strong></td></tr>
   <tr><td><strong>GET</strong></td><td>/api/staff</td><td>Yes</td><td>Admin/Supervisor</td><td>List all staff (supervisors see their assigned staff)</td></tr>
   <tr><td><strong>GET</strong></td><td>/api/staff/:id</td><td>Yes</td><td>Admin/Supervisor</td><td>Staff details with role, shift, supervisor_id</td></tr>
-  <tr><td><strong>GET</strong></td><td>/api/staff/:id/assignments</td><td>Yes</td><td>Admin/Supervisor</td><td>Staff room/floor assignments</td></tr>
+  <tr><td><strong>POST</strong></td><td>/api/staff/:id/floors</td><td>Yes</td><td>Admin</td><td>Assign floor to staff member</td></tr>
+  <tr><td><strong>DELETE</strong></td><td>/api/staff/:id/floors/:floorId</td><td>Yes</td><td>Admin</td><td>Remove floor assignment from staff member</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/staff/:id/performance</td><td>Yes</td><td>Admin</td><td>Get staff performance metrics</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/staff/residents/list</td><td>Yes</td><td>Admin</td><td>List residents for assignment and oversight</td></tr>
   <tr style="background:#e0f7fa;"><td colspan="5"><strong>Dashboard</strong></td></tr>
   <tr><td><strong>GET</strong></td><td>/api/dashboard/admin</td><td>Yes</td><td>Admin</td><td>Admin stats (rooms, complaints, staff, washroomStats, verificationStats)</td></tr>
   <tr><td><strong>GET</strong></td><td>/api/dashboard/staff</td><td>Yes</td><td>Staff/Supervisor</td><td>Staff tasks and assigned items</td></tr>
@@ -798,10 +830,13 @@ graph LR
   <tr><td><strong>GET</strong></td><td>/api/ai/predictions</td><td>Yes</td><td>Admin</td><td>Predictive maintenance forecasts</td></tr>
   <tr><td><strong>GET</strong></td><td>/api/ai/responses/:id</td><td>Yes</td><td>Any</td><td>AI-generated response suggestions</td></tr>
   <tr><td><strong>GET</strong></td><td>/api/ai/insights</td><td>Yes</td><td>Admin</td><td>Dashboard AI insights + recommendations</td></tr>
+  <tr><td><strong>POST</strong></td><td>/api/ai/batch-analyze</td><td>Yes</td><td>Admin</td><td>Analyze multiple complaints in one request</td></tr>
   <tr style="background:#e0f7fa;"><td colspan="5"><strong>Washrooms</strong></td></tr>
   <tr><td><strong>GET</strong></td><td>/api/washrooms</td><td>Yes</td><td>Any</td><td>List all washrooms with supply levels</td></tr>
   <tr><td><strong>GET</strong></td><td>/api/washrooms/by-building</td><td>Yes</td><td>Any</td><td>Washrooms grouped by building</td></tr>
   <tr><td><strong>GET</strong></td><td>/api/washrooms/:id</td><td>Yes</td><td>Any</td><td>Single washroom details</td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/washrooms/:id/checklist/latest</td><td>Yes</td><td>Admin/Supervisor/Staff</td><td>Get the latest supervisor checklist snapshot for a washroom</td></tr>
+  <tr><td><strong>POST</strong></td><td>/api/washrooms/:id/checklist</td><td>Yes</td><td>Supervisor</td><td>Submit supervisor checklist with checklist items and photo proof</td></tr>
   <tr><td><strong>PUT</strong></td><td>/api/washrooms/:id/supplies</td><td>Yes</td><td>Staff/Supervisor/Admin</td><td>Update supply levels (soap, tissue, sanitizer 0-100)</td></tr>
   <tr><td><strong>PUT</strong></td><td>/api/washrooms/:id/status</td><td>Yes</td><td>Staff/Supervisor/Admin</td><td>Update washroom cleaning status</td></tr>
   <tr><td><strong>PUT</strong></td><td>/api/washrooms/:id/assign</td><td>Yes</td><td>Supervisor/Admin</td><td>Assign staff to washroom</td></tr>
@@ -818,6 +853,8 @@ graph LR
   <tr><td><strong>PUT</strong></td><td>/api/reminders/:id</td><td>Yes</td><td>Supervisor/Admin</td><td>Update reminder (message, due_date, is_active)</td></tr>
   <tr><td><strong>DELETE</strong></td><td>/api/reminders/:id</td><td>Yes</td><td>Supervisor/Admin</td><td>Delete a reminder</td></tr>
   <tr><td><strong>GET</strong></td><td>/api/reminders/due/now</td><td>Yes</td><td>Supervisor/Admin</td><td>Reminders past due date that are still active</td></tr>
+  <tr style="background:#e0f7fa;"><td colspan="5"><strong>Public Home Stats</strong></td></tr>
+  <tr><td><strong>GET</strong></td><td>/api/home-stats</td><td>No</td><td>Any</td><td>Landing page summary cards (today requests, completed, pending, supply health)</td></tr>
 </table>
 
 <!-- ==================== 10. ROLES ==================== -->
@@ -827,7 +864,7 @@ graph LR
   <tr><th>Role</th><th>Login</th><th>Can Do</th><th>Dashboard Shows</th></tr>
   <tr><td><strong>Admin</strong></td><td>admin@hostel.com<br/>password123</td><td>Manage rooms, staff, washrooms, and inventory. Assign buildings to supervisors. Monitor live work updates in read-only mode. Review operational stats and trends</td><td>Total stats (rooms/complaints/staff/washrooms/verifications), washroom map, supply inventory, staff/shift overview, live updates, building-to-supervisor assignment controls</td></tr>
   <tr><td><strong>Supervisor</strong></td><td>meera@hostel.com<br/>password123</td><td>Monitor complaints in assigned buildings, update washroom supply stats, and open full staff-tools mode (My Tasks, Assigned Issues, Upload Work). Resolve issues from staff-tools view</td><td>Complaints-in-my-buildings overview, open complaints/buildings counters, supply stats updater, Open Staff Tools entry point</td></tr>
-  <tr><td><strong>Cleaning Staff</strong></td><td>rajesh@hostel.com<br/>password123</td><td>Update room/washroom status (clean/maintain). Handle assigned complaints. View assigned floors/rooms/washrooms. Log cleaning activities. <strong>Upload cleaning proof photos</strong> — LLM auto-verifies for cleanliness. Submit work for supervisor approval</td><td>Assigned tasks, pending complaints, cleaning schedule, room/washroom status of assigned areas, own work submission history with verification status</td></tr>
+  <tr><td><strong>Cleaning Staff</strong></td><td>rajesh@hostel.com<br/>password123</td><td>Update room/washroom status (clean/maintain). Handle assigned complaints. View assigned floors/rooms/washrooms. Log cleaning activities. <strong>Upload cleaning proof photos</strong> — backend stores simulated LLM verification + feedback before supervisor review. Submit work for supervisor approval</td><td>Assigned tasks, pending complaints, cleaning schedule, room/washroom status of assigned areas, own work submission history with verification status</td></tr>
   <tr><td><strong>Student/Faculty</strong></td><td>student1@hostel.com<br/>password123</td><td>File new complaints (with image upload, building/direction selection). <strong>AI auto-categorization</strong>: can leave category blank, AI detects with scores, user reviews and confirms. View own complaint status with AI analysis. Update profile. View notifications. Report false cleaning/maintenance claims</td><td>Own complaints history with AI analysis, complaint status tracking, room info, uploaded images, building washroom status</td></tr>
 </table>
 
@@ -988,6 +1025,8 @@ docker compose exec -T api node scripts/initDb.js  # Re-run migrations</code></p
   <tr><td><strong>Supervisor Dashboard Focus</strong></td><td>Supervisor dashboard now highlights complaints in assigned buildings and a direct "Update Supply Stats (Home)" section</td></tr>
   <tr><td><strong>Supervisor Staff Tools Restored</strong></td><td>Supervisors can open full staff-tools mode (My Tasks, Assigned Issues, Upload Work) from dashboard</td></tr>
   <tr><td><strong>Admin/Supervisor Separation</strong></td><td>Admin tabs remain washroom/inventory/staff/live-updates while supervisor-specific sections remain supervisor-only</td></tr>
+  <tr><td><strong>Supervisor Checklist Feature</strong></td><td>Added per-washroom supervisor checklist workflow with checklist item proof photos and latest-check retrieval endpoint</td></tr>
+  <tr><td><strong>Passive 2-Hour Reminders</strong></td><td>Added supervisor_check_reminders data pipeline to support recurring checklist reminder cadence</td></tr>
 </table>
 
 <!-- v3.1.0 -->

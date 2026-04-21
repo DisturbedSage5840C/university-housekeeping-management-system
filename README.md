@@ -19,13 +19,14 @@ University Housekeeping Management System turns hygiene operations into a measur
 - Authentication and role-based dashboards
 - Complaints lifecycle with AI metadata and media evidence
 - Washroom status and consumables monitoring (soap, tissue, sanitizer)
+- Supervisor washroom checklists with per-item completion and photo proof
 - Supervisor reminders and staff coordination
 - Reporting-ready documentation (HTML + PDF)
 
 ### Role Experience
 
 - Admin: governance, building-to-supervisor mapping, washroom/inventory/staff oversight, and live work monitoring
-- Supervisor: complaints in assigned buildings, supply stats updates, and full staff-tools mode (tasks/issues/upload)
+- Supervisor: complaints in assigned buildings, supply stats updates, checklist submissions, and full staff-tools mode (tasks/issues/upload)
 - Cleaning Staff: assigned task execution and updates
 - Student/Faculty: complaint submission and tracking
 
@@ -119,6 +120,8 @@ Representative endpoint groups:
 - /api/work-submissions
 - /api/reminders
 - /api/ai
+
+Note: Work submission image verification is currently simulated in backend logic and is still enforced through supervisor approval before completion.
 
 ## Repository Contents
 
