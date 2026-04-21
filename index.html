@@ -1403,6 +1403,78 @@
             white-space: nowrap;
         }
 
+        .checklist-camera-modal {
+            max-width: 760px;
+        }
+
+        .checklist-camera-stage {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: #000;
+        }
+
+        .checklist-camera-stage video {
+            width: 100%;
+            display: block;
+            min-height: 280px;
+            max-height: 60vh;
+            object-fit: cover;
+            background: #000;
+        }
+
+        .checklist-camera-hint {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-top: 12px;
+        }
+
+        .inventory-photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .inventory-photo-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: var(--bg-elevated);
+        }
+
+        .inventory-photo-thumb {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+            background: var(--bg-hover);
+        }
+
+        .inventory-photo-meta {
+            padding: 12px;
+        }
+
+        .inventory-photo-meta h4 {
+            font-size: 0.84rem;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .inventory-photo-meta p {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .inventory-photo-empty {
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-sm);
+            padding: 18px;
+            text-align: center;
+            color: var(--text-muted);
+            background: var(--bg-elevated);
+        }
+
         /* AI Analysis Box */
         .ai-analysis-box {
             background: var(--accent-glow);
@@ -2403,6 +2475,41 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="inventoryPhotoModal">
+        <div class="modal detail-modal">
+            <div class="modal-header">
+                <h3 id="inventoryPhotoModalTitle">📷 Refill Photos</h3>
+                <button class="modal-close" onclick="closeModal('inventoryPhotoModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="inventoryPhotoModalBody">
+                <div class="inventory-photo-empty">Select a washroom row to view the latest refill photos.</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('inventoryPhotoModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="checklistCameraModal">
+        <div class="modal checklist-camera-modal">
+            <div class="modal-header">
+                <h3 id="checklistCameraModalTitle">📷 Capture Checklist Photo</h3>
+                <button class="modal-close" onclick="closeChecklistCameraModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="checklist-camera-stage">
+                    <video id="checklistCameraPreview" autoplay playsinline muted></video>
+                    <canvas id="checklistCameraCanvas" style="display:none;"></canvas>
+                </div>
+                <p class="checklist-camera-hint" id="checklistCameraHint">Point the camera at the refill or cleaned area, then capture the photo.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeChecklistCameraModal()">Cancel</button>
+                <button class="btn btn-primary" id="checklistCameraCaptureBtn" onclick="captureChecklistPhoto()" disabled>Capture Photo</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
 
@@ -2973,6 +3080,10 @@
 
         let supervisorChecklistPhotos = {};
         let supervisorChecklistLocalLog = [];
+        let inventoryRefillPhotoCache = {};
+        let activeChecklistCameraItemKey = null;
+        let activeChecklistCameraStream = null;
+        const supervisorChecklistRefillKeys = ['soap_refill', 'tissue_refill', 'sanitizer_refill'];
 
         // Keep rooms for backwards compatibility with room management
         let rooms = [];
@@ -3182,6 +3293,7 @@
         }
 
         function logout() {
+            closeChecklistCameraModal();
             currentUser = null;
             authToken = null;
             useOfflineMode = false;
@@ -3337,6 +3449,7 @@
         function renderInventory(targetBodyId = 'inventoryBody') {
             const body = document.getElementById(targetBodyId);
             if (!body) return;
+            const isAdminInventory = targetBodyId === 'inventoryBody';
 
             const sorted = [...washroomData].sort((a, b) => {
                 if (a.building !== b.building) return a.building.localeCompare(b.building);
@@ -3356,7 +3469,10 @@
                 return `${buildingHeader}<tr>
                     <td>${w.building}</td>
                     <td>${w.floor}${w.direction ? ' (' + w.direction + ')' : ''}</td>
-                    <td style="font-weight:500;">${w.label}</td>
+                    <td>
+                        <div style="font-weight:500;">${w.label}</div>
+                        ${isAdminInventory ? `<button class="btn btn-outline btn-sm" type="button" style="margin-top:8px;" onclick="viewInventoryRefillPhotos('${w.id}')">📷 View refill photos</button>` : ''}
+                    </td>
                     <td class="${stockClass(w.supplies.tissues)}">${w.supplies.tissues}%</td>
                     <td class="${stockClass(w.supplies.soap)}">${w.supplies.soap}%</td>
                     <td class="${stockClass(w.supplies.sanitizer)}">${w.supplies.sanitizer}%</td>
@@ -3830,6 +3946,18 @@
             if (tab === 'liveupdates') renderVerification();
         }
 
+        function syncStaffToolsForRole(isSupervisorMode) {
+            const complaintsBtn = document.getElementById('staffComplaintsTabBtn');
+            const complaintsTab = document.getElementById('staffComplaintsTab');
+
+            if (complaintsBtn) complaintsBtn.style.display = isSupervisorMode ? 'none' : '';
+            if (complaintsTab && isSupervisorMode) complaintsTab.style.display = 'none';
+
+            if (isSupervisorMode) {
+                switchStaffTab('tasks');
+            }
+        }
+
         // ──── Staff Dashboard (Cleaning Staff) ────
         async function renderStaffDashboard() {
             await loadComplaints();
@@ -3850,6 +3978,7 @@
                 document.getElementById('staffModeHeader').style.display = 'none';
             }
 
+            syncStaffToolsForRole(isSupervisorMode);
             document.getElementById('staffTaskCount').textContent = `${myWashrooms.length} washrooms assigned`;
 
             const container = document.getElementById('staffTasksList');
@@ -3879,7 +4008,9 @@
             }
 
             populateWorkWashrooms(myWashrooms);
-            renderStaffComplaints();
+            if (!isSupervisorMode) {
+                renderStaffComplaints();
+            }
         }
 
         function populateWorkWashrooms(washrooms) {
@@ -4003,8 +4134,20 @@
         }
 
         function switchStaffTab(tab) {
+            if (tab === 'complaints' && document.getElementById('staffComplaintsTabBtn')?.style.display === 'none') {
+                tab = 'tasks';
+            }
+
             document.querySelectorAll('#staffDashboard .tab-btn').forEach(b => b.classList.remove('active'));
-            if (event && event.target) event.target.classList.add('active');
+            const fallbackButtonIds = {
+                tasks: 'staffTasksTabBtn',
+                complaints: 'staffComplaintsTabBtn',
+                upload: 'staffUploadTabBtn',
+            };
+            const activeButton = (typeof event !== 'undefined' && event?.target?.classList?.contains('tab-btn'))
+                ? event.target
+                : document.getElementById(fallbackButtonIds[tab]);
+            if (activeButton) activeButton.classList.add('active');
             document.getElementById('staffTasksTab').style.display = tab === 'tasks' ? 'block' : 'none';
             document.getElementById('staffComplaintsTab').style.display = tab === 'complaints' ? 'block' : 'none';
             document.getElementById('staffUploadTab').style.display = tab === 'upload' ? 'block' : 'none';
@@ -4278,6 +4421,181 @@
             return `${date.getFullYear()}${pad2(date.getMonth() + 1)}${pad2(date.getDate())}_${pad2(date.getHours())}${pad2(date.getMinutes())}${pad2(date.getSeconds())}${pad3(date.getMilliseconds())}`;
         }
 
+        function revokeChecklistPreviewUrl(url) {
+            if (url && String(url).startsWith('blob:')) {
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        function clearChecklistPhotoSelection(itemKey, { resetInput = true } = {}) {
+            const existing = supervisorChecklistPhotos[itemKey];
+            if (existing?.previewUrl) revokeChecklistPreviewUrl(existing.previewUrl);
+            delete supervisorChecklistPhotos[itemKey];
+
+            const input = document.getElementById(`supChecklistPhoto-${itemKey}`);
+            if (resetInput && input) input.value = '';
+
+            const label = document.getElementById(`supChecklistPhotoName-${itemKey}`);
+            if (label) label.textContent = 'No photo';
+        }
+
+        function clearAllChecklistPhotos() {
+            supervisorChecklistItems.forEach((item) => clearChecklistPhotoSelection(item.key));
+            supervisorChecklistPhotos = {};
+        }
+
+        function syncChecklistInputFile(input, file) {
+            if (!input || !file || typeof DataTransfer === 'undefined') return;
+
+            try {
+                const transfer = new DataTransfer();
+                transfer.items.add(file);
+                input.files = transfer.files;
+            } catch (_error) {
+                // Some browsers block programmatic file assignment.
+            }
+        }
+
+        function storeChecklistPhoto(itemKey, file, { syncInput = false } = {}) {
+            if (!file) {
+                clearChecklistPhotoSelection(itemKey);
+                return;
+            }
+
+            const previous = supervisorChecklistPhotos[itemKey];
+            if (previous?.previewUrl) revokeChecklistPreviewUrl(previous.previewUrl);
+
+            const ext = (() => {
+                const parts = String(file.name || '').split('.');
+                return parts.length > 1 ? `.${parts.pop().toLowerCase()}` : '.jpg';
+            })();
+
+            const generatedName = `checklist_${itemKey}_${getChecklistDateTimeToken(new Date())}${ext}`;
+            const previewUrl = URL.createObjectURL(file);
+            const input = document.getElementById(`supChecklistPhoto-${itemKey}`);
+            const label = document.getElementById(`supChecklistPhotoName-${itemKey}`);
+
+            supervisorChecklistPhotos[itemKey] = {
+                file,
+                generatedName,
+                previewUrl,
+            };
+
+            if (syncInput) syncChecklistInputFile(input, file);
+            if (label) label.textContent = generatedName;
+        }
+
+        function buildLocalChecklistSnapshot(checklistItemsPayload) {
+            const completedAt = new Date().toISOString();
+            const snapshot = {};
+
+            supervisorChecklistItems.forEach((item) => {
+                const completed = !!checklistItemsPayload[item.key]?.completed;
+                const photoMeta = supervisorChecklistPhotos[item.key];
+
+                snapshot[item.key] = {
+                    completed,
+                    photo_filename: completed && photoMeta ? photoMeta.generatedName : null,
+                    photo_url: completed && photoMeta?.file ? URL.createObjectURL(photoMeta.file) : null,
+                    completed_at: completed ? completedAt : null,
+                };
+            });
+
+            return snapshot;
+        }
+
+        function formatChecklistPhotoUrl(photoUrl) {
+            if (!photoUrl) return null;
+            if (/^(blob:|data:|https?:)/i.test(photoUrl)) return photoUrl;
+            return `${window.location.origin}${photoUrl.startsWith('/') ? photoUrl : `/${photoUrl}`}`;
+        }
+
+        function getLatestLocalChecklistForWashroom(washroomId) {
+            return supervisorChecklistLocalLog
+                .filter((entry) => entry.washroom_id === washroomId)
+                .sort((a, b) => new Date(b.submitted_at || b.created_at) - new Date(a.submitted_at || a.created_at))[0] || null;
+        }
+
+        function getChecklistRefillPhotoEntries(checklist) {
+            const items = checklist?.checklist_items || {};
+
+            return supervisorChecklistItems
+                .filter((item) => supervisorChecklistRefillKeys.includes(item.key))
+                .map((item) => {
+                    const entry = items[item.key];
+                    if (!entry?.completed || (!entry.photo_url && !entry.photo_filename)) return null;
+
+                    return {
+                        label: item.label,
+                        photoUrl: formatChecklistPhotoUrl(entry.photo_url),
+                        photoFilename: entry.photo_filename || 'Captured photo',
+                        completedAt: entry.completed_at || checklist?.submitted_at || checklist?.created_at || null,
+                    };
+                })
+                .filter(Boolean);
+        }
+
+        async function getInventoryChecklistWithFallback(washroomId) {
+            if (Object.prototype.hasOwnProperty.call(inventoryRefillPhotoCache, washroomId)) {
+                return inventoryRefillPhotoCache[washroomId];
+            }
+
+            let checklist = null;
+
+            if (!useOfflineMode) {
+                const result = await api.get(`/washrooms/${washroomId}/checklist/latest`);
+                if (result && Object.prototype.hasOwnProperty.call(result, 'checklist')) {
+                    checklist = result.checklist;
+                }
+            }
+
+            if (!checklist) {
+                checklist = getLatestLocalChecklistForWashroom(washroomId);
+            }
+
+            inventoryRefillPhotoCache[washroomId] = checklist || null;
+            return checklist;
+        }
+
+        async function viewInventoryRefillPhotos(washroomId) {
+            const modal = document.getElementById('inventoryPhotoModal');
+            const title = document.getElementById('inventoryPhotoModalTitle');
+            const body = document.getElementById('inventoryPhotoModalBody');
+            const washroom = washroomData.find((entry) => entry.id === washroomId);
+
+            if (!modal || !title || !body || !washroom) return;
+
+            title.textContent = `📷 ${washroom.building} — ${washroom.label}`;
+            body.innerHTML = '<div class="inventory-photo-empty">Loading latest refill photos...</div>';
+            modal.classList.add('active');
+
+            const checklist = await getInventoryChecklistWithFallback(washroomId);
+            const photoEntries = getChecklistRefillPhotoEntries(checklist);
+
+            if (!photoEntries.length) {
+                body.innerHTML = '<div class="inventory-photo-empty">No supervisor refill photos found for this washroom yet.</div>';
+                return;
+            }
+
+            const submittedAt = checklist?.submitted_at || checklist?.created_at;
+            body.innerHTML = `
+                ${submittedAt ? `<div class="info-box" style="background: var(--accent-glow); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 14px; font-size: 0.82rem; color: var(--text-secondary);">Latest checklist submitted: ${new Date(submittedAt).toLocaleString(localeByLanguage[currentLanguage] || 'en-US')}</div>` : ''}
+                <div class="inventory-photo-grid">
+                    ${photoEntries.map((entry) => `
+                        <div class="inventory-photo-card">
+                            ${entry.photoUrl ? `<img class="inventory-photo-thumb" src="${entry.photoUrl}" alt="${entry.label}" onclick="window.open('${entry.photoUrl}', '_blank')">` : '<div class="inventory-photo-thumb" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted);">No preview</div>'}
+                            <div class="inventory-photo-meta">
+                                <h4>${entry.label}</h4>
+                                <p>${entry.photoFilename}</p>
+                                ${entry.completedAt ? `<p>Captured: ${new Date(entry.completedAt).toLocaleString(localeByLanguage[currentLanguage] || 'en-US')}</p>` : ''}
+                                ${entry.photoUrl ? `<button class="btn btn-outline btn-sm" type="button" style="margin-top:8px;" onclick="window.open('${entry.photoUrl}', '_blank')">Open Photo</button>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
         function setSupervisorChecklistLastSavedText(value) {
             const el = document.getElementById('supChecklistLastSaved');
             if (!el) return;
@@ -4305,13 +4623,7 @@
             }
 
             if (clearPhotos) {
-                supervisorChecklistPhotos = {};
-                supervisorChecklistItems.forEach((item) => {
-                    const input = document.getElementById(`supChecklistPhoto-${item.key}`);
-                    if (input) input.value = '';
-                    const label = document.getElementById(`supChecklistPhotoName-${item.key}`);
-                    if (label) label.textContent = 'No photo';
-                });
+                clearAllChecklistPhotos();
             }
 
             if (clearNotes) {
@@ -4322,15 +4634,12 @@
 
         function applyChecklistSnapshot(snapshotItems, notes) {
             const items = snapshotItems || {};
-            supervisorChecklistPhotos = {};
+            clearAllChecklistPhotos();
 
             supervisorChecklistItems.forEach((item) => {
                 const entry = items[item.key] || {};
                 const checkbox = document.getElementById(`supChecklistDone-${item.key}`);
                 if (checkbox) checkbox.checked = !!entry.completed;
-
-                const input = document.getElementById(`supChecklistPhoto-${item.key}`);
-                if (input) input.value = '';
 
                 const label = document.getElementById(`supChecklistPhotoName-${item.key}`);
                 if (label) {
@@ -4376,36 +4685,108 @@
             setSupervisorChecklistLastSavedText('No washrooms assigned');
         }
 
-        function openChecklistCamera(itemKey) {
+        async function openChecklistCamera(itemKey) {
             const input = document.getElementById(`supChecklistPhoto-${itemKey}`);
-            if (input) input.click();
-        }
+            const modal = document.getElementById('checklistCameraModal');
+            const title = document.getElementById('checklistCameraModalTitle');
+            const hint = document.getElementById('checklistCameraHint');
+            const captureBtn = document.getElementById('checklistCameraCaptureBtn');
+            const video = document.getElementById('checklistCameraPreview');
+            const item = supervisorChecklistItems.find((entry) => entry.key === itemKey);
 
-        function onChecklistPhotoSelected(itemKey, input) {
-            const label = document.getElementById(`supChecklistPhotoName-${itemKey}`);
-            const file = input?.files?.[0];
+            if (!input) return;
 
-            if (!file) {
-                delete supervisorChecklistPhotos[itemKey];
-                if (label) label.textContent = 'No photo';
+            if (!navigator.mediaDevices?.getUserMedia) {
+                showToast('Live camera is not available here. Opening file picker instead.');
+                input.click();
                 return;
             }
 
-            const ext = (() => {
-                const parts = file.name.split('.');
-                return parts.length > 1 ? `.${parts.pop().toLowerCase()}` : '.jpg';
-            })();
+            activeChecklistCameraItemKey = itemKey;
+            if (title) title.textContent = `📷 ${item?.label || 'Capture Checklist Photo'}`;
+            if (hint) hint.textContent = `Capture a fresh photo for "${item?.label || itemKey}".`;
+            if (captureBtn) captureBtn.disabled = true;
+            if (video) video.srcObject = null;
 
-            const generatedName = `checklist_${itemKey}_${getChecklistDateTimeToken(new Date())}${ext}`;
+            modal.classList.add('active');
+            stopChecklistCameraStream();
 
-            supervisorChecklistPhotos[itemKey] = {
-                file,
-                generatedName,
-            };
+            try {
+                activeChecklistCameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: { ideal: 'environment' } },
+                    audio: false,
+                });
 
-            if (label) {
-                label.textContent = generatedName;
+                if (video) {
+                    video.srcObject = activeChecklistCameraStream;
+                    await video.play();
+                }
+
+                if (captureBtn) captureBtn.disabled = false;
+            } catch (_error) {
+                closeChecklistCameraModal();
+                showToast('Camera access failed. Opening file picker instead.');
+                input.click();
             }
+        }
+
+        function stopChecklistCameraStream() {
+            if (activeChecklistCameraStream) {
+                activeChecklistCameraStream.getTracks().forEach((track) => track.stop());
+                activeChecklistCameraStream = null;
+            }
+
+            const video = document.getElementById('checklistCameraPreview');
+            if (video) video.srcObject = null;
+        }
+
+        function closeChecklistCameraModal() {
+            stopChecklistCameraStream();
+            activeChecklistCameraItemKey = null;
+            const modal = document.getElementById('checklistCameraModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        async function captureChecklistPhoto() {
+            const itemKey = activeChecklistCameraItemKey;
+            const video = document.getElementById('checklistCameraPreview');
+            const canvas = document.getElementById('checklistCameraCanvas');
+
+            if (!itemKey || !video || !canvas || !video.videoWidth || !video.videoHeight) {
+                showToast('Camera is still getting ready. Please try again.');
+                return;
+            }
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+            if (!blob) {
+                showToast('Unable to capture photo');
+                return;
+            }
+
+            const file = new File([blob], `${itemKey}.jpg`, {
+                type: 'image/jpeg',
+                lastModified: Date.now(),
+            });
+
+            storeChecklistPhoto(itemKey, file, { syncInput: true });
+            closeChecklistCameraModal();
+            showToast('Checklist photo captured', 'success');
+        }
+
+        function onChecklistPhotoSelected(itemKey, input) {
+            const file = input?.files?.[0];
+
+            if (!file) {
+                clearChecklistPhotoSelection(itemKey, { resetInput: false });
+                return;
+            }
+
+            storeChecklistPhoto(itemKey, file);
         }
 
         async function loadLatestSupervisorChecklist(washroomId) {
@@ -4429,9 +4810,7 @@
                 return;
             }
 
-            const localSnapshot = supervisorChecklistLocalLog
-                .filter((entry) => entry.washroom_id === washroomId)
-                .sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))[0];
+            const localSnapshot = getLatestLocalChecklistForWashroom(washroomId);
 
             if (localSnapshot) {
                 applyChecklistSnapshot(localSnapshot.checklist_items, localSnapshot.notes);
@@ -4496,6 +4875,7 @@
                 const result = await api.upload(`/washrooms/${washroomId}/checklist`, formData);
                 if (result && result.id) {
                     submittedOnline = true;
+                    delete inventoryRefillPhotoCache[washroomId];
                     await loadLatestSupervisorChecklist(washroomId);
                     loadHomeStats();
                     showToast('Checklist submitted successfully', 'success');
@@ -4503,16 +4883,24 @@
             }
 
             if (!submittedOnline) {
+                const localChecklistSnapshot = buildLocalChecklistSnapshot(checklistItemsPayload);
                 const submittedAt = new Date().toISOString();
                 supervisorChecklistLocalLog.unshift({
                     id: `local-${Date.now()}`,
                     washroom_id: washroomId,
-                    checklist_items: checklistItemsPayload,
+                    checklist_items: localChecklistSnapshot,
                     notes: notes || null,
                     submitted_at: submittedAt,
                 });
 
-                applyChecklistSnapshot(checklistItemsPayload, notes || null);
+                inventoryRefillPhotoCache[washroomId] = {
+                    washroom_id: washroomId,
+                    checklist_items: localChecklistSnapshot,
+                    notes: notes || null,
+                    submitted_at: submittedAt,
+                };
+
+                applyChecklistSnapshot(localChecklistSnapshot, notes || null);
                 setSupervisorChecklistLastSavedText(submittedAt);
                 showToast('Checklist saved locally (offline mode)', 'success');
             }
@@ -5069,7 +5457,12 @@
         // Close modal on overlay click
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', function(e) {
-                if (e.target === this) this.classList.remove('active');
+                if (e.target !== this) return;
+                if (this.id === 'checklistCameraModal') {
+                    closeChecklistCameraModal();
+                    return;
+                }
+                this.classList.remove('active');
             });
         });
 
