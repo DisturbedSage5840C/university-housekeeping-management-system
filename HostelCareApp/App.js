@@ -19,52 +19,7 @@ const WEBSITE_URLS = Platform.select({
   default: ['http://localhost', 'http://10.1.61.30'],
 });
 
-const APP_WEB_VERSION = '2026-04-19-home-v1';
-
-const HTTP_PROTOCOLS = new Set(['http:', 'https:']);
-
-function getHost(url) {
-  try {
-    return new URL(url).host;
-  } catch (_error) {
-    return null;
-  }
-}
-
-const WEBSITE_HOSTS = new Set(WEBSITE_URLS.map(getHost).filter(Boolean));
-
-function isInAppUrl(url) {
-  try {
-    const parsed = new URL(url);
-    return HTTP_PROTOCOLS.has(parsed.protocol) && WEBSITE_HOSTS.has(parsed.host);
-  } catch (_error) {
-    return false;
-  }
-}
-
-const WINDOW_OPEN_BRIDGE = `
-  (function () {
-    var post = function (payload) {
-      if (window.ReactNativeWebView) {
-        window.ReactNativeWebView.postMessage(JSON.stringify(payload));
-      }
-    };
-
-    window.open = function (url) {
-      post({ type: 'external', url: url });
-      return null;
-    };
-
-    document.addEventListener('click', function (event) {
-      var anchor = event.target.closest && event.target.closest('a[target="_blank"]');
-      if (anchor && anchor.href) {
-        event.preventDefault();
-        post({ type: 'external', url: anchor.href });
-      }
-    }, true);
-  })();
-  true;
-`;
+const APP_WEB_VERSION = '2026-04-21-supervisor-checklist-v1';
 
 export default function App() {
   const webViewRef = useRef(null);
@@ -100,39 +55,6 @@ export default function App() {
       console.warn('Unable to open external URL:', error);
     }
   }, []);
-
-  const handleMessage = useCallback((event) => {
-    try {
-      const payload = JSON.parse(event.nativeEvent.data);
-      if (payload?.type === 'external') {
-        handleOpenExternal(payload.url);
-      }
-    } catch (error) {
-      console.warn('Invalid WebView message:', error);
-    }
-  }, [handleOpenExternal]);
-
-  const handleShouldStartLoad = useCallback((request) => {
-    const url = request.url || '';
-
-    // Always allow sub-resources and internal browser mechanics.
-    if (request.isTopFrame === false || url === 'about:blank') {
-      return true;
-    }
-
-    if (isInAppUrl(url)) {
-      return true;
-    }
-
-    // Let non-http(s) links (mailto:, tel:, intent:) open natively.
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      handleOpenExternal(url);
-      return false;
-    }
-
-    handleOpenExternal(url);
-    return false;
-  }, [handleOpenExternal]);
 
   const handleRetry = useCallback(() => {
     setHasError(false);
@@ -176,21 +98,23 @@ export default function App() {
           originWhitelist={['*']}
           javaScriptEnabled
           domStorageEnabled
+          incognito
           cacheEnabled={false}
           cacheMode="LOAD_NO_CACHE"
+          textZoom={100}
           geolocationEnabled
           sharedCookiesEnabled
           thirdPartyCookiesEnabled
           mixedContentMode="always"
           allowFileAccess
           pullToRefreshEnabled
+          scalesPageToFit={false}
+          setBuiltInZoomControls={false}
+          setDisplayZoomControls={false}
           setSupportMultipleWindows={false}
           allowsBackForwardNavigationGestures
           allowsInlineMediaPlayback
           mediaPlaybackRequiresUserAction={false}
-          injectedJavaScriptBeforeContentLoaded={WINDOW_OPEN_BRIDGE}
-          onMessage={handleMessage}
-          onShouldStartLoadWithRequest={handleShouldStartLoad}
           onFileDownload={({ nativeEvent }) => {
             handleOpenExternal(nativeEvent.downloadUrl);
           }}
@@ -201,6 +125,7 @@ export default function App() {
             }
           }}
           onError={handleWebError}
+          onHttpError={handleWebError}
           startInLoadingState
           renderLoading={() => (
             <View style={styles.loadingContainer}>
