@@ -1556,18 +1556,21 @@
             white-space: nowrap;
         }
 
-        .checklist-camera-modal {
+        .checklist-camera-modal,
+        .facility-camera-modal {
             max-width: 760px;
         }
 
-        .checklist-camera-stage {
+        .checklist-camera-stage,
+        .facility-camera-stage {
             border: 1px solid var(--border);
             border-radius: var(--radius);
             overflow: hidden;
             background: #000;
         }
 
-        .checklist-camera-stage video {
+        .checklist-camera-stage video,
+        .facility-camera-stage video {
             width: 100%;
             display: block;
             min-height: 280px;
@@ -1576,7 +1579,8 @@
             background: #000;
         }
 
-        .checklist-camera-hint {
+        .checklist-camera-hint,
+        .facility-camera-hint {
             font-size: 0.82rem;
             color: var(--text-secondary);
             margin-top: 12px;
@@ -2411,6 +2415,27 @@
         </div>
     </div>
 
+    <!-- Facility Camera Modal (live camera only, no file/gallery) -->
+    <div class="modal-overlay" id="facilityCameraModal">
+        <div class="modal facility-camera-modal">
+            <div class="modal-header">
+                <h3 id="facilityCameraModalTitle">📷 Capture Facility Photo</h3>
+                <button class="modal-close" onclick="closeFacilityCameraModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="facility-camera-stage">
+                    <video id="facilityCameraPreview" autoplay playsinline muted></video>
+                    <canvas id="facilityCameraCanvas" style="display:none;"></canvas>
+                </div>
+                <p class="facility-camera-hint">Point the camera at the cleaned facility, then capture the photo as proof.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeFacilityCameraModal()">Cancel</button>
+                <button class="btn btn-primary" id="facilityCameraCaptureBtn" onclick="captureFacilityPhoto()" disabled>Capture Photo</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
 
@@ -3081,6 +3106,8 @@
         let inventoryRefillPhotoCache = {};
         let activeChecklistCameraItemKey = null;
         let activeChecklistCameraStream = null;
+        let activeFacilityCameraStream = null;
+        let activeFacilityCameraPending = null;
         const supervisorChecklistRefillKeys = ['soap_refill', 'tissue_refill', 'sanitizer_refill'];
 
         // Keep rooms for backwards compatibility with room management
@@ -3280,6 +3307,7 @@
 
         function logout() {
             closeChecklistCameraModal();
+            closeFacilityCameraModal();
             currentUser = null;
             authToken = null;
             useOfflineMode = false;
@@ -3656,20 +3684,7 @@
             }
 
             if (cleanedValue === 'yes') {
-                supervisorPendingFacilityCapture = {
-                    facilityId,
-                    previousValue,
-                };
-
-                const cameraInput = document.getElementById(facilityDomId('facilityCamera', facilityId));
-                if (!cameraInput) {
-                    select.value = previousValue;
-                    showToast('Camera input is not available for this row');
-                    return;
-                }
-
-                cameraInput.value = '';
-                cameraInput.click();
+                openFacilityCameraModal(facilityId, previousValue);
                 return;
             }
 
@@ -3714,6 +3729,129 @@
 
             supervisorPendingFacilityCapture = null;
             input.value = '';
+
+            if (!update.ok) {
+                if (select) {
+                    select.value = previousValue;
+                    select.dataset.previousValue = previousValue;
+                }
+                showToast(update.error || 'Failed to update facility status');
+                return;
+            }
+
+            if (select) select.dataset.previousValue = 'yes';
+            renderSupervisorFacilitySections(facilityDashboardState.supervisorRows);
+            showToast('Updated successfully', 'success');
+        }
+
+        // ── Facility Live Camera Modal (camera only, no file/gallery) ──
+        async function openFacilityCameraModal(facilityId, previousValue) {
+            const modal = document.getElementById('facilityCameraModal');
+            const video = document.getElementById('facilityCameraPreview');
+            const captureBtn = document.getElementById('facilityCameraCaptureBtn');
+
+            if (!navigator.mediaDevices?.getUserMedia) {
+                showToast('Live camera is not available on this device. Cannot upload without camera.');
+                // Revert select
+                const select = document.getElementById(facilityDomId('facilityStatus', facilityId));
+                if (select) select.value = previousValue;
+                return;
+            }
+
+            activeFacilityCameraPending = { facilityId, previousValue };
+            if (captureBtn) captureBtn.disabled = true;
+            if (video) video.srcObject = null;
+
+            modal.classList.add('active');
+            stopFacilityCameraStream();
+
+            try {
+                activeFacilityCameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: { ideal: 'environment' } },
+                    audio: false,
+                });
+
+                if (video) {
+                    video.srcObject = activeFacilityCameraStream;
+                    await video.play();
+                }
+
+                if (captureBtn) captureBtn.disabled = false;
+            } catch (_error) {
+                closeFacilityCameraModal();
+                showToast('Camera access denied. Cannot upload without a live photo.');
+            }
+        }
+
+        function stopFacilityCameraStream() {
+            if (activeFacilityCameraStream) {
+                activeFacilityCameraStream.getTracks().forEach((track) => track.stop());
+                activeFacilityCameraStream = null;
+            }
+
+            const video = document.getElementById('facilityCameraPreview');
+            if (video) video.srcObject = null;
+        }
+
+        function closeFacilityCameraModal() {
+            stopFacilityCameraStream();
+
+            // Revert the select if no photo was captured
+            if (activeFacilityCameraPending) {
+                const { facilityId, previousValue } = activeFacilityCameraPending;
+                const select = document.getElementById(facilityDomId('facilityStatus', facilityId));
+                if (select) {
+                    select.value = previousValue;
+                    select.dataset.previousValue = previousValue;
+                }
+            }
+
+            activeFacilityCameraPending = null;
+            const modal = document.getElementById('facilityCameraModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        async function captureFacilityPhoto() {
+            const pending = activeFacilityCameraPending;
+            const video = document.getElementById('facilityCameraPreview');
+            const canvas = document.getElementById('facilityCameraCanvas');
+
+            if (!pending || !video || !canvas || !video.videoWidth || !video.videoHeight) {
+                showToast('Camera is still getting ready. Please try again.');
+                return;
+            }
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+            if (!blob) {
+                showToast('Unable to capture photo');
+                return;
+            }
+
+            const photoFile = new File([blob], `facility_${pending.facilityId}.jpg`, {
+                type: 'image/jpeg',
+                lastModified: Date.now(),
+            });
+
+            // Stop camera and close modal without reverting select
+            stopFacilityCameraStream();
+            const facilityId = pending.facilityId;
+            const previousValue = pending.previousValue;
+            activeFacilityCameraPending = null;
+            const modal = document.getElementById('facilityCameraModal');
+            if (modal) modal.classList.remove('active');
+
+            // Now submit the update
+            const select = document.getElementById(facilityDomId('facilityStatus', facilityId));
+            if (select) select.disabled = true;
+
+            const update = await updateSupervisorFacilityStatus(facilityId, 'yes', photoFile, previousValue);
+
+            if (select) select.disabled = false;
 
             if (!update.ok) {
                 if (select) {
