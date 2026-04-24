@@ -1275,6 +1275,20 @@
             .inventory-table td {
                 white-space: nowrap;
             }
+
+            .facility-selector-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .facility-selector-bar .form-group {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .facility-table {
+                min-width: 720px;
+            }
         }
 
         /* Hide sections based on role */
@@ -1306,6 +1320,145 @@
         .stock-low { color: var(--status-danger); font-weight: 700; }
         .stock-ok { color: var(--status-success); font-weight: 700; }
         .stock-warning { color: var(--status-warning); font-weight: 700; }
+
+        /* Facility dashboards (admin + supervisor) */
+        .facility-selector-bar {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .facility-selector-bar .form-group {
+            margin-bottom: 0;
+            min-width: 180px;
+            flex: 1;
+        }
+
+        .facility-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .facility-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .facility-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 760px;
+        }
+
+        .facility-table th,
+        .facility-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.84rem;
+            vertical-align: middle;
+        }
+
+        .facility-table th {
+            background: var(--bg-hover);
+            text-transform: uppercase;
+            font-size: 0.71rem;
+            font-weight: 700;
+            letter-spacing: 0.45px;
+            color: var(--text-muted);
+        }
+
+        .facility-table tr:hover {
+            background: var(--accent-glow);
+        }
+
+        .facility-table select {
+            width: auto;
+            min-width: 90px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 0.82rem;
+        }
+
+        .facility-photo-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+            display: block;
+        }
+
+        .facility-camera-input {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+            pointer-events: none;
+        }
+
+        .facility-loading,
+        .facility-empty {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 20px;
+        }
+
+        .photo-lightbox-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--overlay);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1200;
+            padding: 20px;
+        }
+
+        .photo-lightbox-overlay.active {
+            display: flex;
+        }
+
+        .photo-lightbox-overlay img {
+            max-width: min(920px, 92vw);
+            max-height: 88vh;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            background: var(--bg-card);
+        }
+
+        .photo-lightbox-close {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .photo-lightbox-close:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
 
         /* Restocking Timeline */
         .restock-timeline { list-style: none; padding: 0; margin: 0; }
@@ -1829,155 +1982,50 @@
 
         <!-- Admin Dashboard -->
         <main class="main-content admin-only" id="adminDashboard">
-            <!-- Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div>
-                            <h3 id="statTotalRooms">48</h3>
-                            <p>Total Washrooms</p>
-                        </div>
-                        <div class="stat-card-icon teal">🚻</div>
-                    </div>
+            <div class="facility-selector-bar">
+                <div class="form-group">
+                    <label for="adminFacilityBuilding">Building</label>
+                    <select id="adminFacilityBuilding" disabled>
+                        <option value="H2 Hostel">H2 Hostel</option>
+                    </select>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div>
-                            <h3 id="statCleanedToday">32</h3>
-                            <p>Restocked Today</p>
-                        </div>
-                        <div class="stat-card-icon green">✨</div>
-                    </div>
+                <div class="form-group">
+                    <label for="adminFacilityFloor">Floor</label>
+                    <select id="adminFacilityFloor"></select>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div>
-                            <h3 id="statPendingComplaints">5</h3>
-                            <p>Pending Reports</p>
-                        </div>
-                        <div class="stat-card-icon yellow">⏳</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div>
-                            <h3 id="statResolvedComplaints">23</h3>
-                            <p>Resolved This Week</p>
-                        </div>
-                        <div class="stat-card-icon green">✅</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div>
-                            <h3 id="statActiveStaff">6</h3>
-                            <p>Staff on Shift</p>
-                        </div>
-                        <div class="stat-card-icon blue">👷</div>
-                    </div>
+                <div class="form-group">
+                    <label for="adminFacilityType">Facility</label>
+                    <select id="adminFacilityType"></select>
                 </div>
             </div>
 
-            <!-- Tabs for Admin -->
-            <div class="tabs" id="adminTabs">
-                <button class="tab-btn active" onclick="switchAdminTab('washrooms')">Washroom Map</button>
-                <button class="tab-btn" onclick="switchAdminTab('inventory')">Supply Inventory</button>
-                <button class="tab-btn" onclick="switchAdminTab('shifts')">Staff & Shifts</button>
-                <button class="tab-btn" onclick="switchAdminTab('liveupdates')">Live Updates</button>
-            </div>
-
-            <!-- Washroom Map Section (replaces Room Management) -->
-            <div id="adminWashroomsTab">
+            <div class="facility-section">
                 <div class="section-header">
-                    <h2>Washrooms — Building & Floor Map</h2>
-                    <button class="btn btn-primary btn-sm" onclick="openAssignModal()">
-                        👤 Assign Staff
-                    </button>
-                </div>
-                <div class="floors-container" id="floorsContainer">
-                    <!-- Rendered dynamically with building + direction info -->
-                </div>
-            </div>
-
-            <!-- Supply Inventory Section -->
-            <div id="adminInventoryTab" style="display: none;">
-                <div class="section-header">
-                    <h2>🧴 Supply Inventory Sheet</h2>
-                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                        <button class="btn btn-primary btn-sm" onclick="exportInventoryCSV()">📥 Export CSV</button>
-                        <button class="btn btn-outline btn-sm" onclick="exportInventoryPDF()">📄 Export PDF</button>
-                    </div>
+                    <h2 id="adminFacilityLogTitle">Facility Update Log</h2>
                 </div>
                 <div class="inventory-table-wrap">
-                    <table class="inventory-table" id="inventoryTable">
+                    <table class="facility-table">
                         <thead>
                             <tr>
-                                <th>Building</th>
-                                <th>Floor</th>
-                                <th>Washroom</th>
-                                <th>🧻 Tissues</th>
-                                <th>🧼 Soap</th>
-                                <th>🧴 Sanitizer</th>
-                                <th>Health</th>
-                                <th>Last Restocked</th>
-                                <th>Assigned Supervisor</th>
-                                <th>Status</th>
+                                <th>#</th>
+                                <th>Cleaned?</th>
+                                <th>Photo</th>
+                                <th>Last Updated</th>
+                                <th>Updated By</th>
                             </tr>
                         </thead>
-                        <tbody id="inventoryBody">
-                            <!-- Rendered dynamically -->
+                        <tbody id="adminFacilityLogBody">
+                            <tr>
+                                <td colspan="5" class="facility-loading">Loading facility updates...</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Complaints Section -->
-            <div id="adminComplaintsTab" style="display: none;">
-                <div class="section-header">
-                    <h2>All Reports & Complaints</h2>
-                    <button class="filter-btn" id="togglePhotosBtn" onclick="toggleComplaintPhotos()" style="border-color:var(--accent);margin-left:auto;">📷 Show Photos</button>
-                </div>
-                <div class="filters">
-                    <button class="filter-btn active" onclick="filterComplaints('all', this)">All</button>
-                    <button class="filter-btn" onclick="filterComplaints('pending', this)">Pending</button>
-                    <button class="filter-btn" onclick="filterComplaints('in-progress', this)">In Progress</button>
-                    <button class="filter-btn" onclick="filterComplaints('resolved', this)">Resolved</button>
-                    <button class="filter-btn" style="border-color:var(--status-danger);" onclick="filterComplaints('false-report', this)">⚠️ False Reports</button>
-                </div>
-                <div class="cards-grid two-col" id="adminComplaintsList">
-                    <!-- Complaints will be rendered here -->
-                </div>
-            </div>
-
-            <!-- Staff & Shifts Section -->
-            <div id="adminShiftsTab" style="display: none;">
-                <div class="section-header">
-                    <h2>👷 Staff Shift Tracker</h2>
-                </div>
-                <div class="cards-grid two-col" id="staffShiftsList">
-                    <!-- Rendered dynamically -->
-                </div>
-                <div class="section-header" style="margin-top: 24px;">
-                    <h2>📊 Activity History</h2>
-                </div>
-                <div id="activityHistory" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
-                    <ul class="restock-timeline" id="activityTimeline">
-                        <!-- Rendered dynamically -->
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Live Updates Section -->
-            <div id="adminLiveupdatesTab" style="display: none;">
-                <div class="section-header">
-                    <h2>📡 Live Work Updates (Read-only)</h2>
-                </div>
-                <div class="info-box" style="background: var(--accent-glow); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 16px; font-size: 0.85rem; color: var(--text-secondary);">
-                    Admin can monitor complete task evidence, status, and timeline. Approval/rejection is restricted to supervisors.
-                </div>
-                <div class="cards-grid two-col" id="verificationList">
-                    <!-- Rendered dynamically -->
-                </div>
+            <div class="photo-lightbox-overlay" id="facilityPhotoLightbox" onclick="closeFacilityPhotoLightbox(event)">
+                <button class="photo-lightbox-close" type="button" onclick="closeFacilityPhotoLightbox(event)">&times;</button>
+                <img id="facilityPhotoLightboxImage" src="" alt="Facility proof photo">
             </div>
         </main>
 
@@ -2062,172 +2110,25 @@
 
         <!-- Supervisor Dashboard -->
         <main class="main-content supervisor-only" id="supervisorDashboard">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div>
-                            <h3 id="supPendingVerify">3</h3>
-                            <p>Complaints in My Buildings</p>
-                        </div>
-                        <div class="stat-card-icon yellow">⏳</div>
-                    </div>
+            <div class="facility-selector-bar">
+                <div class="form-group">
+                    <label for="supervisorFacilityBuilding">Building</label>
+                    <select id="supervisorFacilityBuilding" disabled>
+                        <option value="H2 Hostel">H2 Hostel</option>
+                    </select>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div>
-                            <h3 id="supApproved">12</h3>
-                            <p>Open Complaints</p>
-                        </div>
-                        <div class="stat-card-icon green">✅</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div>
-                            <h3 id="supBuildings">2</h3>
-                            <p>Buildings Assigned</p>
-                        </div>
-                        <div class="stat-card-icon teal">🏢</div>
-                    </div>
+                <div class="form-group">
+                    <label for="supervisorFacilityFloor">Floor</label>
+                    <select id="supervisorFacilityFloor"></select>
                 </div>
             </div>
 
             <div class="section-header" style="margin-bottom: 14px;">
-                <h2>📬 Complaints Overview</h2>
+                <h2>H2 Hostel Floor-wise Facility Cleaning Tracker</h2>
                 <button class="btn btn-outline btn-sm" type="button" id="openStaffModeBtn" onclick="openSupervisorStaffMode()">👷 Open Staff Tools</button>
             </div>
 
-            <!-- My Tasks -->
-            <div id="supVerifyTab">
-                <div class="section-header">
-                    <h2>📬 Complaints in My Buildings</h2>
-                </div>
-                <div class="cards-grid" id="supervisorComplaintsList">
-                    <!-- Rendered dynamically -->
-                </div>
-
-                <div class="section-header" style="margin-top: 22px;">
-                    <h2 id="supervisorSupplyEditorTitle">🧴 Update Supply Stats (Home)</h2>
-                </div>
-                <div class="task-card">
-                    <div class="form-group">
-                        <label for="supSupplyWashroom" id="supSupplyWashroomLabel">Washroom</label>
-                        <select id="supSupplyWashroom" onchange="prefillSupervisorSupplyValues()"></select>
-                    </div>
-                    <div class="cards-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;">
-                        <div class="form-group" style="margin:0;">
-                            <label for="supTissueLevel" id="supTissueLabel">Tissues %</label>
-                            <input type="number" id="supTissueLevel" min="0" max="100" value="0">
-                        </div>
-                        <div class="form-group" style="margin:0;">
-                            <label for="supSoapLevel" id="supSoapLabel">Soap %</label>
-                            <input type="number" id="supSoapLevel" min="0" max="100" value="0">
-                        </div>
-                        <div class="form-group" style="margin:0;">
-                            <label for="supSanitizerLevel" id="supSanitizerLabel">Sanitizer %</label>
-                            <input type="number" id="supSanitizerLevel" min="0" max="100" value="0">
-                        </div>
-                    </div>
-                    <button class="btn btn-primary btn-sm" type="button" id="supSupplySaveBtn" onclick="updateSupplyStatsBySupervisor()">Update Supply Stats</button>
-                </div>
-
-                <div class="section-header" style="margin-top: 22px;">
-                    <h2>📝 Digital Washroom Checklist</h2>
-                    <span style="color: var(--text-muted); font-size: 0.78rem;" id="supChecklistLastSaved">No recent submission</span>
-                </div>
-
-                <div class="task-card">
-                    <div class="info-box" style="background: var(--accent-glow); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 12px; font-size: 0.83rem; color: var(--text-secondary);">
-                        Supervisors can complete each washroom checklist item and capture evidence using camera for every completed parameter.
-                    </div>
-
-                    <div class="form-group">
-                        <label for="supChecklistWashroom">Washroom</label>
-                        <select id="supChecklistWashroom" onchange="loadLatestSupervisorChecklist(this.value)"></select>
-                    </div>
-
-                    <div id="supChecklistItems" class="checklist-grid">
-                        <div class="checklist-row">
-                            <label class="checklist-check" for="supChecklistDone-soap_refill">
-                                <input type="checkbox" id="supChecklistDone-soap_refill">
-                                <span>Soap refill completed</span>
-                            </label>
-                            <div class="checklist-camera-actions">
-                                <button type="button" class="btn btn-outline btn-sm" onclick="openChecklistCamera('soap_refill')">📷 Open Camera</button>
-                                <input class="checklist-file-input" type="file" id="supChecklistPhoto-soap_refill" accept="image/*" capture="environment" onchange="onChecklistPhotoSelected('soap_refill', this)">
-                                <span id="supChecklistPhotoName-soap_refill" class="checklist-photo-name">No photo</span>
-                            </div>
-                        </div>
-
-                        <div class="checklist-row">
-                            <label class="checklist-check" for="supChecklistDone-tissue_refill">
-                                <input type="checkbox" id="supChecklistDone-tissue_refill">
-                                <span>Tissue paper refill completed</span>
-                            </label>
-                            <div class="checklist-camera-actions">
-                                <button type="button" class="btn btn-outline btn-sm" onclick="openChecklistCamera('tissue_refill')">📷 Open Camera</button>
-                                <input class="checklist-file-input" type="file" id="supChecklistPhoto-tissue_refill" accept="image/*" capture="environment" onchange="onChecklistPhotoSelected('tissue_refill', this)">
-                                <span id="supChecklistPhotoName-tissue_refill" class="checklist-photo-name">No photo</span>
-                            </div>
-                        </div>
-
-                        <div class="checklist-row">
-                            <label class="checklist-check" for="supChecklistDone-sanitizer_refill">
-                                <input type="checkbox" id="supChecklistDone-sanitizer_refill">
-                                <span>Sanitizer refill completed</span>
-                            </label>
-                            <div class="checklist-camera-actions">
-                                <button type="button" class="btn btn-outline btn-sm" onclick="openChecklistCamera('sanitizer_refill')">📷 Open Camera</button>
-                                <input class="checklist-file-input" type="file" id="supChecklistPhoto-sanitizer_refill" accept="image/*" capture="environment" onchange="onChecklistPhotoSelected('sanitizer_refill', this)">
-                                <span id="supChecklistPhotoName-sanitizer_refill" class="checklist-photo-name">No photo</span>
-                            </div>
-                        </div>
-
-                        <div class="checklist-row">
-                            <label class="checklist-check" for="supChecklistDone-sink_cleaning">
-                                <input type="checkbox" id="supChecklistDone-sink_cleaning">
-                                <span>Sink cleaned</span>
-                            </label>
-                            <div class="checklist-camera-actions">
-                                <button type="button" class="btn btn-outline btn-sm" onclick="openChecklistCamera('sink_cleaning')">📷 Open Camera</button>
-                                <input class="checklist-file-input" type="file" id="supChecklistPhoto-sink_cleaning" accept="image/*" capture="environment" onchange="onChecklistPhotoSelected('sink_cleaning', this)">
-                                <span id="supChecklistPhotoName-sink_cleaning" class="checklist-photo-name">No photo</span>
-                            </div>
-                        </div>
-
-                        <div class="checklist-row">
-                            <label class="checklist-check" for="supChecklistDone-floor_mopping">
-                                <input type="checkbox" id="supChecklistDone-floor_mopping">
-                                <span>Floor mopping completed</span>
-                            </label>
-                            <div class="checklist-camera-actions">
-                                <button type="button" class="btn btn-outline btn-sm" onclick="openChecklistCamera('floor_mopping')">📷 Open Camera</button>
-                                <input class="checklist-file-input" type="file" id="supChecklistPhoto-floor_mopping" accept="image/*" capture="environment" onchange="onChecklistPhotoSelected('floor_mopping', this)">
-                                <span id="supChecklistPhotoName-floor_mopping" class="checklist-photo-name">No photo</span>
-                            </div>
-                        </div>
-
-                        <div class="checklist-row">
-                            <label class="checklist-check" for="supChecklistDone-dustbin_cleared">
-                                <input type="checkbox" id="supChecklistDone-dustbin_cleared">
-                                <span>Dustbin cleared</span>
-                            </label>
-                            <div class="checklist-camera-actions">
-                                <button type="button" class="btn btn-outline btn-sm" onclick="openChecklistCamera('dustbin_cleared')">📷 Open Camera</button>
-                                <input class="checklist-file-input" type="file" id="supChecklistPhoto-dustbin_cleared" accept="image/*" capture="environment" onchange="onChecklistPhotoSelected('dustbin_cleared', this)">
-                                <span id="supChecklistPhotoName-dustbin_cleared" class="checklist-photo-name">No photo</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group" style="margin-top: 12px;">
-                        <label for="supChecklistNotes">Checklist Notes (optional)</label>
-                        <textarea id="supChecklistNotes" placeholder="Any observations from this washroom check"></textarea>
-                    </div>
-
-                    <button class="btn btn-primary btn-sm" type="button" id="supChecklistSubmitBtn" onclick="submitSupervisorChecklist()">Submit Checklist</button>
-                </div>
-            </div>
+            <div id="supervisorFacilitySections"></div>
         </main>
 
         <!-- Student/Faculty Dashboard -->
@@ -3004,45 +2905,142 @@
             text.textContent = `${t('selectedLogin')}: ${labels[selectedLoginTrack] || selectedLoginTrack}`;
         }
 
-        // ── Washroom Data — Building-wise, Floor-wise, with Direction ──
-        const buildings = [
-            { id: 'H1', name: 'H1 — Hostel 1', type: 'hostel' },
-            { id: 'H2', name: 'H2 — Hostel 2', type: 'hostel' },
-            { id: 'H3', name: 'H3 — Hostel 3', type: 'hostel' },
-            { id: 'Academic Block', name: 'Academic Block', type: 'academic' },
-            { id: 'Library', name: 'Library Block', type: 'academic' },
-            { id: 'Cafeteria', name: 'Cafeteria', type: 'other' },
-        ];
+        // ── H2 Facility Tracker configuration (shared by admin + supervisor) ──
+        const H2_BUILDING_NAME = 'H2 Hostel';
+        const H2_FLOORS = ['G', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
-        const washroomData = [
-            // H1 — Hostel 1
-            { id: 'H1-G-M', building: 'H1', floor: 'Ground', direction: '', label: 'Ground Floor WR (Male)', supplies: { tissues: 80, soap: 90, sanitizer: 70 }, lastRestocked: new Date(Date.now() - 3600000) },
-            { id: 'H1-G-F', building: 'H1', floor: 'Ground', direction: '', label: 'Ground Floor WR (Female)', supplies: { tissues: 60, soap: 40, sanitizer: 85 }, lastRestocked: new Date(Date.now() - 7200000) },
-            { id: 'H1-1-M', building: 'H1', floor: '1st', direction: '', label: 'Floor 1 WR (Male)', supplies: { tissues: 30, soap: 20, sanitizer: 50 }, lastRestocked: new Date(Date.now() - 86400000 * 2) },
-            { id: 'H1-1-F', building: 'H1', floor: '1st', direction: '', label: 'Floor 1 WR (Female)', supplies: { tissues: 90, soap: 85, sanitizer: 60 }, lastRestocked: new Date(Date.now() - 43200000) },
-            { id: 'H1-2-M', building: 'H1', floor: '2nd', direction: '', label: 'Floor 2 WR (Male)', supplies: { tissues: 10, soap: 5, sanitizer: 15 }, lastRestocked: new Date(Date.now() - 86400000 * 4) },
-            { id: 'H1-2-F', building: 'H1', floor: '2nd', direction: '', label: 'Floor 2 WR (Female)', supplies: { tissues: 45, soap: 50, sanitizer: 30 }, lastRestocked: new Date(Date.now() - 86400000) },
-            // H2 — Hostel 2 (with directional info: North/South wing)
-            { id: 'H2-G-N', building: 'H2', floor: 'Ground', direction: 'North Wing', label: 'Ground Floor WR (North Wing)', supplies: { tissues: 70, soap: 80, sanitizer: 90 }, lastRestocked: new Date(Date.now() - 7200000) },
-            { id: 'H2-G-S', building: 'H2', floor: 'Ground', direction: 'South Wing', label: 'Ground Floor WR (South Wing)', supplies: { tissues: 5, soap: 10, sanitizer: 0 }, lastRestocked: new Date(Date.now() - 86400000 * 3) },
-            { id: 'H2-1-N', building: 'H2', floor: '1st', direction: 'North Wing', label: 'Floor 1 WR (North Wing)', supplies: { tissues: 55, soap: 60, sanitizer: 45 }, lastRestocked: new Date(Date.now() - 28800000) },
-            { id: 'H2-1-S', building: 'H2', floor: '1st', direction: 'South Wing', label: 'Floor 1 WR (South Wing)', supplies: { tissues: 85, soap: 90, sanitizer: 80 }, lastRestocked: new Date(Date.now() - 14400000) },
-            { id: 'H2-2-N', building: 'H2', floor: '2nd', direction: 'North Wing', label: 'Floor 2 WR (North Wing)', supplies: { tissues: 40, soap: 35, sanitizer: 25 }, lastRestocked: new Date(Date.now() - 86400000) },
-            { id: 'H2-2-S', building: 'H2', floor: '2nd', direction: 'South Wing', label: 'Floor 2 WR (South Wing)', supplies: { tissues: 0, soap: 0, sanitizer: 5 }, lastRestocked: new Date(Date.now() - 86400000 * 4) },
-            // H3 — Hostel 3
-            { id: 'H3-G', building: 'H3', floor: 'Ground', direction: '', label: 'Ground Floor WR', supplies: { tissues: 95, soap: 88, sanitizer: 92 }, lastRestocked: new Date(Date.now() - 3600000) },
-            { id: 'H3-1', building: 'H3', floor: '1st', direction: '', label: 'Floor 1 WR', supplies: { tissues: 50, soap: 55, sanitizer: 40 }, lastRestocked: new Date(Date.now() - 43200000) },
-            { id: 'H3-2', building: 'H3', floor: '2nd', direction: '', label: 'Floor 2 WR', supplies: { tissues: 20, soap: 15, sanitizer: 10 }, lastRestocked: new Date(Date.now() - 86400000 * 2) },
-            // Academic Block
-            { id: 'AB-G', building: 'Academic Block', floor: 'Ground', direction: '', label: 'Ground Floor WR', supplies: { tissues: 60, soap: 75, sanitizer: 50 }, lastRestocked: new Date(Date.now() - 21600000) },
-            { id: 'AB-1', building: 'Academic Block', floor: '1st', direction: '', label: 'Floor 1 WR', supplies: { tissues: 25, soap: 30, sanitizer: 20 }, lastRestocked: new Date(Date.now() - 86400000 * 1.5) },
-            { id: 'AB-2', building: 'Academic Block', floor: '2nd', direction: '', label: 'Floor 2 WR', supplies: { tissues: 80, soap: 85, sanitizer: 70 }, lastRestocked: new Date(Date.now() - 28800000) },
-            // Library
-            { id: 'LIB-G', building: 'Library', floor: 'Ground', direction: '', label: 'Ground Floor WR', supplies: { tissues: 35, soap: 40, sanitizer: 30 }, lastRestocked: new Date(Date.now() - 57600000) },
-            { id: 'LIB-1', building: 'Library', floor: '1st', direction: '', label: 'Floor 1 WR', supplies: { tissues: 65, soap: 70, sanitizer: 55 }, lastRestocked: new Date(Date.now() - 36000000) },
-            // Cafeteria
-            { id: 'CAF-G', building: 'Cafeteria', floor: 'Ground', direction: '', label: 'Main WR', supplies: { tissues: 15, soap: 10, sanitizer: 5 }, lastRestocked: new Date(Date.now() - 86400000 * 3) },
-        ];
+        const H2_FACILITY_CONFIG = {
+            G: [
+                { type: 'Meeting Room', count: 4 },
+                { type: 'Lounge', count: 1 },
+                { type: 'MPH', count: 1 },
+                { type: 'Art Room', count: 1 },
+                { type: 'Washroom (Male)', count: 2 },
+                { type: 'Washroom (Female)', count: 2 },
+                { type: 'Washroom (Inclusive)', count: 1 },
+            ],
+            1: [
+                { type: 'Room', count: 17 },
+                { type: 'Meeting Room', count: 8 },
+                { type: 'Washroom', count: 1 },
+                { type: 'Refrigerator', count: 1 },
+                { type: 'Induction', count: 1 },
+                { type: 'Water Cooler', count: 2 },
+                { type: 'Microwave', count: 1 },
+                { type: 'Sink', count: 1 },
+                { type: 'Corridor', count: 1 },
+                { type: 'Balcony', count: 1 },
+            ],
+            2: [
+                { type: 'Room', count: 32 },
+                { type: 'Washroom', count: 2 },
+                { type: 'Refrigerator', count: 1 },
+                { type: 'Induction', count: 1 },
+                { type: 'Water Cooler', count: 2 },
+                { type: 'Microwave', count: 1 },
+                { type: 'Sink', count: 1 },
+                { type: 'Corridor', count: 1 },
+                { type: 'Drying Stand', count: 2 },
+            ],
+            3: [
+                { type: 'Room', count: 32 },
+                { type: 'Washroom', count: 2 },
+                { type: 'Refrigerator', count: 1 },
+                { type: 'Induction', count: 1 },
+                { type: 'Water Cooler', count: 2 },
+                { type: 'Microwave', count: 1 },
+                { type: 'Sink', count: 1 },
+                { type: 'Corridor', count: 1 },
+                { type: 'Washing Machine', count: 2 },
+                { type: 'Drying Stand', count: 2 },
+            ],
+            4: [
+                { type: 'Room', count: 32 },
+                { type: 'Washroom', count: 2 },
+                { type: 'Refrigerator', count: 1 },
+                { type: 'Induction', count: 1 },
+                { type: 'Water Cooler', count: 2 },
+                { type: 'Microwave', count: 1 },
+                { type: 'Sink', count: 1 },
+                { type: 'Corridor', count: 1 },
+                { type: 'Drying Stand', count: 2 },
+            ],
+            5: [
+                { type: 'Room', count: 32 },
+                { type: 'Washroom', count: 2 },
+                { type: 'Refrigerator', count: 1 },
+                { type: 'Induction', count: 1 },
+                { type: 'Water Cooler', count: 2 },
+                { type: 'Microwave', count: 1 },
+                { type: 'Sink', count: 1 },
+                { type: 'Corridor', count: 1 },
+                { type: 'Washing Machine', count: 2 },
+                { type: 'Drying Stand', count: 2 },
+            ],
+            6: [
+                { type: 'Room', count: 32 },
+                { type: 'Washroom', count: 2 },
+                { type: 'Refrigerator', count: 1 },
+                { type: 'Induction', count: 1 },
+                { type: 'Water Cooler', count: 2 },
+                { type: 'Microwave', count: 1 },
+                { type: 'Sink', count: 1 },
+                { type: 'Corridor', count: 1 },
+                { type: 'Drying Stand', count: 2 },
+            ],
+            7: [
+                { type: 'Room', count: 27 },
+                { type: 'Washroom', count: 2 },
+                { type: 'Refrigerator', count: 1 },
+                { type: 'Induction', count: 1 },
+                { type: 'Water Cooler', count: 2 },
+                { type: 'Microwave', count: 1 },
+                { type: 'Sink', count: 1 },
+                { type: 'Corridor', count: 1 },
+                { type: 'Washing Machine', count: 2 },
+                { type: 'Drying Stand', count: 2 },
+            ],
+            8: [
+                { type: 'Room', count: 32 },
+                { type: 'Washroom', count: 2 },
+                { type: 'Refrigerator', count: 1 },
+                { type: 'Induction', count: 1 },
+                { type: 'Water Cooler', count: 2 },
+                { type: 'Microwave', count: 1 },
+                { type: 'Sink', count: 1 },
+                { type: 'Corridor', count: 1 },
+                { type: 'Drying Stand', count: 2 },
+            ],
+            9: [
+                { type: 'Room', count: 32 },
+                { type: 'Washroom', count: 2 },
+                { type: 'Refrigerator', count: 1 },
+                { type: 'Induction', count: 1 },
+                { type: 'Water Cooler', count: 2 },
+                { type: 'Microwave', count: 1 },
+                { type: 'Sink', count: 1 },
+                { type: 'Corridor', count: 1 },
+                { type: 'Drying Stand', count: 2 },
+            ],
+        };
+
+        const buildings = [{ id: 'H2', name: 'H2 Hostel', type: 'hostel' }];
+        const washroomData = [];
+
+        let facilityFallbackRows = [];
+        let facilityFallbackInitialized = false;
+        let facilityOfflineNoticeShown = false;
+        let supervisorPendingFacilityCapture = null;
+
+        const facilityDashboardState = {
+            building: H2_BUILDING_NAME,
+            supervisorFloor: 'G',
+            supervisorRows: [],
+            adminFloor: 'G',
+            adminFacilityType: 'Meeting Room',
+            adminRows: [],
+            usingOfflineData: false,
+        };
 
         // Staff members with roles (supervisor vs cleaning staff) and shifts
         const staffMembers = [
@@ -3087,18 +3085,6 @@
 
         // Keep rooms for backwards compatibility with room management
         let rooms = [];
-        for (let floor = 1; floor <= 4; floor++) {
-            for (let room = 1; room <= 12; room++) {
-                const roomNum = floor * 100 + room;
-                const statuses = ['pending', 'cleaned', 'in-progress', 'needs-maintenance'];
-                const randomStatus = Math.random() > 0.7 ? statuses[Math.floor(Math.random() * statuses.length)] : 'pending';
-                rooms.push({
-                    id: roomNum, floor: floor, number: roomNum.toString(),
-                    status: randomStatus,
-                    assignedTo: staffMembers.find(s => s.role === 'cleaning' && s.assignedBuildings.includes('H1'))?.id || null
-                });
-            }
-        }
 
         // Demo complaints fallback
         const demoComplaints = [
@@ -3278,13 +3264,13 @@
 
             if (currentUser.role === 'admin') {
                 document.getElementById('supervisorDashboard').style.display = 'none';
-                renderAdminDashboard();
+                renderAdminFacilityDashboard();
             } else if (currentUser.role === 'supervisor') {
                 isSupervisorStaffMode = false;
                 document.getElementById('staffDashboard').style.display = 'none';
                 document.getElementById('supervisorDashboard').style.display = 'block';
                 document.getElementById('staffModeHeader').style.display = 'none';
-                renderSupervisorDashboard();
+                renderSupervisorFacilityDashboard();
             } else if (currentUser.role === 'staff') {
                 renderStaffDashboard();
             } else {
@@ -3330,11 +3316,573 @@
             }
         }
 
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function facilityDomId(prefix, value) {
+            return `${prefix}-${String(value).replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+        }
+
+        function facilityFloorLabel(floor) {
+            return floor === 'G' ? 'Ground Floor' : `Floor ${floor}`;
+        }
+
+        function formatFacilityDateTime(value) {
+            if (!value) return '—';
+            const date = value instanceof Date ? value : new Date(value);
+            if (Number.isNaN(date.getTime())) return '—';
+
+            const pad = (num) => String(num).padStart(2, '0');
+            return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        }
+
+        function resolveFacilityPhotoUrl(photoUrl) {
+            if (!photoUrl) return '';
+            if (/^(blob:|data:|https?:)/i.test(photoUrl)) return photoUrl;
+            return `${window.location.origin}${photoUrl.startsWith('/') ? photoUrl : `/${photoUrl}`}`;
+        }
+
+        function getFacilityTypesForFloor(floor) {
+            return (H2_FACILITY_CONFIG[floor] || []).map((entry) => entry.type);
+        }
+
+        function cloneFacilityRow(row) {
+            return {
+                id: row.id,
+                building: row.building,
+                floor: String(row.floor),
+                facility_type: row.facility_type,
+                facility_number: Number(row.facility_number),
+                cleaned: row.cleaned || null,
+                photo_url: row.photo_url || null,
+                last_updated: row.last_updated || null,
+                updated_by: row.updated_by || null,
+                created_at: row.created_at || null,
+                updated_at: row.updated_at || null,
+            };
+        }
+
+        function sortFacilityRows(rows) {
+            return [...rows].sort((left, right) => {
+                if (left.facility_type !== right.facility_type) {
+                    return String(left.facility_type).localeCompare(String(right.facility_type));
+                }
+                return Number(left.facility_number) - Number(right.facility_number);
+            });
+        }
+
+        function sortFacilityLogRows(rows) {
+            return [...rows].sort((left, right) => {
+                const leftTime = left.last_updated ? new Date(left.last_updated).getTime() : 0;
+                const rightTime = right.last_updated ? new Date(right.last_updated).getTime() : 0;
+                if (leftTime !== rightTime) return rightTime - leftTime;
+                return Number(left.facility_number) - Number(right.facility_number);
+            });
+        }
+
+        function ensureFacilityFallbackRows() {
+            if (facilityFallbackInitialized) return;
+
+            let nextId = 1;
+            facilityFallbackRows = [];
+
+            H2_FLOORS.forEach((floor) => {
+                (H2_FACILITY_CONFIG[floor] || []).forEach((entry) => {
+                    for (let number = 1; number <= entry.count; number += 1) {
+                        facilityFallbackRows.push({
+                            id: nextId,
+                            building: H2_BUILDING_NAME,
+                            floor,
+                            facility_type: entry.type,
+                            facility_number: number,
+                            cleaned: null,
+                            photo_url: null,
+                            last_updated: null,
+                            updated_by: null,
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString(),
+                        });
+                        nextId += 1;
+                    }
+                });
+            });
+
+            facilityFallbackInitialized = true;
+        }
+
+        function getFallbackFacilityRows({ floor, facilityType = '', onlyUpdated = false } = {}) {
+            ensureFacilityFallbackRows();
+
+            let rows = facilityFallbackRows.filter((row) => row.building === H2_BUILDING_NAME);
+            if (floor) rows = rows.filter((row) => String(row.floor) === String(floor));
+            if (facilityType) rows = rows.filter((row) => row.facility_type === facilityType);
+            if (onlyUpdated) rows = rows.filter((row) => row.cleaned !== null);
+
+            const mapped = rows.map(cloneFacilityRow);
+            return onlyUpdated ? sortFacilityLogRows(mapped) : sortFacilityRows(mapped);
+        }
+
+        function upsertFacilityFallbackRow(updatedRow) {
+            ensureFacilityFallbackRows();
+
+            const byIdIndex = facilityFallbackRows.findIndex((row) => String(row.id) === String(updatedRow.id));
+            if (byIdIndex !== -1) {
+                facilityFallbackRows[byIdIndex] = { ...facilityFallbackRows[byIdIndex], ...cloneFacilityRow(updatedRow) };
+                return;
+            }
+
+            const byKeyIndex = facilityFallbackRows.findIndex((row) =>
+                String(row.floor) === String(updatedRow.floor)
+                && row.facility_type === updatedRow.facility_type
+                && Number(row.facility_number) === Number(updatedRow.facility_number)
+            );
+
+            if (byKeyIndex !== -1) {
+                facilityFallbackRows[byKeyIndex] = { ...facilityFallbackRows[byKeyIndex], ...cloneFacilityRow(updatedRow) };
+            }
+        }
+
+        function upsertFacilityRowInList(list, updatedRow) {
+            const index = list.findIndex((row) => String(row.id) === String(updatedRow.id));
+            if (index === -1) return;
+            list[index] = { ...list[index], ...cloneFacilityRow(updatedRow) };
+        }
+
+        function showFacilityOfflineToastOnce() {
+            if (facilityOfflineNoticeShown) return;
+            showToast('Facility API unavailable. Using offline tracker data');
+            facilityOfflineNoticeShown = true;
+        }
+
+        async function facilityApiRequest(path, { method = 'GET', body = null, isFormData = false } = {}) {
+            const headers = {};
+            if (authToken) headers.Authorization = `Bearer ${authToken}`;
+            if (!isFormData) headers['Content-Type'] = 'application/json';
+
+            try {
+                const response = await fetch(`${API_BASE}${path}`, {
+                    method,
+                    headers,
+                    body: isFormData ? body : (body ? JSON.stringify(body) : undefined),
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    return { ok: false, status: 401, error: 'Session expired' };
+                }
+
+                const payload = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    return {
+                        ok: false,
+                        status: response.status,
+                        data: payload,
+                        error: payload?.error || 'Request failed',
+                    };
+                }
+
+                return { ok: true, status: response.status, data: payload };
+            } catch (_error) {
+                return { ok: false, status: 0, error: 'Network error' };
+            }
+        }
+
+        async function loadSupervisorFacilityRows() {
+            const container = document.getElementById('supervisorFacilitySections');
+            if (container) {
+                container.innerHTML = '<div class="facility-section"><div class="facility-loading">Loading floor facilities...</div></div>';
+            }
+
+            const floor = facilityDashboardState.supervisorFloor;
+            const endpoint = `/facilities?building=${encodeURIComponent(H2_BUILDING_NAME)}&floor=${encodeURIComponent(floor)}`;
+            const result = await facilityApiRequest(endpoint);
+
+            if (result.ok && Array.isArray(result.data)) {
+                facilityDashboardState.usingOfflineData = false;
+                facilityDashboardState.supervisorRows = sortFacilityRows(result.data.map(cloneFacilityRow));
+            } else {
+                facilityDashboardState.usingOfflineData = true;
+                showFacilityOfflineToastOnce();
+                facilityDashboardState.supervisorRows = getFallbackFacilityRows({ floor });
+            }
+
+            renderSupervisorFacilitySections(facilityDashboardState.supervisorRows);
+        }
+
+        async function updateSupervisorFacilityStatus(facilityId, cleaned, photoFile, previousValue) {
+            if (cleaned === 'yes' && !photoFile) {
+                return { ok: false, error: 'Photo proof is required when marking as cleaned' };
+            }
+
+            const formData = new FormData();
+            formData.append('cleaned', cleaned);
+            if (photoFile) formData.append('photo', photoFile);
+
+            const result = await facilityApiRequest(`/facilities/${encodeURIComponent(facilityId)}`, {
+                method: 'PUT',
+                body: formData,
+                isFormData: true,
+            });
+
+            if (result.ok && result.data) {
+                const updated = cloneFacilityRow(result.data);
+                upsertFacilityRowInList(facilityDashboardState.supervisorRows, updated);
+                upsertFacilityFallbackRow(updated);
+                return { ok: true, row: updated };
+            }
+
+            if (result.status >= 400 && result.status < 500) {
+                return { ok: false, error: result.error || 'Unable to update facility' };
+            }
+
+            const currentRow = facilityDashboardState.supervisorRows.find((row) => String(row.id) === String(facilityId));
+            if (!currentRow) {
+                return { ok: false, error: result.error || 'Unable to update facility' };
+            }
+
+            const nowIso = new Date().toISOString();
+            const offlineRow = {
+                ...currentRow,
+                cleaned,
+                photo_url: cleaned === 'yes' ? URL.createObjectURL(photoFile) : null,
+                last_updated: nowIso,
+                updated_by: currentUser?.name || 'Supervisor',
+                updated_at: nowIso,
+            };
+
+            facilityDashboardState.usingOfflineData = true;
+            showFacilityOfflineToastOnce();
+            upsertFacilityRowInList(facilityDashboardState.supervisorRows, offlineRow);
+            upsertFacilityFallbackRow(offlineRow);
+
+            if (previousValue === 'yes' && cleaned === 'no' && currentRow.photo_url && String(currentRow.photo_url).startsWith('blob:')) {
+                URL.revokeObjectURL(currentRow.photo_url);
+            }
+
+            return { ok: true, row: offlineRow };
+        }
+
+        function renderSupervisorFacilitySections(rows) {
+            const container = document.getElementById('supervisorFacilitySections');
+            if (!container) return;
+
+            if (!rows || !rows.length) {
+                container.innerHTML = '<div class="facility-section"><div class="facility-empty">No facilities configured for this floor.</div></div>';
+                return;
+            }
+
+            const floor = facilityDashboardState.supervisorFloor;
+            const grouped = {};
+
+            rows.forEach((row) => {
+                if (!grouped[row.facility_type]) grouped[row.facility_type] = [];
+                grouped[row.facility_type].push(row);
+            });
+
+            const orderedTypes = [...new Set([...getFacilityTypesForFloor(floor), ...Object.keys(grouped)])];
+
+            const html = orderedTypes.map((facilityType) => {
+                const typeRows = sortFacilityRows(grouped[facilityType] || []);
+                if (!typeRows.length) return '';
+
+                const rowsHtml = typeRows.map((row) => {
+                    const cleanedValue = row.cleaned || '';
+                    const statusSelectId = facilityDomId('facilityStatus', row.id);
+                    const cameraInputId = facilityDomId('facilityCamera', row.id);
+                    const photoUrl = resolveFacilityPhotoUrl(row.photo_url);
+                    const photoCell = photoUrl
+                        ? `<a href="${escapeHtml(photoUrl)}" target="_blank" rel="noopener"><img class="facility-photo-thumb" src="${escapeHtml(photoUrl)}" alt="Facility proof"></a>`
+                        : '—';
+
+                    return `
+                        <tr>
+                            <td>${row.facility_number}</td>
+                            <td>
+                                <select id="${statusSelectId}" data-facility-id="${escapeHtml(String(row.id))}" data-previous-value="${escapeHtml(cleanedValue)}" onchange="handleSupervisorFacilityCleanedChange(event)">
+                                    <option value="" ${cleanedValue === '' ? 'selected' : ''}>—</option>
+                                    <option value="yes" ${cleanedValue === 'yes' ? 'selected' : ''}>Yes</option>
+                                    <option value="no" ${cleanedValue === 'no' ? 'selected' : ''}>No</option>
+                                </select>
+                                <input class="facility-camera-input" type="file" id="${cameraInputId}" data-facility-id="${escapeHtml(String(row.id))}" accept="image/*" capture="environment" onchange="handleSupervisorFacilityCameraChange(event)">
+                            </td>
+                            <td>${photoCell}</td>
+                            <td>${formatFacilityDateTime(row.last_updated)}</td>
+                            <td>${row.updated_by ? escapeHtml(row.updated_by) : '—'}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                return `
+                    <section class="facility-section">
+                        <h3 class="facility-section-title">${escapeHtml(facilityType)}</h3>
+                        <div class="inventory-table-wrap">
+                            <table class="facility-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Cleaned?</th>
+                                        <th>Photo</th>
+                                        <th>Last Updated</th>
+                                        <th>Updated By</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${rowsHtml}</tbody>
+                            </table>
+                        </div>
+                    </section>
+                `;
+            }).join('');
+
+            container.innerHTML = html || '<div class="facility-section"><div class="facility-empty">No facilities available for the selected floor.</div></div>';
+        }
+
+        async function handleSupervisorFacilityCleanedChange(event) {
+            const select = event.target;
+            const facilityId = select.dataset.facilityId;
+            const previousValue = select.dataset.previousValue || '';
+            const cleanedValue = select.value;
+
+            if (cleanedValue === previousValue) return;
+
+            if (!cleanedValue) {
+                select.value = previousValue;
+                return;
+            }
+
+            if (cleanedValue === 'yes') {
+                supervisorPendingFacilityCapture = {
+                    facilityId,
+                    previousValue,
+                };
+
+                const cameraInput = document.getElementById(facilityDomId('facilityCamera', facilityId));
+                if (!cameraInput) {
+                    select.value = previousValue;
+                    showToast('Camera input is not available for this row');
+                    return;
+                }
+
+                cameraInput.value = '';
+                cameraInput.click();
+                return;
+            }
+
+            select.disabled = true;
+            const update = await updateSupervisorFacilityStatus(facilityId, 'no', null, previousValue);
+            select.disabled = false;
+
+            if (!update.ok) {
+                select.value = previousValue;
+                showToast(update.error || 'Failed to update facility status');
+                return;
+            }
+
+            select.dataset.previousValue = 'no';
+            renderSupervisorFacilitySections(facilityDashboardState.supervisorRows);
+            showToast('Updated successfully', 'success');
+        }
+
+        async function handleSupervisorFacilityCameraChange(event) {
+            const input = event.target;
+            const facilityId = input.dataset.facilityId;
+            const pending = supervisorPendingFacilityCapture;
+            const select = document.getElementById(facilityDomId('facilityStatus', facilityId));
+            const previousValue = pending?.facilityId === facilityId
+                ? pending.previousValue
+                : (select?.dataset.previousValue || '');
+
+            const photo = input.files?.[0] || null;
+            if (!photo) {
+                if (select) {
+                    select.value = previousValue;
+                    select.dataset.previousValue = previousValue;
+                }
+                supervisorPendingFacilityCapture = null;
+                showToast('Photo proof is required when marking as cleaned');
+                return;
+            }
+
+            if (select) select.disabled = true;
+            const update = await updateSupervisorFacilityStatus(facilityId, 'yes', photo, previousValue);
+            if (select) select.disabled = false;
+
+            supervisorPendingFacilityCapture = null;
+            input.value = '';
+
+            if (!update.ok) {
+                if (select) {
+                    select.value = previousValue;
+                    select.dataset.previousValue = previousValue;
+                }
+                showToast(update.error || 'Failed to update facility status');
+                return;
+            }
+
+            if (select) select.dataset.previousValue = 'yes';
+            renderSupervisorFacilitySections(facilityDashboardState.supervisorRows);
+            showToast('Updated successfully', 'success');
+        }
+
+        async function renderSupervisorFacilityDashboard() {
+            const buildingSelect = document.getElementById('supervisorFacilityBuilding');
+            const floorSelect = document.getElementById('supervisorFacilityFloor');
+            if (!buildingSelect || !floorSelect) return;
+
+            buildingSelect.value = H2_BUILDING_NAME;
+            floorSelect.innerHTML = H2_FLOORS.map((floor) => `<option value="${floor}">${floor}</option>`).join('');
+
+            if (!H2_FLOORS.includes(facilityDashboardState.supervisorFloor)) {
+                facilityDashboardState.supervisorFloor = 'G';
+            }
+            floorSelect.value = facilityDashboardState.supervisorFloor;
+
+            floorSelect.onchange = async (event) => {
+                facilityDashboardState.supervisorFloor = event.target.value;
+                await loadSupervisorFacilityRows();
+            };
+
+            await loadSupervisorFacilityRows();
+        }
+
+        function syncAdminFacilityTypeOptions() {
+            const facilitySelect = document.getElementById('adminFacilityType');
+            if (!facilitySelect) return;
+
+            const availableTypes = getFacilityTypesForFloor(facilityDashboardState.adminFloor);
+            facilitySelect.innerHTML = availableTypes.map((type) => `<option value="${escapeHtml(type)}">${escapeHtml(type)}</option>`).join('');
+
+            if (!availableTypes.length) {
+                facilityDashboardState.adminFacilityType = '';
+                return;
+            }
+
+            if (!availableTypes.includes(facilityDashboardState.adminFacilityType)) {
+                facilityDashboardState.adminFacilityType = availableTypes[0];
+            }
+
+            facilitySelect.value = facilityDashboardState.adminFacilityType;
+        }
+
+        function renderAdminFacilityLogRows(rows) {
+            const tableBody = document.getElementById('adminFacilityLogBody');
+            if (!tableBody) return;
+
+            if (!rows.length) {
+                tableBody.innerHTML = '<tr><td colspan="5" class="facility-empty">No updates yet for this facility.</td></tr>';
+                return;
+            }
+
+            tableBody.innerHTML = rows.map((row) => {
+                const photoUrl = resolveFacilityPhotoUrl(row.photo_url);
+                const photoCell = photoUrl
+                    ? `<button class="btn btn-outline btn-sm" type="button" data-photo-url="${escapeHtml(photoUrl)}" onclick="openFacilityPhotoLightbox(this.dataset.photoUrl)">📷 View</button>`
+                    : '—';
+
+                return `
+                    <tr>
+                        <td>${row.facility_number}</td>
+                        <td>${row.cleaned === 'yes' ? 'Yes' : 'No'}</td>
+                        <td>${photoCell}</td>
+                        <td>${formatFacilityDateTime(row.last_updated)}</td>
+                        <td>${row.updated_by ? escapeHtml(row.updated_by) : '—'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function loadAdminFacilityLogRows() {
+            const tableBody = document.getElementById('adminFacilityLogBody');
+            const title = document.getElementById('adminFacilityLogTitle');
+            if (!tableBody) return;
+
+            tableBody.innerHTML = '<tr><td colspan="5" class="facility-loading">Loading facility updates...</td></tr>';
+
+            const floor = facilityDashboardState.adminFloor;
+            const facilityType = facilityDashboardState.adminFacilityType;
+            const query = `/facilities/log?building=${encodeURIComponent(H2_BUILDING_NAME)}&floor=${encodeURIComponent(floor)}${facilityType ? `&facility_type=${encodeURIComponent(facilityType)}` : ''}`;
+            const result = await facilityApiRequest(query);
+
+            if (result.ok && Array.isArray(result.data)) {
+                facilityDashboardState.adminRows = sortFacilityLogRows(result.data.map(cloneFacilityRow));
+            } else {
+                showFacilityOfflineToastOnce();
+                facilityDashboardState.adminRows = getFallbackFacilityRows({
+                    floor,
+                    facilityType,
+                    onlyUpdated: true,
+                });
+            }
+
+            if (title) {
+                title.textContent = `Facility Update Log: ${facilityType || 'All'} (${facilityFloorLabel(floor)})`;
+            }
+
+            renderAdminFacilityLogRows(facilityDashboardState.adminRows);
+        }
+
+        async function renderAdminFacilityDashboard() {
+            const buildingSelect = document.getElementById('adminFacilityBuilding');
+            const floorSelect = document.getElementById('adminFacilityFloor');
+            const facilitySelect = document.getElementById('adminFacilityType');
+
+            if (!buildingSelect || !floorSelect || !facilitySelect) return;
+
+            buildingSelect.value = H2_BUILDING_NAME;
+            floorSelect.innerHTML = H2_FLOORS.map((floor) => `<option value="${floor}">${floor}</option>`).join('');
+
+            if (!H2_FLOORS.includes(facilityDashboardState.adminFloor)) {
+                facilityDashboardState.adminFloor = 'G';
+            }
+
+            floorSelect.value = facilityDashboardState.adminFloor;
+
+            syncAdminFacilityTypeOptions();
+
+            floorSelect.onchange = async (event) => {
+                facilityDashboardState.adminFloor = event.target.value;
+                syncAdminFacilityTypeOptions();
+                await loadAdminFacilityLogRows();
+            };
+
+            facilitySelect.onchange = async (event) => {
+                facilityDashboardState.adminFacilityType = event.target.value;
+                await loadAdminFacilityLogRows();
+            };
+
+            await loadAdminFacilityLogRows();
+        }
+
+        function openFacilityPhotoLightbox(photoUrl) {
+            if (!photoUrl) return;
+            const overlay = document.getElementById('facilityPhotoLightbox');
+            const image = document.getElementById('facilityPhotoLightboxImage');
+            if (!overlay || !image) return;
+
+            image.src = photoUrl;
+            overlay.classList.add('active');
+        }
+
+        function closeFacilityPhotoLightbox(event) {
+            if (event && event.target) {
+                const canClose = event.target.id === 'facilityPhotoLightbox' || event.target.classList.contains('photo-lightbox-close');
+                if (!canClose) return;
+            }
+
+            const overlay = document.getElementById('facilityPhotoLightbox');
+            const image = document.getElementById('facilityPhotoLightboxImage');
+            if (overlay) overlay.classList.remove('active');
+            if (image) image.src = '';
+        }
+
         // ──── Admin Dashboard ────
         async function renderAdminDashboard() {
-            await loadComplaints();
-            updateStats();
-            renderFloors();
+            await renderAdminFacilityDashboard();
         }
 
         function updateStats() {
@@ -4997,7 +5545,7 @@
                 const result = await api.put(`/complaints/${complaintId}/assign`, { staff_id: staffId });
                 if (result) {
                     await loadComplaints();
-                    renderSupervisorDashboard();
+                    renderSupervisorFacilityDashboard();
                     showToast(`Complaint assigned to ${staff.name}`, 'success');
                     return;
                 }
@@ -5007,7 +5555,7 @@
             if (complaint) {
                 complaint.assigned_staff_id = staffId;
                 complaint.assigned_staff_name = staff.name;
-                renderSupervisorDashboard();
+                renderSupervisorFacilityDashboard();
                 showToast(`Complaint assigned to ${staff.name}`, 'success');
             }
         }
@@ -5060,7 +5608,7 @@
             const w = workSubmissions.find(x => x.id === id);
             if (w) {
                 w.supervisorApproved = approved;
-                renderSupervisorDashboard();
+                renderSupervisorFacilityDashboard();
                 showToast(approved ? 'Work approved ✅' : 'Work rejected — staff notified ❌', approved ? 'success' : '');
             }
         }
@@ -5123,7 +5671,7 @@
             document.getElementById('staffDashboard').style.display = 'none';
             document.getElementById('supervisorDashboard').style.display = 'block';
             document.getElementById('staffModeHeader').style.display = 'none';
-            renderSupervisorDashboard();
+            renderSupervisorFacilityDashboard();
         }
 
         function openReminderModal() {
@@ -5350,10 +5898,10 @@
         function showAIResultInForm(ai, complaint) {}
 
         function refreshCurrentView() {
-            if (currentUser.role === 'admin') { renderAdminComplaints(); updateStats(); }
+            if (currentUser.role === 'admin') { renderAdminFacilityDashboard(); }
             else if (currentUser.role === 'supervisor') {
                 if (isSupervisorStaffMode) renderStaffDashboard();
-                else renderSupervisorDashboard();
+                else renderSupervisorFacilityDashboard();
             }
             else if (currentUser.role === 'staff') { renderStaffComplaints(); }
             else { renderResidentDashboard(); }
@@ -5412,8 +5960,7 @@
             if (staff && !staff.assignedBuildings.includes(building)) staff.assignedBuildings.push(building);
             closeModal('assignModal');
             selectedStaff = null;
-            renderSupervisorDashboard();
-            renderFloors();
+            renderSupervisorFacilityDashboard();
             showToast(`${building} assigned to Supervisor ${staff.name}`, 'success');
         }
 

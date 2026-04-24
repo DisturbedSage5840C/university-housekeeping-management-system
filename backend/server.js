@@ -30,6 +30,7 @@ const dashboardRoutes = require('./routes/dashboard');
 const washroomRoutes = require('./routes/washrooms');
 const workSubmissionRoutes = require('./routes/work-submissions');
 const reminderRoutes = require('./routes/reminders');
+const facilityRoutes = require('./routes/facilities');
 
 // Import middleware
 const { authenticateToken } = require('./middleware/auth');
@@ -210,6 +211,7 @@ function startWorker() {
     app.use('/api/washrooms', authenticateToken, washroomRoutes);
     app.use('/api/work-submissions', authenticateToken, workSubmissionRoutes);
     app.use('/api/reminders', authenticateToken, reminderRoutes);
+    app.use('/api/facilities', authenticateToken, facilityRoutes);
 
     // SPA fallback - serve index.html for client-side routes
     app.get('*', (req, res, next) => {
